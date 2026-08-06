@@ -1,5 +1,8 @@
 <?php
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../../inc/security.php';
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
@@ -7,12 +10,12 @@ include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/sidebar.php';
 include __DIR__ . '/../includes/db.php';
 
-if (!isset($_GET['id'])) {
+if (!isset($_GET['id']) && !isset($_POST['id'])) {
     header("Location: index.php");
     exit();
 }
 
-$id = intval($_GET['id']);
+$id = intval($_GET['id'] ?? $_POST['id']);
 
 /* ===============================
    FETCH EXISTING POST
@@ -181,7 +184,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <h1>Edit Puppy</h1>
 
-    <form method="POST" enctype="multipart/form-data" class="admin-form">
+    <form method="POST" action="edit.php?id=<?= (int)$post['id']; ?>" enctype="multipart/form-data" class="admin-form">
         <?= csrfField(); ?>
 
         <div class="form-group">
