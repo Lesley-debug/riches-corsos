@@ -33,6 +33,7 @@
         <div class="footer-column footer-contact">
             <h3>Contact</h3>
             <ul>
+                <li><a href="mailto:barbarapettra@gmail.com">barbarapettra@gmail.com</a></li>
                 <li><a href="tel:+1214212-3023">+1 (214) 212-3023</a></li>
                 <li><a href="<?= $basePath; ?>/pages/contact.php">Send a message</a></li>
             </ul>
