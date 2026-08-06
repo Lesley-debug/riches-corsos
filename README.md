@@ -16,3 +16,4 @@ Next steps:
 - Improve styles in `assets/css/style.css` and reuse existing CSS in `assets/css/`.
 - Install PHPMailer for reliable email sending.
 - Convert `puppy1.html` content into `pages/home.php` or other templates as desired.
+ 
