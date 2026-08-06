@@ -104,7 +104,7 @@ function getEmailTemplate($content) {
         <div class="footer">
             <p><strong>Riches Corsos</strong></p>
             <p>Premium Cane Corso Puppies</p>
-            <p>Email: barbarapettra@gmail.com</p>
+            <p>Email: info@richescorsos.com</p>
             <p style="font-size: 12px; color: #999999; margin-top: 20px;">
                 This email was sent because you registered or placed an order on our website.
             </p>
