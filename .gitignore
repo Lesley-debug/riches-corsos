@@ -1,0 +1,9 @@
+.env
+vendor/
+uploads/*
+!uploads/.htaccess
+richescorsos/uploads/*
+composer.lock
+*.log
+.DS_Store
+Thumbs.db

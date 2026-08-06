@@ -1,0 +1,17 @@
+document.addEventListener('DOMContentLoaded', function () {
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach((item) => {
+        item.querySelector('.faq-question').addEventListener('click', () => {
+            faqItems.forEach((i) => { if (i !== item) i.classList.remove('active'); });
+            item.classList.toggle('active');
+        });
+    });
+
+    document.getElementById('faqSearch')?.addEventListener('keyup', function () {
+        const value = this.value.toLowerCase().trim();
+        faqItems.forEach((item) => {
+            item.style.display = item.innerText.toLowerCase().includes(value) ? 'block' : 'none';
+        });
+    });
+});

@@ -1,0 +1,151 @@
+/* ==========================================================================
+   MOBILE — unified responsive overrides (max-width: 1023px and below)
+   ========================================================================== */
+
+@media (max-width: 1023px) {
+  .header-tools {
+    gap: 6px;
+  }
+
+  .header-tools .cart-icon {
+    display: inline-flex;
+  }
+
+  /* Typography scale down */
+  h1 { font-size: clamp(2rem, 6vw, 3rem); }
+  h2 { font-size: clamp(1.6rem, 4.5vw, 2.4rem); }
+  h3 { font-size: clamp(1.3rem, 3.5vw, 1.9rem); }
+
+  /* Container */
+  .container {
+    width: 92%;
+  }
+
+  /* Grids → 2 columns */
+  .puppy-grid,
+  .blog-grid,
+  .trust-grid,
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  /* Grids → 1 column */
+  .puppy-grid,
+  .blog-grid,
+  .trust-grid,
+  .stats-grid,
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Section padding */
+  .stats-section,
+  .puppies-section,
+  .trust-section,
+  .blog-section,
+  .testimonials-section,
+  .cta-section {
+    padding: 48px 0;
+  }
+
+  /* Cart page */
+  .cart-layout {
+    flex-direction: column;
+  }
+
+  .cart-item-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cart-item-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  /* Dashboard / account pages */
+  .dashboard-grid,
+  .wishlist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Checkout */
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Contact */
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Success page */
+  .success-actions {
+    flex-direction: column;
+  }
+
+  .btn-view-orders,
+  .btn-continue-shopping {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Testimonial summary */
+  .testimonial-summary {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  /* CTA buttons */
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-buttons a {
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+  }
+
+  /* Mini cart width */
+  .mini-cart {
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  /* Bottom padding for mobile nav */
+  body {
+    padding-bottom: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Tighter section padding on small phones */
+  .stats-section,
+  .puppies-section,
+  .trust-section,
+  .blog-section,
+  .testimonials-section,
+  .cta-section {
+    padding: 36px 0;
+  }
+
+  .health-section {
+    padding: 20px 16px;
+  }
+
+  .success-card {
+    padding: 32px 16px;
+  }
+
+  .terms-card,
+  .legal-content {
+    padding: 20px 16px;
+  }
+}

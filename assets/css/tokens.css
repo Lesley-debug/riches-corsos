@@ -1,0 +1,159 @@
+/* ==========================================================================
+   RICHES CORSOS — DESIGN TOKENS
+   Single source of truth for color, type, spacing, radius across the site.
+   Load this BEFORE any other stylesheet in header.php.
+   ========================================================================== */
+
+:root {
+
+  /* ---- Brand accent (bronze/amber — used sparingly, for CTAs & highlights) ---- */
+  --accent-50:  #FAF6EE;
+  --accent-100: #F0E4CC;
+  --accent-300: #C9A45C;
+  --accent-500: #9C7A3F;   /* primary accent — buttons, links, active states */
+  --accent-600: #8A6D3F;   /* accent hover */
+  --accent-700: #6B5330;
+  --accent-900: #3D2B1F;   /* text on light accent backgrounds */
+
+  /* ---- Neutrals (warm-tinted gray, not clinical/blue-gray) ---- */
+  --neutral-0:   #FFFFFF;
+  --neutral-50:  #FAFAF9;
+  --neutral-100: #F4F3F1;
+  --neutral-200: #E8E6E1;
+  --neutral-300: #D6D3CC;
+  --neutral-400: #A8A49C;
+  --neutral-600: #6B675F;
+  --neutral-800: #34322C;
+  --neutral-900: #1A1917;
+
+  /* ---- Surfaces ---- */
+  --surface-page:  var(--neutral-50);
+  --surface-card:  var(--neutral-0);
+  --surface-sunken: var(--neutral-100);
+  --surface-dark:  var(--neutral-900);   /* footer, dark sections */
+
+  /* ---- Text ---- */
+  --text-primary:   var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-muted:     var(--neutral-400);
+  --text-on-dark:   var(--neutral-50);
+  --text-on-accent: var(--neutral-0);
+
+  /* ---- Borders ---- */
+  --border:        var(--neutral-200);
+  --border-strong: var(--neutral-300);
+
+  /* ---- Semantic (kept minimal — errors/success only, never decorative) ---- */
+  --color-success: #4B7C4E;
+  --color-error:   #B5473C;
+
+  /* ---- Typography ---- */
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Poppins', -apple-system, sans-serif;
+
+  --text-h1: 400 3rem/1.15 var(--font-heading);      /* 48px — hero headlines */
+  --text-h2: 400 2.25rem/1.2 var(--font-heading);     /* 36px — section titles */
+  --text-h3: 400 1.75rem/1.3 var(--font-heading);     /* 28px — card/subsection titles */
+  --text-h4: 500 1.375rem/1.4 var(--font-body);       /* 22px — small headings */
+  --text-body: 400 1rem/1.7 var(--font-body);         /* 16px — paragraph copy */
+  --text-small: 400 0.875rem/1.6 var(--font-body);    /* 14px — captions, labels */
+  --text-eyebrow: 500 0.8125rem/1.4 var(--font-body); /* 13px, use with letter-spacing */
+
+  /* ---- Spacing scale ---- */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-24: 6rem;     /* 96px */
+
+  /* ---- Radius ---- */
+  --radius-sm: 4px;    /* buttons, inputs, small chips */
+  --radius-md: 8px;    /* form fields, tags */
+  --radius-lg: 12px;   /* cards */
+  --radius-full: 999px; /* pills, avatars */
+
+  /* ---- Shadow (used sparingly — cards on hover only, never decorative) ---- */
+  --shadow-card: 0 1px 3px rgba(26, 25, 23, 0.06), 0 1px 2px rgba(26, 25, 23, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(26, 25, 23, 0.08), 0 2px 4px rgba(26, 25, 23, 0.04);
+
+  /* ---- Transitions ---- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+}
+
+/* ---- Base element mappings (so existing markup picks these up automatically) ---- */
+body {
+  font: var(--text-body);
+  color: var(--text-primary);
+  background: var(--surface-page);
+}
+
+h1, .h1 { font: var(--text-h1); color: var(--text-primary); margin: 0; }
+h2, .h2 { font: var(--text-h2); color: var(--text-primary); margin: 0; }
+h3, .h3 { font: var(--text-h3); color: var(--text-primary); margin: 0; }
+h4, .h4 { font: var(--text-h4); color: var(--text-primary); margin: 0; }
+
+.eyebrow {
+  font: var(--text-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-500);
+}
+
+a { color: var(--accent-500); transition: color var(--dur-fast) var(--ease); }
+a:hover { color: var(--accent-600); }
+
+/* ---- Reusable button classes — replace one-off button styles page by page ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-sm);
+  font: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+}
+
+.btn-primary {
+  background: var(--accent-500);
+  color: var(--text-on-accent);
+}
+.btn-primary:hover { background: var(--accent-600); color: var(--text-on-accent); }
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--neutral-900);
+  color: var(--neutral-900);
+}
+.btn-outline:hover { background: var(--neutral-900); color: var(--text-on-dark); }
+
+.btn-outline-light {
+  background: transparent;
+  border-color: var(--neutral-0);
+  color: var(--neutral-0);
+}
+.btn-outline-light:hover { background: var(--neutral-0); color: var(--neutral-900); }
+
+/* ---- Card ---- */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--dur-base) var(--ease), transform var(--dur-base) var(--ease);
+}
+.card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}

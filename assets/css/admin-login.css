@@ -1,0 +1,110 @@
+/* ==========================================================================
+   Admin Login Page — standalone styles (no inline style needed)
+   ========================================================================== */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:
+        linear-gradient(160deg, rgba(13,10,7,0.88) 0%, rgba(26,18,10,0.72) 100%),
+        url('../images/lena1.jpeg') center/cover no-repeat fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.login-container {
+    background: #fff;
+    padding: 48px 40px;
+    border-radius: 20px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-container h2 {
+    text-align: center;
+    color: #111827;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+.login-container .subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.88rem;
+    margin: 0 0 28px;
+}
+
+.login-container .error {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 11px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.login-container .form-group {
+    margin-bottom: 18px;
+}
+
+.login-container label {
+    display: block;
+    color: #374151;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;
+    padding: 13px 14px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    box-sizing: border-box;
+    background: #fff;
+    color: #111827;
+}
+
+.login-container input:focus {
+    outline: none;
+    border-color: #c19a6b;
+    box-shadow: 0 0 0 3px rgba(193,154,107,0.15);
+}
+
+.login-container button[type="submit"] {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #111827, #1f2937);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    margin-top: 4px;
+}
+
+.login-container button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(17,24,39,0.35);
+}
+
+.login-container button[type="submit"]:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .icon { font-size: 2em; margin: 10px; }
+    .toolbar { display: flex; gap: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Font Awesome Icon Test</h1>
+  <div class="toolbar">
+    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> User</div>
+    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 20.49 21.49 19 15.5 14z"/></svg> Search</div>
+    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 3.99 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 18.01 4 20 6 20 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Wishlist</div>
+    <div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M7 4h-2l-1 2h2l3.6 7.59-1.35 2.44C8.16 16.37 8 16.69 8 17a2 2 0 1 0 2 2h8v-2H10.42c-.14 0-.25-.11-.29-.24L11.1 16h6.45c.75 0 1.41-.41 1.73-1.03L21 6H7z"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg> Cart</div>
+  </div>
+  
+</body>
+</html>
+
+
+/*
+/* ==========================
+   TOP HEADER
+========================== */
+.top-header {
+  background: #fff;
+}
+
+/* Center menu */
+.bottom-header .menu {
+  justify-content: center;
+}
+
+/* Optional: subtle shadow when sticky */
+.bottom-header {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.bottom-header .main-nav {
+  display: flex;
+  justify-content: center;
+}
+
+.bottom-header .menu {
+  justify-content: center;
+}
+
+
+
+/* -------------------------
+   logo
+-------------------------- */
+.logo-img {
+  max-width: 100px;
+  width: 100%;
+  height: auto;
+}
+
+/* -------------------------
+   HEADER BASE
+-------------------------- */
+.whb-header {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  position: relative;
+  z-index: 100;
+}
+
+.whb-general-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 40px;
+}
+
+/* -------------------------
+   MAIN NAV
+-------------------------- */
+.main-nav .menu {
+  display: flex;
+  gap: 30px; /* slightly more space */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: #222; /* slightly darker for contrast */
+  font-weight: 700; /* bold */
+  font-size: 18px; /* bigger text */
+  letter-spacing: 0.5px; /* slight spacing for premium feel */
+  transition: color 0.3s ease;
+}
+
+.main-nav a:hover {
+  color: #e6c7b8; /* soft accent color for hover */
+}
+
+
+/* Hide main nav on mobile */
+@media (max-width: 768px) {
+  .main-nav {
+    display: none;
+  }
+}
+
+/* -------------------------
+   HEADER TOOLS (ICONS)
+-------------------------- */
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.header-icon {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.header-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #333;
+  fill: none;
+  stroke-width: 1.6;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.header-icon:hover svg {
+  transform: translateY(-2px);
+  opacity: 0.7;
+}
+
+/* Badge (wishlist / cart) */
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #e6c7b8;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* -------------------------
+   ACCOUNT DROPDOWN
+-------------------------- */
+.wd-header-my-account {
+  position: relative;
+}
+
+/* Dropdown hidden */
+.wd-header-my-account .wd-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 360px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.35s ease;
+  z-index: 1200;
+}
+
+/* Desktop hover */
+@media (min-width: 1024px) {
+  .wd-header-my-account:hover .wd-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0.15s;
+  }
+}
+
+/* Mobile click */
+.wd-header-my-account.active .wd-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Dropdown inner */
+.login-dropdown-inner {
+  padding: 28px;
+}
+
+.wd-heading {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.wd-heading .title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Inputs */
+.login-dropdown-inner input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  margin-top: 6px;
+}
+
+/* Button */
+.login-dropdown-inner button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 999px;
+  background: #e6c7b8;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.login-dropdown-inner button:hover {
+  background: #d6b1a1;
+}
+
+/* Footer links */
+.login-form-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+/* -------------------------
+   SEARCH OVERLAY
+-------------------------- */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease;
+  z-index: 900;
+}
+
+.search-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.search-overlay input {
+  width: 60%;
+  font-size: 32px;
+  border: none;
+  outline: none;
+  border-bottom: 2px solid #ddd;
+  background: transparent;
+}
+
+@media (max-width: 768px) {
+  .search-overlay input {
+    width: 80%;
+    font-size: 24px;
+  }
+}
+
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  z-index: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.search-inner {
+  position: relative;
+  width: 80%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.search-overlay input {
+  width: 100%;
+  font-size: 32px;
+  border: none;
+  outline: none;
+  border-bottom: 2px solid #ddd;
+  padding: 12px 16px;
+  background: transparent;
+}
+
+.close-search {
+  position: absolute;
+  top: -48px;
+  right: 0;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #333;
+  padding: 4px 8px;
+}
+
+/* -------------------------
+   MINI CART
+-------------------------- */
+.mini-cart {
+  position: fixed;
+  top: 0;
+  right: -100%;      /* keep fully hidden offscreen */
+  width: 360px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -20px 0 40px rgba(0,0,0,0.1);
+  padding: 24px;
+  transition: right 0.4s ease;
+  z-index: 850;
+}
+
+.mini-cart.active {
+  right: 0;          /* slide into view */
+}
+
+
+/* -------------------------
+   MOBILE BOTTOM NAV
+-------------------------- */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  inset-inline: 0;
+  background: #fff;
+  display: none;
+  justify-content: space-around;
+  padding: 14px 0;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.08);
+  z-index: 950;
+}
+
+.mobile-bottom-nav button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  body {
+    padding-bottom: 70px; /* prevent overlap */
+  }
+}
+
+.account-toggle {
+  pointer-events: auto;
+}
+
+/* Close button for mini cart */
+.close-cart {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Normal header */
+.whb-header { z-index: 100; }
+
+/* Sticky nav */
+.bottom-header { z-index: 900; }
+
+/* Dropdowns */
+.wd-dropdown { z-index: 1200; }
+
+/* Mini cart */
+.mini-cart { z-index: 1300; }
+
+/* Search overlay */
+.search-overlay { z-index: 2000; }
+
+
+/* product,html section 
+.product-wrapper {
+  max-width: 1200px;
+  margin: 80px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+}
+
+.product-gallery img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.details {
+  list-style: none;
+  padding: 0;
+}
+
+.details li {
+  margin-bottom: 10px;
+}
+
+.add-to-cart {
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+} */
+
+*/
+
+
+<div class="container">
+
+  <!-- ================= PRODUCT WRAPPER ================= -->
+  <div class="product-wrapper">
+    <!-- product gallery -->
+    <div class="product-gallery">
+
+      <div class="slider">
+        <?php
+        $allImages = array_merge([$puppy['featured_image']], $gallery);
+        foreach ($allImages as $img):
+        ?>
+          <div class="slide">
+            <img src="<?= htmlspecialchars($img); ?>" alt="<?= htmlspecialchars($puppy['name']); ?>">
+          </div>
+        <?php endforeach; ?>
+      </div>
+
+      <button class="slider-btn prev">&#10094;</button>
+      <button class="slider-btn next">&#10095;</button>
+
+    </div>
+
+    <!-- PRODUCT INFO -->
+    <div class="product-info">
+
+      <!-- Availability Badge -->
+      <?php if ($puppy['status'] === 'Available'): ?>
+        <span class="availability available">Available</span>
+      <?php else: ?>
+        <span class="availability sold">Adopted</span>
+      <?php endif; ?>
+
+      <h1><?= htmlspecialchars($puppy['title'] ?: $puppy['name']); ?></h1>
+
+      <!-- Price -->
+      <div class="price-box">
+        <span class="price">$<?= number_format($puppy['price'], 2); ?></span>
+        <span class="deposit-note">Secure with a deposit</span>
+      </div>
+
+      <!-- Quick Highlights -->
+      <div class="highlights">
+        <div><strong>Breed:</strong> <?= htmlspecialchars($puppy['breed']); ?></div>
+        <div><strong>Age:</strong> <?= htmlspecialchars($puppy['age']); ?></div>
+        <div><strong>Sex:</strong> <?= htmlspecialchars($puppy['sex']); ?></div>
+      </div>
+
+      <!-- Detailed Info -->
+      <ul class="details">
+        <li><strong>Vaccination:</strong> <?= htmlspecialchars($puppy['vaccination_status']); ?></li>
+        <li><strong>Potty Trained:</strong> <?= htmlspecialchars($puppy['potty_trained']); ?></li>
+        <li><strong>Registration Papers:</strong> <?= htmlspecialchars($puppy['registration_papers']); ?></li>
+        <li><strong>Health Certificate:</strong> <?= htmlspecialchars($puppy['health_certificate']); ?></li>
+      </ul>
+
+      <!-- Trust Icons -->
+      <div class="trust-badges">
+        <span>✔ Vet Checked</span>
+        <span>✔ Health Guarantee</span>
+        <span>✔ Safe Delivery</span>
+      </div>
+
+      <!-- CTA Buttons -->
+      <?php if ($puppy['status'] === 'Available'): ?>
+        <div class="product-actions">
+          <a href="../add-to-cart.php?id=<?= $puppy['id']; ?>&redirect=cart"
+            class="btn-primary">
+            Reserve This Puppy
+          </a>
+        </div>
+      <?php else: ?>
+        <div class="sold-message">
+          This puppy has already been adopted.
+        </div>
+      <?php endif; ?>
+
+      <!-- Share -->
+      <div class="puppy-share">
+        <span>Share: </span>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]") ?>" target="_blank">
+          <img src="../assets/icons/facebook.png" alt="Facebook" class="social-icon">
+        </a>
+        <a href="https://www.tiktok.com/share?url=<?= urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]") ?>" target="_blank">
+          <img src="../assets/icons/tik-tok.png" alt="TikTok" class="social-icon">
+        </a>
+        <a href="https://www.instagram.com/?url=<?= urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]") ?>" target="_blank">
+          <img src="../assets/icons/instagram.png" alt="Instagram" class="social-icon">
+        </a>
+        <a href="https://twitter.com/intent/tweet?url=<?= urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]") ?>" target="_blank">
+          <img src="../assets/icons/twitter.png" alt="Twitter" class="social-icon">
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+  <!-- END PRODUCT WRAPPER -->
+
+
+  <!-- ================= PRODUCT TABS ================= -->
+  <div class="product-tabs">
+
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="description">Description</button>
+      <button class="tab-btn" data-tab="health">Health Guarantee</button>
+      <button class="tab-btn" data-tab="shipping">Shipping & Delivery</button>
+    </div>
+
+    <div class="tab-content active" id="description">
+      <p><?= nl2br(htmlspecialchars($puppy['description'])); ?></p>
+    </div>
+
+    <div class="tab-content" id="health">
+      <p>
+        All our puppies are fully vaccinated, dewormed, and come with official
+        health certificates. We provide a comprehensive health guarantee.
+      </p>
+    </div>
+
+    <div class="tab-content" id="shipping">
+      <p>
+        We offer safe nationwide delivery. Your puppy will travel comfortably
+        with licensed pet transport services. Pickup options are available.
+      </p>
+    </div>
+
+  </div>
+  <!-- END PRODUCT TABS -->
+
+</div>

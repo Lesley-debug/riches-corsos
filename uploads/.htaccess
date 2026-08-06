@@ -1,0 +1,23 @@
+# Defense-in-depth: this folder should only ever contain images.
+# Even though uploads are MIME-checked, block script execution here
+# in case that check is ever bypassed or misconfigured.
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(php|php3|php4|php5|php7|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(php|php3|php4|php5|php7|phtml|pl|py|jsp|asp|sh|cgi)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Extra belt-and-suspenders for PHP itself, if handler picks up the FilesMatch above being ignored
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>

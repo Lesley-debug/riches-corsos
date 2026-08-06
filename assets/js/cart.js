@@ -1,0 +1,19 @@
+document.querySelectorAll('.btn-remove').forEach((btn) => {
+    btn.addEventListener('click', function () {
+        if (!confirm('Remove this item from cart?')) return;
+        const el = this;
+        el.disabled = true;
+        el.textContent = 'Removing…';
+        fetch(window.__RC?.basePath + '/remove-from-cart.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: el.dataset.id })
+        })
+            .then((r) => r.json())
+            .then(() => location.reload())
+            .catch(() => {
+                el.disabled = false;
+                el.textContent = 'Remove';
+            });
+    });
+});

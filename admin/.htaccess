@@ -1,0 +1,12 @@
+# Admin Security
+# Block direct access to internal include files (db.php, config.php, auth.php)
+# Works on both Apache 2.4+ (mod_authz_core) and legacy 2.2 (mod_access_compat)
+<FilesMatch "^(db|config|auth)\.php$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
