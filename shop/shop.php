@@ -92,17 +92,7 @@ $normalizeImagePath = static fn(?string $path): string => normalize_site_url($pa
                             </p>
                             <p class="puppy-price">$<?= number_format((float)$row['price'], 2); ?></p>
                             
-                                <?php if (!empty(trim((string)($row['parent_name'] ?? '')))) : ?>
-                                    <div class="puppy-parents">
-                                        <h4>Parents</h4>
-                                        <p><?= htmlspecialchars($row['parent_name'] ?? ''); ?></p>
-                                        <?php if (!empty(trim((string)($row['parent_breed'] ?? '')))) : ?>
-                                            <span><?= htmlspecialchars($row['parent_breed'] ?? ''); ?></span>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endif; ?>
-                            
-                            <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$row['id']; ?>" class="btn-primary">View</a>
+                                <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$row['id']; ?>" class="btn-primary">View</a>
                         </div>
                     </article>
                 <?php endwhile; ?>

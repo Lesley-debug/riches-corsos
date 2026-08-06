@@ -114,19 +114,34 @@ require __DIR__ . '/../template/header.php';
     <?php if (!empty(trim((string)($puppy['parent_name'] ?? ''))) || !empty(trim((string)($puppy['parent_info'] ?? '')))) : ?>
         <section class="parent-section">
             <div class="parent-card">
-                <h2>Parent Information</h2>
-                <div class="parent-grid">
-                    <div>
-                        <h3>Parent Name</h3>
-                        <p><?= htmlspecialchars($puppy['parent_name'] ?? ''); ?></p>
-                    </div>
-                    <div>
-                        <h3>Parent Breed</h3>
-                        <p><?= htmlspecialchars($puppy['parent_breed'] ?? ''); ?></p>
-                    </div>
-                    <div class="parent-full">
-                        <h3>Parent Details</h3>
-                        <p><?= nl2br(htmlspecialchars($puppy['parent_info'] ?? '')); ?></p>
+                <h2>Meet the Parents</h2>
+                <div class="parent-layout">
+                    <?php if (!empty($puppy['parent_image'])): ?>
+                        <div class="parent-image-wrap">
+                            <img src="<?= htmlspecialchars($normalizeImagePath($puppy['parent_image'])); ?>" alt="Parent">
+                        </div>
+                    <?php endif; ?>
+                    <div class="parent-details">
+                        <?php if (!empty(trim((string)($puppy['parent_name'] ?? '')))): ?>
+                            <div class="parent-meta-row">
+                                <div>
+                                    <h3>Parent Name</h3>
+                                    <p><?= htmlspecialchars($puppy['parent_name']); ?></p>
+                                </div>
+                                <?php if (!empty(trim((string)($puppy['parent_breed'] ?? '')))): ?>
+                                    <div>
+                                        <h3>Parent Breed</h3>
+                                        <p><?= htmlspecialchars($puppy['parent_breed']); ?></p>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (!empty(trim((string)($puppy['parent_info'] ?? '')))): ?>
+                            <div class="parent-info-block">
+                                <h3>About the Parents</h3>
+                                <p><?= nl2br(htmlspecialchars($puppy['parent_info'])); ?></p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

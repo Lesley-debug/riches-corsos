@@ -80,6 +80,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    $parentImagePath = $post['parent_image'] ?? '';
+    if (!empty($_FILES['parent_image']['name']) && $_FILES['parent_image']['error'] === UPLOAD_ERR_OK) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $_FILES['parent_image']['tmp_name']);
+        finfo_close($finfo);
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (in_array($mimeType, $allowedTypes)) {
+            if (!empty($post['parent_image'])) {
+                $oldPath = app_path($post['parent_image']);
+                if (file_exists($oldPath)) unlink($oldPath);
+            }
+            $extension = strtolower(pathinfo($_FILES['parent_image']['name'], PATHINFO_EXTENSION));
+            $uniqueName = bin2hex(random_bytes(16)) . '.' . $extension;
+            $parentImagePath = 'uploads/' . $uniqueName;
+            move_uploaded_file($_FILES['parent_image']['tmp_name'], app_path($parentImagePath));
+        }
+    }
+
     /* === Handle Gallery === */
     $gallery = json_decode($post['gallery'], true);
     if (!is_array($gallery)) $gallery = [];
@@ -126,13 +144,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     /* === UPDATE DATABASE === */
     $update = $conn->prepare("UPDATE puppies SET
-        title=?, price=?, name=?, breed=?, age=?, sex=?, parent_name=?, parent_breed=?, parent_info=?,
+        title=?, price=?, name=?, breed=?, age=?, sex=?, parent_name=?, parent_breed=?, parent_info=?, parent_image=?,
         status=?, category=?, description=?,
         featured_image=?, gallery=?
         WHERE id=?");
 
     $update->bind_param(
-        "sdssssssssssssi",
+        "sdsssssssssssssi",
         $title,
         $price,
         $name,
@@ -142,6 +160,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $parent_name,
         $parent_breed,
         $parent_info,
+        $parentImagePath,
         $status,
         $category,
         $description,
@@ -230,6 +249,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <label>Parent Breed</label>
                 <input type="text" name="parent_breed" value="<?= htmlspecialchars($post['parent_breed'] ?? ''); ?>">
+            </div>
+            <div class="form-group">
+                <label>Parent Image</label>
+                <?php if (!empty($post['parent_image'])): ?>
+                    <img src="<?= htmlspecialchars(normalize_site_url($post['parent_image'])); ?>" width="120" style="display:block;margin-bottom:8px;border-radius:8px;"><br>
+                <?php endif; ?>
+                <input type="file" name="parent_image" accept="image/*">
             </div>
             <div class="form-group">
                 <label>Parent Details</label>

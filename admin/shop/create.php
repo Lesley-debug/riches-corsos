@@ -139,6 +139,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    // --- Parent Image ---
+    $parentImagePath = '';
+    if (!empty($_FILES['parent_image']['name']) && $_FILES['parent_image']['error'] === UPLOAD_ERR_OK) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $_FILES['parent_image']['tmp_name']);
+        finfo_close($finfo);
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (in_array($mimeType, $allowedTypes)) {
+            $extension = strtolower(pathinfo($_FILES['parent_image']['name'], PATHINFO_EXTENSION));
+            $uniqueName = bin2hex(random_bytes(16)) . '.' . $extension;
+            $parentImagePath = 'uploads/' . $uniqueName;
+            move_uploaded_file($_FILES['parent_image']['tmp_name'], app_path($parentImagePath));
+        }
+    }
+
     // --- Gallery Images & Thumbnails ---
     $galleryPaths = [];
     $thumbnailPaths = [];
@@ -179,13 +194,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $thumbnailJSON = json_encode($thumbnailPaths);
 
     $stmt = $conn->prepare("INSERT INTO puppies 
-        (title, price, name, breed, age, sex, parent_name, parent_breed, parent_info, vaccination_status, potty_trained, 
+        (title, price, name, breed, age, sex, parent_name, parent_breed, parent_info, parent_image, vaccination_status, potty_trained, 
         registration_papers, health_certificate, status, category, description, 
         featured_image, gallery, thumbnails) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     $stmt->bind_param(
-        "sdsssssssssssssssss",
+        "sdssssssssssssssssss",
         $title,
         $price,
         $name,
@@ -195,6 +210,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $parent_name,
         $parent_breed,
         $parent_info,
+        $parentImagePath,
         $vaccination_status,
         $potty_trained,
         $registration_papers,
@@ -283,6 +299,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-group"><label>Parent Breed</label><input type="text" name="parent_breed" placeholder="Cane Corso"></div>
             </div>
             <div class="form-group">
+                <label>Parent Image</label>
+                <input type="file" id="parentImageInput" name="parent_image" accept="image/*">
+                <div id="parentPreview" class="image-preview"></div>
+            </div>
+            <div class="form-group">
                 <label>Parent Details</label>
                 <textarea name="parent_info" rows="4" placeholder="Share health, temperament, and lineage notes about the parents..."></textarea>
             </div>
@@ -364,6 +385,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             Array.from(this.files).forEach(file => {
                 galleryPreview.appendChild(createImagePreview(file));
             });
+        });
+    }
+
+    // parent image preview
+    const parentInput = document.getElementById('parentImageInput');
+    const parentPreview = document.getElementById('parentPreview');
+    if (parentInput) {
+        parentInput.addEventListener('change', function() {
+            parentPreview.innerHTML = '';
+            if (this.files && this.files[0]) {
+                parentPreview.appendChild(createImagePreview(this.files[0]));
+            }
         });
     }
 </script>
