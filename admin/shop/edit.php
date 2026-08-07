@@ -1,138 +1,103 @@
 <?php
-
 require_once __DIR__ . '/../../inc/security.php';
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 
 if (!isset($_GET['id']) && !isset($_POST['id'])) {
-    header("Location: index.php");
+    header("Location: " . site_url('/admin/shop/index.php'));
     exit();
 }
 
 $id = intval($_GET['id'] ?? $_POST['id']);
 
-
-/* ===============================
-   FETCH EXISTING POST
-================================= */
 $stmt = $conn->prepare("SELECT * FROM puppies WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$result = $stmt->get_result();
-$post = $result->fetch_assoc();
+$post = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if (!$post) {
-    header("Location: index.php");
+    header("Location: " . site_url('/admin/shop/index.php'));
     exit();
 }
 
-/* ===============================
-   UPDATE POST
-================================= */
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     requireValidCSRF();
 
-    $title = trim($_POST['title']);
-    $price = floatval($_POST['price']);
-    $name = trim($_POST['name']);
-    $breed = trim($_POST['breed']);
-    $age = trim($_POST['age']);
-    $sex = trim($_POST['sex']);
-    $parent_name = trim($_POST['parent_name'] ?? '');
+    $title       = trim($_POST['title']);
+    $price       = floatval($_POST['price']);
+    $name        = trim($_POST['name']);
+    $breed       = trim($_POST['breed']);
+    $age         = trim($_POST['age']);
+    $sex         = trim($_POST['sex']);
+    $parent_name  = trim($_POST['parent_name'] ?? '');
     $parent_breed = trim($_POST['parent_breed'] ?? '');
-    $parent_info = trim($_POST['parent_info'] ?? '');
-    $status = trim($_POST['status']);
-    $status = ucfirst(strtolower($status));
-    if (!in_array($status, ['Available', 'Reserved', 'Sold', 'Draft'], true)) {
-        $status = 'Available';
-    }
-    $category = trim($_POST['category']);
-    $category = ucfirst(strtolower($category));
-    if (!in_array($category, ['Puppies', 'Featured'], true)) {
-        $category = 'Puppies';
-    }
+    $parent_info  = trim($_POST['parent_info'] ?? '');
     $description = trim($_POST['description']);
 
-    $featuredPath = $post['featured_image'];
+    $status = ucfirst(strtolower(trim($_POST['status'])));
+    if (!in_array($status, ['Available', 'Reserved', 'Sold', 'Draft'], true)) $status = 'Available';
 
-    /* === Replace Featured Image === */
+    $category = ucfirst(strtolower(trim($_POST['category'])));
+    if (!in_array($category, ['Puppies', 'Featured'], true)) $category = 'Puppies';
+
+    $featuredPath    = $post['featured_image'];
+    $parentImagePath = $post['parent_image'] ?? '';
+
+    // Replace featured image
     if (!empty($_FILES['image']['name']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $_FILES['image']['tmp_name']);
         finfo_close($finfo);
-
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
-        if (in_array($mimeType, $allowedTypes)) {
+        if (in_array($mimeType, ['image/jpeg', 'image/png', 'image/webp'])) {
             if (!empty($post['featured_image'])) {
-                $oldPath = app_path($post['featured_image']);
-                if (file_exists($oldPath)) unlink($oldPath);
+                $old = app_path($post['featured_image']);
+                if (file_exists($old)) unlink($old);
             }
-
-            $extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $uniqueName = bin2hex(random_bytes(16)) . '.' . $extension;
-            $featuredPath = 'uploads/' . $uniqueName;
+            $ext          = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            $featuredPath = 'uploads/' . bin2hex(random_bytes(16)) . '.' . $ext;
             move_uploaded_file($_FILES['image']['tmp_name'], app_path($featuredPath));
         }
     }
 
-    $parentImagePath = $post['parent_image'] ?? '';
+    // Replace parent image
     if (!empty($_FILES['parent_image']['name']) && $_FILES['parent_image']['error'] === UPLOAD_ERR_OK) {
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $finfo    = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $_FILES['parent_image']['tmp_name']);
         finfo_close($finfo);
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        if (in_array($mimeType, $allowedTypes)) {
+        if (in_array($mimeType, ['image/jpeg', 'image/png', 'image/webp'])) {
             if (!empty($post['parent_image'])) {
-                $oldPath = app_path($post['parent_image']);
-                if (file_exists($oldPath)) unlink($oldPath);
+                $old = app_path($post['parent_image']);
+                if (file_exists($old)) unlink($old);
             }
-            $extension = strtolower(pathinfo($_FILES['parent_image']['name'], PATHINFO_EXTENSION));
-            $uniqueName = bin2hex(random_bytes(16)) . '.' . $extension;
-            $parentImagePath = 'uploads/' . $uniqueName;
+            $ext             = strtolower(pathinfo($_FILES['parent_image']['name'], PATHINFO_EXTENSION));
+            $parentImagePath = 'uploads/' . bin2hex(random_bytes(16)) . '.' . $ext;
             move_uploaded_file($_FILES['parent_image']['tmp_name'], app_path($parentImagePath));
         }
     }
 
-    /* === Handle Gallery === */
+    // Gallery
     $gallery = json_decode($post['gallery'], true);
     if (!is_array($gallery)) $gallery = [];
 
-    // Delete selected gallery images
     if (!empty($_POST['delete_gallery'])) {
-        foreach ($_POST['delete_gallery'] as $deleteImg) {
-
-            $filePath = app_path($deleteImg);
-            if (file_exists($filePath)) unlink($filePath);
-
-            $gallery = array_filter($gallery, function ($img) use ($deleteImg) {
-                return $img !== $deleteImg;
-            });
+        foreach ($_POST['delete_gallery'] as $del) {
+            $fp = app_path($del);
+            if (file_exists($fp)) unlink($fp);
+            $gallery = array_filter($gallery, fn($img) => $img !== $del);
         }
     }
 
-    // Add new gallery images
     if (!empty($_FILES['gallery']['name'][0])) {
-
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-
         foreach ($_FILES['gallery']['name'] as $key => $nameFile) {
-
             if ($_FILES['gallery']['error'][$key] !== UPLOAD_ERR_OK) continue;
-
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $finfo    = finfo_open(FILEINFO_MIME_TYPE);
             $mimeType = finfo_file($finfo, $_FILES['gallery']['tmp_name'][$key]);
             finfo_close($finfo);
-
-            if (!in_array($mimeType, $allowedTypes)) continue;
-
-            $extension = strtolower(pathinfo($nameFile, PATHINFO_EXTENSION));
-            $uniqueName = bin2hex(random_bytes(16)) . '.' . $extension;
-            $path = 'uploads/' . $uniqueName;
-
+            if (!in_array($mimeType, ['image/jpeg', 'image/png', 'image/webp'])) continue;
+            $ext  = strtolower(pathinfo($nameFile, PATHINFO_EXTENSION));
+            $path = 'uploads/' . bin2hex(random_bytes(16)) . '.' . $ext;
             if (move_uploaded_file($_FILES['gallery']['tmp_name'][$key], app_path($path))) {
                 $gallery[] = $path;
             }
@@ -141,46 +106,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $galleryJSON = json_encode(array_values($gallery));
 
-    /* === UPDATE DATABASE === */
     $update = $conn->prepare("UPDATE puppies SET
-        title=?, price=?, name=?, breed=?, age=?, sex=?, parent_name=?, parent_breed=?, parent_info=?, parent_image=?,
-        status=?, category=?, description=?,
-        featured_image=?, gallery=?
+        title=?, price=?, name=?, breed=?, age=?, sex=?,
+        parent_name=?, parent_breed=?, parent_info=?, parent_image=?,
+        status=?, category=?, description=?, featured_image=?, gallery=?
         WHERE id=?");
 
     $update->bind_param(
         "sdsssssssssssssi",
-        $title,
-        $price,
-        $name,
-        $breed,
-        $age,
-        $sex,
-        $parent_name,
-        $parent_breed,
-        $parent_info,
-        $parentImagePath,
-        $status,
-        $category,
-        $description,
-        $featuredPath,
-        $galleryJSON,
+        $title, $price, $name, $breed, $age, $sex,
+        $parent_name, $parent_breed, $parent_info, $parentImagePath,
+        $status, $category, $description, $featuredPath, $galleryJSON,
         $id
     );
 
     if (!$update->execute()) {
-        die('Update failed: ' . $update->error);
+        error_log('Puppy update failed: ' . $update->error);
+        die('Update failed. Please try again.');
     }
     $update->close();
 
-    header("Location: index.php");
+    header("Location: " . site_url('/admin/shop/index.php'));
     exit();
 }
-?>
-<?php
+
 include __DIR__ . '/../includes/header.php';
 include __DIR__ . '/../includes/sidebar.php';
 ?>
+
 <main class="admin-content">
 
     <h1>Edit Puppy</h1>
@@ -270,31 +223,26 @@ include __DIR__ . '/../includes/sidebar.php';
         <hr>
 
         <h3>Featured Image</h3>
-
         <?php if (!empty($post['featured_image'])): ?>
             <img src="<?= htmlspecialchars(normalize_site_url($post['featured_image'])); ?>" width="120"><br><br>
         <?php endif; ?>
-
         <input type="file" name="image">
 
         <hr>
 
         <h3>Gallery Images</h3>
-
         <?php
         $gallery = json_decode($post['gallery'], true);
         if (is_array($gallery)) :
             foreach ($gallery as $img) :
         ?>
-
-                <div style="display:inline-block;margin:10px;text-align:center;">
-                    <img src="<?= htmlspecialchars(normalize_site_url($img)); ?>" width="100"><br>
-                    <label>
-                        <input type="checkbox" name="delete_gallery[]" value="<?= htmlspecialchars($img); ?>">
-                        Delete
-                    </label>
-                </div>
-
+            <div style="display:inline-block;margin:10px;text-align:center;">
+                <img src="<?= htmlspecialchars(normalize_site_url($img)); ?>" width="100"><br>
+                <label>
+                    <input type="checkbox" name="delete_gallery[]" value="<?= htmlspecialchars($img); ?>">
+                    Delete
+                </label>
+            </div>
         <?php endforeach;
         endif; ?>
 
