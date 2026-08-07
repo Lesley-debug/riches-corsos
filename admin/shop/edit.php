@@ -1,11 +1,17 @@
 <?php
-
 require_once __DIR__ . '/../../inc/security.php';
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-include __DIR__ . '/../includes/header.php';
-include __DIR__ . '/../includes/sidebar.php';
-include __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/db.php';
+// NOTE: header.php and sidebar.php are NOT included here anymore.
+// They used to be included at the top, which printed HTML before we
+// knew whether this was a POST (update) request. Once ANY output is
+// sent to the browser, PHP can no longer send new HTTP headers - so
+// header("Location: index.php") later on would silently fail, and
+// you'd get a blank/half-rendered page instead of a redirect.
+// Fix: only include the page chrome AFTER all POST handling (and any
+// possible redirect) is fully done. See bottom of the POST block and
+// just above the HTML form below.
 
 if (!isset($_GET['id']) && !isset($_POST['id'])) {
     header("Location: index.php");
@@ -81,6 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    /* === Replace Parent Image === */
     $parentImagePath = $post['parent_image'] ?? '';
     if (!empty($_FILES['parent_image']['name']) && $_FILES['parent_image']['error'] === UPLOAD_ERR_OK) {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -150,6 +157,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         featured_image=?, gallery=?
         WHERE id=?");
 
+    // Safety check: if the query has a typo or a column doesn't exist,
+    // prepare() returns false instead of a statement object. Calling
+    // bind_param() on false would fatal-error and (with display_errors
+    // off) show a blank page with no clue why. This makes it loud instead.
+    if (!$update) {
+        die('Prepare failed: ' . $conn->error);
+    }
+
     $update->bind_param(
         "sdsssssssssssssi",
         $title,
@@ -178,6 +193,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: index.php");
     exit();
 }
+
+/* ===============================
+   ONLY NOW include page chrome.
+   By this point, a POST request has either redirected and exited above,
+   or this is a plain GET request loading the edit form - either way,
+   nothing has been echoed yet, so header() calls above were always safe.
+================================= */
+include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/sidebar.php';
 ?>
 
 <main class="admin-content">
