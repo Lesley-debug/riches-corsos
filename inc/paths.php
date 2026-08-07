@@ -8,40 +8,38 @@ $normalizedDocumentRoot = str_replace('\\', '/', rtrim($documentRoot, '/'));
 
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
 $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
-$candidatePaths = [$requestPath, $scriptName];
 $basePath = '';
 
-foreach ($candidatePaths as $candidatePath) {
-    $candidatePath = str_replace('\\', '/', trim((string)$candidatePath));
-    if ($candidatePath === '' || $candidatePath === '/') {
-        continue;
-    }
-
-    foreach (['/pages/', '/shop/', '/blog/', '/account/', '/admin/'] as $knownDir) {
-        $knownDirPos = strpos($candidatePath, $knownDir);
-        if ($knownDirPos !== false) {
-            $basePath = substr($candidatePath, 0, $knownDirPos);
-            break 2;
-        }
-    }
-
-    $segments = array_values(array_filter(explode('/', $candidatePath), 'strlen'));
-    if (count($segments) >= 2) {
-        $basePath = '/' . $segments[0];
-        break;
-    }
-
-    if (count($segments) === 1 && !in_array($segments[0], ['index.php', 'shop', 'pages', 'blog', 'account', 'admin', 'about', 'contact', 'faqs', 'privacy', 'terms', 'testimonials', 'cart', 'checkout', 'search'], true)) {
-        $basePath = '/' . $segments[0];
-        break;
-    }
-}
-
-if ($basePath === '' && $normalizedDocumentRoot !== '' && str_starts_with($normalizedAppRoot, $normalizedDocumentRoot)) {
+if ($normalizedDocumentRoot !== '' && str_starts_with($normalizedAppRoot, $normalizedDocumentRoot)) {
     $basePath = substr($normalizedAppRoot, strlen($normalizedDocumentRoot));
     $basePath = '/' . trim($basePath, '/');
     if ($basePath === '/') {
         $basePath = '';
+    }
+} elseif (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'localhost')) {
+    $basePath = '/richescorsos';
+} else {
+    $candidatePaths = [$requestPath, $scriptName];
+
+    foreach ($candidatePaths as $candidatePath) {
+        $candidatePath = str_replace('\\', '/', trim((string)$candidatePath));
+        if ($candidatePath === '' || $candidatePath === '/') {
+            continue;
+        }
+
+        foreach (['/pages/', '/shop/', '/blog/', '/account/', '/admin/'] as $knownDir) {
+            $knownDirPos = strpos($candidatePath, $knownDir);
+            if ($knownDirPos !== false) {
+                $basePath = substr($candidatePath, 0, $knownDirPos);
+                break 2;
+            }
+        }
+
+        $segments = array_values(array_filter(explode('/', $candidatePath), 'strlen'));
+        if (count($segments) >= 2) {
+            $basePath = '/' . $segments[0];
+            break;
+        }
     }
 }
 
@@ -63,7 +61,12 @@ if (!function_exists('site_url')) {
             return $path;
         }
 
-        return ($basePath ?: '') . '/' . ltrim($path, '/');
+        $prefix = $basePath !== '' ? $basePath : '';
+        if ($prefix === '' && isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'localhost')) {
+            $prefix = '/richescorsos';
+        }
+
+        return $prefix . '/' . ltrim($path, '/');
     }
 }
 

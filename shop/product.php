@@ -115,13 +115,14 @@ require __DIR__ . '/../template/header.php';
         <section class="parent-section">
             <div class="parent-card">
                 <h2>Meet the Parents</h2>
+                <?php $hasParentImage = !empty($puppy['parent_image']); ?>
                 <div class="parent-layout">
-                    <?php if (!empty($puppy['parent_image'])): ?>
+                    <?php if ($hasParentImage): ?>
                         <div class="parent-image-wrap">
                             <img src="<?= htmlspecialchars($normalizeImagePath($puppy['parent_image'])); ?>" alt="Parent">
                         </div>
                     <?php endif; ?>
-                    <div class="parent-details">
+                    <div class="parent-details<?= $hasParentImage ? '' : ' parent-details-full'; ?>">
                         <?php if (!empty(trim((string)($puppy['parent_name'] ?? '')))): ?>
                             <div class="parent-meta-row">
                                 <div>

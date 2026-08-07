@@ -345,6 +345,14 @@
   align-items: start;
 }
 
+.parent-details {
+  min-width: 0;
+}
+
+.parent-details-full {
+  grid-column: 1 / -1;
+}
+
 .parent-image-wrap img {
   width: 100%;
   height: 280px;
