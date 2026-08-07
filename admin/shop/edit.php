@@ -1,14 +1,9 @@
 <?php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 require_once __DIR__ . '/../../inc/security.php';
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
-include __DIR__ . '/../includes/header.php';
-include __DIR__ . '/../includes/sidebar.php';
-include __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/db.php';
 
 if (!isset($_GET['id']) && !isset($_POST['id'])) {
     header("Location: index.php");
@@ -16,6 +11,7 @@ if (!isset($_GET['id']) && !isset($_POST['id'])) {
 }
 
 $id = intval($_GET['id'] ?? $_POST['id']);
+
 
 /* ===============================
    FETCH EXISTING POST
@@ -172,14 +168,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $id
     );
 
-    $update->execute();
+    if (!$update->execute()) {
+        die('Update failed: ' . $update->error);
+    }
     $update->close();
 
     header("Location: index.php");
     exit();
 }
 ?>
-
+<?php
+include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/sidebar.php';
+?>
 <main class="admin-content">
 
     <h1>Edit Puppy</h1>

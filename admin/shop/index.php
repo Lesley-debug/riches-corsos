@@ -86,7 +86,11 @@ $normalizeImagePath = static fn(?string $path): string => normalize_site_url($pa
                             <td class="actions">
                                 <a href="#" class="action-btn view-btn" onclick="openModal(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>); return false;">View</a>
                                 <a href="edit.php?id=<?= $row['id']; ?>" class="action-btn edit-btn">Edit</a>
-                                <a href="#" class="action-btn delete-btn" onclick="return confirmDelete(<?= (int)$row['id']; ?>);">Delete</a>
+                                <form method="POST" action="delete.php" style="display:inline;" onsubmit="return confirm('Delete this puppy?');">
+                                    <?= csrfField(); ?>
+                                    <input type="hidden" name="id" value="<?= (int)$row['id']; ?>">
+                                    <button type="submit" class="action-btn delete-btn">Delete</button>
+                                </form>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -96,20 +100,8 @@ $normalizeImagePath = static fn(?string $path): string => normalize_site_url($pa
 
         </form>
 
-        <!-- Standalone form for single-row deletes (can't nest inside the bulk-delete form above) -->
-        <form method="POST" action="delete.php" id="singleDeleteForm" style="display:none;">
-            <?= csrfField(); ?>
-            <input type="hidden" name="id" id="singleDeleteId">
-        </form>
-        <script>
-            function confirmDelete(id) {
-                if (confirm('Delete this puppy?')) {
-                    document.getElementById('singleDeleteId').value = id;
-                    document.getElementById('singleDeleteForm').submit();
-                }
-                return false;
-            }
-        </script>
+
+
     </div>
 
     <!-- Pagination -->
@@ -131,6 +123,8 @@ $normalizeImagePath = static fn(?string $path): string => normalize_site_url($pa
     </div>
 
 </main>
+
+
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 

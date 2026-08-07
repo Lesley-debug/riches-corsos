@@ -111,7 +111,7 @@ require __DIR__ . '/../template/header.php';
         </div>
     </div>
 
-    <?php if (!empty(trim((string)($puppy['parent_name'] ?? ''))) || !empty(trim((string)($puppy['parent_info'] ?? '')))) : ?>
+    <?php if (!empty(trim((string)($puppy['parent_name'] ?? ''))) || !empty(trim((string)($puppy['parent_info'] ?? ''))) || !empty(trim((string)($puppy['parent_image'] ?? '')))) : ?>
         <section class="parent-section">
             <div class="parent-card">
                 <h2>Meet the Parents</h2>

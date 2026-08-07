@@ -14,8 +14,8 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit();
 }
 
-// Session timeout: 15 minutes of inactivity
-$timeout = 15 * 60;
+// Session timeout: 2 hours of inactivity
+$timeout = 2 * 60 * 60;
 
 if (isset($_SESSION['last_activity'])) {
     $elapsed = time() - $_SESSION['last_activity'];
