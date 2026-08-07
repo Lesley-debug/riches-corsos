@@ -6,28 +6,47 @@ $documentRoot = realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: '';
 $normalizedAppRoot = str_replace('\\', '/', rtrim($appRoot, '/'));
 $normalizedDocumentRoot = str_replace('\\', '/', rtrim($documentRoot, '/'));
 
-if ($normalizedDocumentRoot !== '' && str_starts_with($normalizedAppRoot, $normalizedDocumentRoot)) {
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+$candidatePaths = [$requestPath, $scriptName];
+$basePath = '';
+
+foreach ($candidatePaths as $candidatePath) {
+    $candidatePath = str_replace('\\', '/', trim((string)$candidatePath));
+    if ($candidatePath === '' || $candidatePath === '/') {
+        continue;
+    }
+
+    foreach (['/pages/', '/shop/', '/blog/', '/account/', '/admin/'] as $knownDir) {
+        $knownDirPos = strpos($candidatePath, $knownDir);
+        if ($knownDirPos !== false) {
+            $basePath = substr($candidatePath, 0, $knownDirPos);
+            break 2;
+        }
+    }
+
+    $segments = array_values(array_filter(explode('/', $candidatePath), 'strlen'));
+    if (count($segments) >= 2) {
+        $basePath = '/' . $segments[0];
+        break;
+    }
+
+    if (count($segments) === 1 && !in_array($segments[0], ['index.php', 'shop', 'pages', 'blog', 'account', 'admin', 'about', 'contact', 'faqs', 'privacy', 'terms', 'testimonials', 'cart', 'checkout', 'search'], true)) {
+        $basePath = '/' . $segments[0];
+        break;
+    }
+}
+
+if ($basePath === '' && $normalizedDocumentRoot !== '' && str_starts_with($normalizedAppRoot, $normalizedDocumentRoot)) {
     $basePath = substr($normalizedAppRoot, strlen($normalizedDocumentRoot));
     $basePath = '/' . trim($basePath, '/');
     if ($basePath === '/') {
         $basePath = '';
     }
-} else {
-    $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+}
+
+if ($basePath === '/' || $basePath === '.') {
     $basePath = '';
-    foreach (['/pages/', '/shop/', '/blog/', '/account/', '/admin/'] as $knownDir) {
-        $knownDirPos = strpos($scriptName, $knownDir);
-        if ($knownDirPos !== false) {
-            $basePath = substr($scriptName, 0, $knownDirPos);
-            break;
-        }
-    }
-    if ($basePath === '') {
-        $basePath = rtrim(dirname($scriptName), '/');
-    }
-    if ($basePath === '/' || $basePath === '.') {
-        $basePath = '';
-    }
 }
 
 if (!function_exists('site_url')) {
