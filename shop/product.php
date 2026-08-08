@@ -29,6 +29,9 @@ if (!is_array($thumbnails)) {
 array_unshift($thumbnails, $puppy['featured_image']);
 $thumbnails = array_values(array_unique(array_filter($thumbnails)));
 
+$requestScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+$currentProductUrl = $requestScheme . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '');
+
 require __DIR__ . '/../template/header.php';
 ?>
 
@@ -95,17 +98,25 @@ require __DIR__ . '/../template/header.php';
 
             <div class="puppy-share">
                 <span>Share:</span>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" target="_blank" rel="noopener noreferrer">
-                    <img src="<?= $basePath; ?>/assets/icons/facebook.png" alt="Facebook" class="social-icon">
+                <a class="share-link share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode($currentProductUrl); ?>" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M22 12.07C22 6.49 17.52 2 11.93 2S1.87 6.49 1.87 12.07C1.87 17.09 5.59 21.2 10.36 21.98v-7.02H7.64v-2.9h2.72V9.79c0-2.7 1.61-4.18 4.08-4.18 1.18 0 2.42.21 2.42.21v2.66h-1.37c-1.35 0-1.77.84-1.77 1.7v2.05h3.01l-.48 2.9h-2.53V21.98C18.41 21.2 22 17.09 22 12.07z" />
+                    </svg>
                 </a>
-                <a href="https://twitter.com/intent/tweet?url=<?= urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); ?>" target="_blank" rel="noopener noreferrer">
-                    <img src="<?= $basePath; ?>/assets/icons/twitter.png" alt="Twitter" class="social-icon">
+                <a class="share-link share-twitter" href="https://twitter.com/intent/tweet?url=<?= urlencode($currentProductUrl); ?>" target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M23.95 4.57a10 10 0 0 1-2.83.78 4.93 4.93 0 0 0 2.17-2.72 9.86 9.86 0 0 1-3.13 1.2A4.92 4.92 0 0 0 11.78 8.3 13.96 13.96 0 0 1 1.64 3.16a4.92 4.92 0 0 0 1.52 6.57 4.9 4.9 0 0 1-2.23-.62v.06a4.93 4.93 0 0 0 3.95 4.83 4.96 4.96 0 0 1-2.22.08 4.93 4.93 0 0 0 4.6 3.42A9.88 9.88 0 0 1 0 19.54a13.94 13.94 0 0 0 7.55 2.21c9.06 0 14.01-7.5 14.01-14.01 0-.21 0-.42-.01-.64a10 10 0 0 0 2.46-2.55z" />
+                    </svg>
                 </a>
-                <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
-                    <img src="<?= $basePath; ?>/assets/icons/instagram.png" alt="Instagram" class="social-icon">
+                <a class="share-link share-instagram" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Open Instagram">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 2A3.75 3.75 0 0 0 4 7.75v8.5A3.75 3.75 0 0 0 7.75 20h8.5A3.75 3.75 0 0 0 20 16.25v-8.5A3.75 3.75 0 0 0 16.25 4h-8.5zm4.25 3.2A4.8 4.8 0 1 1 7.2 12 4.8 4.8 0 0 1 12 7.2zm0 2A2.8 2.8 0 1 0 14.8 12 2.8 2.8 0 0 0 12 9.2zm5.35-2.55a1.12 1.12 0 1 1-1.12 1.12 1.12 1.12 0 0 1 1.12-1.12z" />
+                    </svg>
                 </a>
-                <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer">
-                    <img src="<?= $basePath; ?>/assets/icons/tik-tok.png" alt="TikTok" class="social-icon">
+                <a class="share-link share-tiktok" href="https://www.tiktok.com/@canecorsopuppies60?_r=1&amp;_t=ZS-98aYUPnTKDM" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+                    </svg>
                 </a>
             </div>
         </div>

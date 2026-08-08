@@ -228,15 +228,51 @@
   font-weight: 600;
 }
 
-.social-icon {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  transition: transform 0.2s ease;
+.share-link {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.social-icon:hover {
-  transform: scale(1.08);
+.share-link svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.share-link:hover {
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.share-facebook {
+  background: #1877f2;
+  box-shadow: 0 7px 15px rgba(24, 119, 242, 0.25);
+}
+
+.share-twitter {
+  background: #1da1f2;
+  box-shadow: 0 7px 15px rgba(29, 161, 242, 0.24);
+}
+
+.share-instagram {
+  background: linear-gradient(135deg, #f58529 0%, #dd2a7b 45%, #8134af 72%, #515bd4 100%);
+  box-shadow: 0 7px 15px rgba(221, 42, 123, 0.24);
+}
+
+.share-tiktok {
+  background: #010101;
+  box-shadow:
+    inset 2px 0 0 #25f4ee,
+    inset -2px 0 0 #fe2c55,
+    0 7px 15px rgba(1, 1, 1, 0.22);
 }
 
 .product-tabs {
