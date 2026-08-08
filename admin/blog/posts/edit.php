@@ -35,12 +35,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_id = $_POST['category_id'];
     $tags_input = $_POST['tags'] ?? [];
 
+    // Keep existing image unless a new one is uploaded
+    $featured_image = $post['featured_image'] ?? '';
+
+    // Image Upload
+    if (!empty($_FILES['featured_image']['name']) && is_uploaded_file($_FILES['featured_image']['tmp_name'])) {
+        $uploadDir = __DIR__ . '/../../../uploads/'; // go up three levels to richescorsos/uploads
+        $filename = time() . '_' . basename($_FILES['featured_image']['name']);
+        $featured_image = 'uploads/' . $filename; // store relative path in DB
+
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0755, true); // Create folder if missing
+        }
+
+        $targetPath = $uploadDir . $filename;
+
+        if (!move_uploaded_file($_FILES['featured_image']['tmp_name'], $targetPath)) {
+            die('Failed to upload image.');
+        }
+    }
+
     $stmt = $conn->prepare("
         UPDATE posts SET
-        title=?, slug=?, excerpt=?, content=?, status=?, category_id=?
+        title=?, slug=?, excerpt=?, content=?, status=?, category_id=?, featured_image=?
         WHERE id=?
     ");
-    $stmt->bind_param("sssssii", $title, $slug, $excerpt, $content, $status, $category_id, $id);
+    $stmt->bind_param("sssssisi", $title, $slug, $excerpt, $content, $status, $category_id, $featured_image, $id);
     $stmt->execute();
 
     // Resync tags
@@ -70,7 +90,7 @@ require_once __DIR__ . '/../../includes/sidebar.php';
 
     <div class="admin-form">
 
-        <form method="POST" id="postForm">
+        <form method="POST" id="postForm" enctype="multipart/form-data">
             <?= csrfField(); ?>
 
             <div class="form-grid">
@@ -128,6 +148,17 @@ require_once __DIR__ . '/../../includes/sidebar.php';
                         </select>
                     </div>
 
+                    <div class="form-box">
+                        <label>Featured Image</label>
+                        <?php if (!empty($post['featured_image'])): ?>
+                            <img src="<?= htmlspecialchars(normalize_site_url($post['featured_image'])); ?>"
+                                alt="Current featured image"
+                                style="width:100%; max-height:180px; object-fit:cover; border-radius:10px; margin-bottom:10px; border:2px solid var(--adm-line);">
+                        <?php endif; ?>
+                        <input type="file" name="featured_image" id="imageInput" accept="image/*">
+                        <img id="imagePreview" style="display:none; margin-top:10px; border-radius:10px; max-width:100%; max-height:200px; object-fit:cover;">
+                    </div>
+
                     <button type="submit" class="primary-btn">Update Post</button>
 
                 </div>
@@ -153,4 +184,16 @@ require_once __DIR__ . '/../../includes/sidebar.php';
             direction: "asc"
         }
     });
+
+    // Image Preview
+    document.getElementById('imageInput').addEventListener('change', function(e){
+        const reader = new FileReader();
+        reader.onload = function(){
+            const preview = document.getElementById('imagePreview');
+            preview.src = reader.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    });
+
 </script>

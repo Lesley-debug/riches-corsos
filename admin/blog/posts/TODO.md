@@ -1,7 +1,7 @@
-# TODO: Style blog/posts/edit.php
+# TODO: Blog post edit page — styling + featured image
 
-- [x] Analyze edit.php, create.php, admin.css, header/sidebar/footer
-- [x] Plan styling approach matching create.php layout
-- [x] Rewrite edit.php front-end markup with admin layout (content/topbar/form-grid)
-- [x] Keep all PHP logic unchanged (POST handling, CSRF, pre-selection)
-- [x] Verify page renders correctly
+- [x] Style blog/posts/edit.php with admin layout (content/topbar/form-grid)
+- [x] Add featured image upload field with current-image preview
+- [x] Handle featured_image upload/save in the POST handler
+- [x] Add live image preview JS
+- [x] Verify PHP syntax (php -l passes)
