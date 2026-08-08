@@ -52,9 +52,7 @@
         </div>
     </div>
     <div class="footer-bottom container">
-        <p>© 2026 <a href="<?= $basePath; ?>/index.php">Riches Corsos</a>. All rights reserved.
-            <a href="<?= $basePath; ?>/admin/login.php" class="footer-admin-link"></a>
-        </p>
+        <p>© 2026 <a href="<?= $basePath; ?>/index.php">Riches Corsos</a>. All rights reserved.</p>
     </div>
 </footer>
 
