@@ -81,7 +81,11 @@ $bodyClass = trim(($pageClass ?? '') . ' ' . $routeBodyClass);
   <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Riches Corsos'; ?></title>
   <link rel="icon" type="image/png" href="<?= $basePath; ?>/assets/images/logo1.png">
   <?php foreach ($stylesToLoad as $styleFile): ?>
-    <link rel="stylesheet" href="<?= $basePath; ?>/assets/css/<?= htmlspecialchars($styleFile); ?>">
+    <?php
+      $stylePath = app_path('assets/css/' . $styleFile);
+      $styleVersion = is_file($stylePath) ? '?v=' . filemtime($stylePath) : '';
+    ?>
+    <link rel="stylesheet" href="<?= $basePath; ?>/assets/css/<?= htmlspecialchars($styleFile); ?><?= htmlspecialchars($styleVersion); ?>">
   <?php endforeach; ?>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

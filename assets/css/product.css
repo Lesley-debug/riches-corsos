@@ -324,6 +324,11 @@
   margin: 0 auto 34px;
 }
 
+.product-parent-section {
+  width: 100%;
+  margin: 34px 0;
+}
+
 .parent-card {
   background: #fff;
   border: 1px solid #e8ddcc;

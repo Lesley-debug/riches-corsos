@@ -112,9 +112,9 @@ require __DIR__ . '/../template/header.php';
     </div>
 
     <?php if (!empty(trim((string)($puppy['parent_name'] ?? ''))) || !empty(trim((string)($puppy['parent_info'] ?? ''))) || !empty(trim((string)($puppy['parent_image'] ?? '')))) : ?>
-        <section class="parent-section">
+        <section class="parent-section product-parent-section" aria-labelledby="parent-section-title">
             <div class="parent-card">
-                <h2>Meet the Parents</h2>
+                <h2 id="parent-section-title">Meet the Parents</h2>
                 <?php $hasParentImage = !empty($puppy['parent_image']); ?>
                 <div class="parent-layout">
                     <?php if ($hasParentImage): ?>

@@ -16,8 +16,6 @@ if ($normalizedDocumentRoot !== '' && str_starts_with($normalizedAppRoot, $norma
     if ($basePath === '/') {
         $basePath = '';
     }
-} elseif (isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'localhost')) {
-    $basePath = '/richescorsos';
 } else {
     $candidatePaths = [$requestPath, $scriptName];
 
@@ -62,9 +60,6 @@ if (!function_exists('site_url')) {
         }
 
         $prefix = $basePath !== '' ? $basePath : '';
-        if ($prefix === '' && isset($_SERVER['HTTP_HOST']) && str_contains($_SERVER['HTTP_HOST'], 'localhost')) {
-            $prefix = '/richescorsos';
-        }
 
         return $prefix . '/' . ltrim($path, '/');
     }
