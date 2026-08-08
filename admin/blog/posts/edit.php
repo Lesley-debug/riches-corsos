@@ -57,47 +57,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: index.php");
     exit();
 }
+
+// Only include page chrome after all POST handling is done
+require_once __DIR__ . '/../../includes/header.php';
+require_once __DIR__ . '/../../includes/sidebar.php';
 ?>
 
-<h2>Edit Post</h2>
+<main class="admin-content">
+    <div class="admin-topbar">
+        <h1>Edit Blog Post</h1>
+    </div>
 
-<form method="POST">
-    <?= csrfField(); ?>
+    <div class="admin-form">
 
-    Title:<br>
-    <input type="text" name="title" value="<?= htmlspecialchars($post['title']); ?>"><br><br>
+        <form method="POST" id="postForm">
+            <?= csrfField(); ?>
 
-    Excerpt:<br>
-    <textarea name="excerpt"><?= htmlspecialchars($post['excerpt']); ?></textarea><br><br>
+            <div class="form-grid">
 
-    Content:<br>
-    <textarea name="content" rows="8"><?= htmlspecialchars($post['content']); ?></textarea><br><br>
+                <div class="form-main">
 
-    Category:<br>
-    <select name="category_id">
-        <?php while ($cat = $categories->fetch_assoc()): ?>
-            <option value="<?= $cat['id']; ?>"
-                <?= $cat['id'] == $post['category_id'] ? 'selected' : ''; ?>>
-                <?= htmlspecialchars($cat['name']); ?>
-            </option>
-        <?php endwhile; ?>
-    </select><br><br>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" value="<?= htmlspecialchars($post['title']); ?>" required>
+                    </div>
 
-    Tags:<br>
-    <?php while ($tag = $tags->fetch_assoc()): ?>
-        <label>
-            <input type="checkbox" name="tags[]" value="<?= $tag['id']; ?>"
-                <?= in_array($tag['id'], $post_tags) ? 'checked' : ''; ?>>
-            <?= htmlspecialchars($tag['name']); ?>
-        </label><br>
-    <?php endwhile; ?>
+                    <div class="form-group">
+                        <label>Excerpt</label>
+                        <textarea name="excerpt" rows="3"><?= htmlspecialchars($post['excerpt']); ?></textarea>
+                    </div>
 
-    <br>
-    Status:<br>
-    <select name="status">
-        <option value="draft" <?= $post['status'] == 'draft' ? 'selected' : ''; ?>>Draft</option>
-        <option value="published" <?= $post['status'] == 'published' ? 'selected' : ''; ?>>Published</option>
-    </select><br><br>
+                    <div class="form-group">
+                        <label>Content</label>
+                        <textarea name="content" id="editor"><?= htmlspecialchars($post['content']); ?></textarea>
+                    </div>
 
-    <button type="submit">Update</button>
-</form>
+                </div>
+
+                <div class="form-sidebar">
+
+                    <div class="form-box">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="draft" <?= $post['status'] == 'draft' ? 'selected' : ''; ?>>Draft</option>
+                            <option value="published" <?= $post['status'] == 'published' ? 'selected' : ''; ?>>Published</option>
+                        </select>
+                    </div>
+
+                    <div class="form-box">
+                        <label>Category</label>
+                        <select name="category_id">
+                            <?php while ($cat = $categories->fetch_assoc()): ?>
+                                <option value="<?= $cat['id']; ?>"
+                                    <?= $cat['id'] == $post['category_id'] ? 'selected' : ''; ?>>
+                                    <?= htmlspecialchars($cat['name']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-box">
+                        <label>Tags</label>
+                        <select name="tags[]" multiple id="tagSelect">
+                            <?php while ($tag = $tags->fetch_assoc()): ?>
+                                <option value="<?= $tag['id']; ?>"
+                                    <?= in_array($tag['id'], $post_tags) ? 'selected' : ''; ?>>
+                                    <?= htmlspecialchars($tag['name']); ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="primary-btn">Update Post</button>
+
+                </div>
+
+            </div>
+
+        </form>
+    </div>
+</main>
+
+<?php require_once __DIR__ . '/../../includes/footer.php'; ?>
+
+<script>
+    // Rich content editor
+    document.getElementById('editor').style.minHeight = '400px';
+
+    // Tom Select for Tags
+    new TomSelect("#tagSelect", {
+        plugins: ['remove_button'],
+        create: false,
+        sortField: {
+            field: "text",
+            direction: "asc"
+        }
+    });
+</script>
