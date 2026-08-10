@@ -136,7 +136,7 @@ require __DIR__ . '/../template/header.php';
             </div>
 
             <div class="contact-notes">
-                <p><strong>Email:</strong> <a href="mailto:barbarapettra@gmail.com">barbarapettra@gmail.com</a></p>
+                <p><strong>Email:</strong> <a href="mailto:info@richescorsos.com">info@richescorsos.com</a></p>
                 <p><strong>Phone:</strong> <a href="tel:+14707216309">+1 (470) 721-6309</a></p>
                 <p><strong>Response Time:</strong> Usually within 24 hours.</p>
             </div>

@@ -483,7 +483,7 @@
 
 @media (max-width: 768px) {
   .dash-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .dash-hero-inner {
@@ -497,6 +497,10 @@
 }
 
 @media (max-width: 480px) {
+  .dash-stats {
+    grid-template-columns: 1fr;
+  }
+
   .dash-actions {
     grid-template-columns: repeat(2, 1fr);
   }

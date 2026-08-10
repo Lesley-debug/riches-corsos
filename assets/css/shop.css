@@ -558,6 +558,10 @@
   .featured-hero {
     align-items: start;
   }
+
+  .featured-hero img {
+    height: 360px;
+  }
 }
 
 @media (max-width: 740px) {
@@ -570,7 +574,7 @@
   }
 
   .featured-hero img {
-    height: 300px;
+    height: 260px;
   }
 
   .action-row a {
