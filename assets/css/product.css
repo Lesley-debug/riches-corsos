@@ -493,16 +493,9 @@
 }
 
 .related-track-wrap {
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   cursor: grab;
   user-select: none;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-}
-
-.related-track-wrap::-webkit-scrollbar {
-  display: none;
 }
 
 .related-track-wrap:active {

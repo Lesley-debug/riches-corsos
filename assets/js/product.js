@@ -50,33 +50,36 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── You May Also Like slider ──
-    const wrap    = document.querySelector('.related-track-wrap');
     const track   = document.getElementById('relatedTrack');
     const prevBtn = document.getElementById('relatedPrev');
     const nextBtn = document.getElementById('relatedNext');
 
-    if (wrap && track && prevBtn && nextBtn) {
+    if (track && prevBtn && nextBtn) {
         const cards = Array.from(track.querySelectorAll('.related-card'));
-        if (cards.length === 0) { prevBtn.hidden = nextBtn.hidden = true; }
+        if (!cards.length) { prevBtn.hidden = nextBtn.hidden = true; return; }
 
-        const updateBtns = () => {
-            prevBtn.disabled = wrap.scrollLeft <= 0;
-            nextBtn.disabled = wrap.scrollLeft >= wrap.scrollWidth - wrap.clientWidth - 1;
+        let current = 0;
+        const perView  = () => window.innerWidth <= 640 ? 1 : window.innerWidth <= 1024 ? 2 : 3;
+        const maxSlide = () => Math.max(0, cards.length - perView());
+        const gap      = 22;
+
+        const goTo = (n) => {
+            current = Math.max(0, Math.min(n, maxSlide()));
+            const w = cards[0].offsetWidth + gap;
+            track.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
+            track.style.transform  = `translateX(-${current * w}px)`;
+            prevBtn.disabled = current === 0;
+            nextBtn.disabled = current >= maxSlide();
         };
 
-        const scrollBy = (dir) => {
-            const cardW = cards[0] ? cards[0].offsetWidth + 22 : wrap.clientWidth;
-            wrap.scrollBy({ left: dir * cardW, behavior: 'smooth' });
-        };
-
-        prevBtn.addEventListener('click', () => scrollBy(-1));
-        nextBtn.addEventListener('click', () => scrollBy(1));
-        wrap.addEventListener('scroll', updateBtns, { passive: true });
-        updateBtns();
+        prevBtn.addEventListener('click', () => goTo(current - 1));
+        nextBtn.addEventListener('click', () => goTo(current + 1));
+        window.addEventListener('resize', () => goTo(current));
+        goTo(0);
 
         let startX = 0;
-        wrap.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
-        wrap.addEventListener('touchend',   (e) => { const diff = startX - e.changedTouches[0].clientX; if (Math.abs(diff) > 50) scrollBy(diff > 0 ? 1 : -1); });
+        track.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+        track.addEventListener('touchend',   (e) => { const d = startX - e.changedTouches[0].clientX; if (Math.abs(d) > 50) goTo(d > 0 ? current + 1 : current - 1); });
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry, i) => {
