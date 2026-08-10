@@ -447,3 +447,234 @@
     height: 220px;
   }
 }
+
+/* ── You May Also Like ── */
+.related-section {
+  background: linear-gradient(180deg, #f4efe7 0%, #fdfbf7 100%);
+  padding: 72px 0 80px;
+  overflow: hidden;
+}
+
+.related-inner {
+  width: min(1280px, 92%);
+  margin: 0 auto;
+  position: relative;
+}
+
+.related-header {
+  text-align: center;
+  margin-bottom: 42px;
+}
+
+.related-eyebrow {
+  display: inline-flex;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(156, 122, 63, 0.1);
+  border: 1px solid rgba(156, 122, 63, 0.22);
+  color: var(--accent-500);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.related-header h2 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  color: #161c27;
+  margin: 0 0 10px;
+}
+
+.related-header p {
+  color: #5c6570;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.related-track-wrap {
+  overflow: hidden;
+  cursor: grab;
+  user-select: none;
+}
+
+.related-track-wrap:active {
+  cursor: grabbing;
+}
+
+.related-track {
+  display: flex;
+  gap: 22px;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.related-card {
+  flex: 0 0 calc(33.333% - 15px);
+  background: linear-gradient(180deg, #fff 0%, #f8f5f1 100%);
+  border: 1px solid rgba(207, 189, 165, 0.5);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(24, 31, 45, 0.09);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.related-card.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.related-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 52px rgba(24, 31, 45, 0.16);
+  border-color: rgba(156, 122, 63, 0.3);
+}
+
+.related-card-img-wrap {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.related-card-img-wrap img {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  display: block;
+}
+
+.related-card:hover .related-card-img-wrap img {
+  transform: scale(1.04);
+}
+
+.related-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.related-badge.available {
+  background: rgba(47, 124, 79, 0.9);
+  color: #fff;
+}
+
+.related-badge.reserved {
+  background: rgba(176, 125, 42, 0.9);
+  color: #fff;
+}
+
+.related-card-body {
+  padding: 20px 22px 24px;
+}
+
+.related-card-body h3 {
+  font-size: 1.15rem;
+  color: #1e2635;
+  margin: 0 0 8px;
+}
+
+.related-meta {
+  font-size: 0.88rem;
+  color: #5e6778;
+  margin: 0 0 16px;
+}
+
+.related-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.related-price {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--accent-500);
+}
+
+.related-btn {
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: #1d2430;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.25s ease;
+  white-space: nowrap;
+}
+
+.related-btn:hover {
+  background: var(--accent-500);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.related-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 36px;
+}
+
+.related-prev,
+.related-next {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(156, 122, 63, 0.3);
+  background: #fff;
+  color: #1d2430;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(24, 31, 45, 0.1);
+}
+
+.related-prev svg,
+.related-next svg {
+  width: 20px;
+  height: 20px;
+}
+
+.related-prev:hover,
+.related-next:hover {
+  background: var(--accent-500);
+  border-color: var(--accent-500);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(156, 122, 63, 0.28);
+}
+
+.related-prev:disabled,
+.related-next:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 1024px) {
+  .related-card {
+    flex: 0 0 calc(50% - 11px);
+  }
+}
+
+@media (max-width: 640px) {
+  .related-card {
+    flex: 0 0 80vw;
+  }
+
+  .related-section {
+    padding: 52px 0 64px;
+  }
+}

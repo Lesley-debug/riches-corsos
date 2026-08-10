@@ -32,6 +32,16 @@ $thumbnails = array_values(array_unique(array_filter($thumbnails)));
 $requestScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $currentProductUrl = $requestScheme . ($_SERVER['HTTP_HOST'] ?? '') . ($_SERVER['REQUEST_URI'] ?? '');
 
+$relatedStmt = $conn->prepare(
+    "SELECT id, name, breed, age, sex, price, featured_image, status
+     FROM puppies
+     WHERE id != ? AND LOWER(TRIM(status)) IN ('available', 'reserved')
+     ORDER BY RAND() LIMIT 6"
+);
+$relatedStmt->bind_param('i', $id);
+$relatedStmt->execute();
+$relatedPuppies = $relatedStmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
 require __DIR__ . '/../template/header.php';
 ?>
 
@@ -186,6 +196,51 @@ require __DIR__ . '/../template/header.php';
         </div>
     </div>
 </div>
+
+<?php if (!empty($relatedPuppies)): ?>
+<section class="related-section">
+    <div class="related-inner">
+        <div class="related-header">
+            <span class="related-eyebrow">Explore More</span>
+            <h2>You May Also Like</h2>
+            <p>More healthy, family-raised Cane Corso puppies available now.</p>
+        </div>
+        <div class="related-track-wrap">
+            <div class="related-track" id="relatedTrack">
+                <?php foreach ($relatedPuppies as $r): ?>
+                    <?php $isReserved = strtolower(trim($r['status'])) === 'reserved'; ?>
+                    <article class="related-card">
+                        <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$r['id']; ?>" class="related-card-img-wrap">
+                            <img src="<?= htmlspecialchars($normalizeImagePath($r['featured_image'] ?? '')); ?>" alt="<?= htmlspecialchars($r['name']); ?>" loading="lazy">
+                            <?php if ($isReserved): ?>
+                                <span class="related-badge reserved">Reserved</span>
+                            <?php else: ?>
+                                <span class="related-badge available">Available</span>
+                            <?php endif; ?>
+                        </a>
+                        <div class="related-card-body">
+                            <h3><?= htmlspecialchars($r['name']); ?></h3>
+                            <p class="related-meta"><?= htmlspecialchars($r['breed']); ?> &bull; <?= htmlspecialchars($r['age']); ?> &bull; <?= htmlspecialchars($r['sex']); ?></p>
+                            <div class="related-footer">
+                                <span class="related-price">$<?= number_format((float)$r['price'], 2); ?></span>
+                                <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$r['id']; ?>" class="related-btn">View Details</a>
+                            </div>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div class="related-nav">
+            <button class="related-prev" id="relatedPrev" aria-label="Previous">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <button class="related-next" id="relatedNext" aria-label="Next">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 <script src="<?= $basePath; ?>/assets/js/product.js" defer></script>
 
