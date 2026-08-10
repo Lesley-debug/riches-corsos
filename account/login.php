@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     setcookie('user_email', $email, time() + (86400 * 30), '/', '', true, true);
                 }
 
-                $redirectUrl = $_SESSION['redirect_after_login'] ?? site_url('/account/dashboard.php');
+                $redirectUrl = $_SESSION['redirect_after_login'] ?? site_url('/index.php');
                 unset($_SESSION['redirect_after_login']);
                 $_SESSION['just_logged_in'] = true;
 
