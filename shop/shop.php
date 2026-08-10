@@ -51,6 +51,7 @@ $normalizeImagePath = static fn(?string $path): string => normalize_site_url($pa
                     <img src="<?= htmlspecialchars($normalizeImagePath($featured['featured_image'] ?? '')); ?>" alt="<?= htmlspecialchars($featured['name']); ?>">
                 </div>
                 <div class="featured-content">
+                    <span class="featured-eyebrow">Featured Puppy</span>
                     <h2><?= htmlspecialchars($featured['title'] ?: $featured['name']); ?></h2>
                     <p><?= htmlspecialchars(substr($featured['description'] ?? '', 0, 220)); ?>...</p>
                     <div class="featured-price">$<?= number_format((float)$featured['price'], 2); ?></div>

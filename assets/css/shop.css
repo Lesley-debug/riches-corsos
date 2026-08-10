@@ -137,14 +137,16 @@
   overflow: hidden;
 }
 
-.featured-hero::before {
-  content: "Featured Puppy";
-  position: absolute;
-  top: 24px;
-  left: 28px;
-  font-size: 0.82rem;
+.featured-eyebrow {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(156, 122, 63, 0.1);
+  border: 1px solid rgba(156, 122, 63, 0.25);
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   color: var(--accent-500);
   text-transform: uppercase;
 }
