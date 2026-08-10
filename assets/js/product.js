@@ -54,16 +54,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const prevBtn = document.getElementById('relatedPrev');
     const nextBtn = document.getElementById('relatedNext');
 
-    if (track && prevBtn && nextBtn) {
+    if (track && prevBtn && nextBtn && cards.length > 0) {
         const cards    = Array.from(track.querySelectorAll('.related-card'));
         let current    = 0;
         const visible  = () => window.innerWidth <= 640 ? 1 : window.innerWidth <= 1024 ? 2 : 3;
         const maxIndex = () => Math.max(0, cards.length - visible());
 
+        const cardWidth = () => {
+            const w = cards[0].getBoundingClientRect().width
+                   || cards[0].offsetWidth
+                   || (track.getBoundingClientRect().width - (visible() - 1) * 22) / visible();
+            return w + 22;
+        };
+
         const goTo = (index) => {
             current = Math.max(0, Math.min(index, maxIndex()));
-            const cardW = cards[0].getBoundingClientRect().width + 22;
-            track.style.transform = `translateX(-${current * cardW}px)`;
+            track.style.transform = `translateX(-${current * cardWidth()}px)`;
             prevBtn.disabled = current === 0;
             nextBtn.disabled = current >= maxIndex();
         };
