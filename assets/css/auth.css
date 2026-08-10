@@ -4,8 +4,8 @@
   align-items: center;
   justify-content: center;
   background:
-    linear-gradient(160deg, rgba(13, 10, 7, 0.88), rgba(40, 28, 14, 0.72)),
-    url('../images/lena1.jpeg') center/cover no-repeat;
+    linear-gradient(160deg, rgba(13, 10, 7, 0.82), rgba(40, 28, 14, 0.65)),
+    url('../images/happy_puppy.jpeg') center/cover no-repeat fixed;
   padding: 40px 20px;
 }
 
