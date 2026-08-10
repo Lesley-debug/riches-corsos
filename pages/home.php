@@ -6,7 +6,7 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
     <div class="welcome-banner" id="welcomeBanner">
         <div class="welcome-banner-inner">
             <span>👋 Welcome back, ' . $welcomeName . '! Visit your <a href="' . $basePath . '/account/dashboard.php">dashboard</a> to view your orders, wishlist, and account settings.</span>
-            <button onclick="document.getElementById(\"welcomeBanner\").remove()" aria-label="Close">&times;</button>
+            <button type="button" aria-label="Close">&times;</button>
         </div>
     </div>';
 }

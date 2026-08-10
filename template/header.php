@@ -80,6 +80,14 @@ $bodyClass = trim(($pageClass ?? '') . ' ' . $routeBodyClass);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Riches Corsos'; ?></title>
   <link rel="icon" type="image/png" href="<?= $basePath; ?>/assets/images/logo1.png">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LZ5V31BCDM"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LZ5V31BCDM');
+  </script>
   <?php foreach ($stylesToLoad as $styleFile): ?>
     <?php
       $stylePath = app_path('assets/css/' . $styleFile);

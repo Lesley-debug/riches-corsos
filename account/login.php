@@ -81,6 +81,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     setcookie('user_email', $email, time() + (86400 * 30), '/', '', true, true);
                 }
 
+                // Notify admin of login
+                try {
+                    require_once __DIR__ . '/../inc/email.php';
+                    $adminEmail  = getenv('MAIL_USERNAME') ?: 'info@richescorsos.com';
+                    $loginTime   = date('F j, Y \a\t g:i A');
+                    $loginIp     = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+                    $loginDevice = substr($_SERVER['HTTP_USER_AGENT'] ?? 'unknown', 0, 120);
+                    sendEmail(
+                        $adminEmail,
+                        'Riches Corsos',
+                        '🔔 New Login — ' . $user['name'],
+                        '<h2>Someone just signed in</h2>
+                        <div class="info-box">
+                            <p><strong>Name:</strong> ' . htmlspecialchars($user['name']) . '</p>
+                            <p><strong>Email:</strong> ' . htmlspecialchars($user['email']) . '</p>
+                            <p><strong>Time:</strong> ' . $loginTime . '</p>
+                            <p><strong>IP:</strong> ' . htmlspecialchars($loginIp) . '</p>
+                            <p><strong>Device:</strong> ' . htmlspecialchars($loginDevice) . '</p>
+                        </div>'
+                    );
+                } catch (Throwable $e) {
+                    error_log('Login notify failed: ' . $e->getMessage());
+                }
+
                 $redirectUrl = $_SESSION['redirect_after_login'] ?? site_url('/index.php');
                 unset($_SESSION['redirect_after_login']);
                 $_SESSION['just_logged_in'] = true;

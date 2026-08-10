@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const banner = document.getElementById('welcomeBanner');
+    if (banner) {
+        const closeBtn = banner.querySelector('button');
+        if (closeBtn) closeBtn.addEventListener('click', () => banner.remove());
+    }
+
     const revealElements = document.querySelectorAll('.reveal');
 
     function revealOnScroll() {
