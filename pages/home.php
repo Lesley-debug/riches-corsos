@@ -14,7 +14,7 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
 
 <!-- ================== HERO ================== -->
 <section class="hero-section">
-    <video class="hero-video" autoplay muted loop playsinline>
+    <video class="hero-video" autoplay muted loop playsinline poster="<?= $basePath; ?>/assets/images/puppies_fam.jpg">
         <source src="<?= $basePath; ?>/assets/videos/bg.mp4" type="video/mp4">
     </video>
     <div class="hero-overlay-glow"></div>
@@ -79,18 +79,15 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
         } catch (Throwable $e) { error_log('Home puppies: ' . $e->getMessage()); }
         foreach ($puppyRows as $row):
         ?>
-            <div class="puppy-card">
-                <div class="puppy-img-wrapper">
-                    <img src="<?= htmlspecialchars($normalizeImagePath($row['featured_image'] ?? '')); ?>" alt="<?= htmlspecialchars($row['name']); ?>" loading="lazy" decoding="async">
-                    <span class="badge"><?= htmlspecialchars($row['category'] ?? 'Available'); ?></span>
-                </div>
-                <div class="puppy-info">
+            <article class="puppy-card">
+                <img src="<?= htmlspecialchars($normalizeImagePath($row['featured_image'] ?? '')); ?>" alt="<?= htmlspecialchars($row['name']); ?>" loading="lazy" decoding="async">
+                <div class="puppy-card-content">
                     <h3><?= htmlspecialchars($row['name']); ?></h3>
-                    <span>$<?= number_format((float)$row['price'], 2); ?></span>
-                    <p><?= htmlspecialchars($row['breed']); ?> | <?= htmlspecialchars($row['age']); ?> | <?= htmlspecialchars($row['sex']); ?></p>
-                    <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$row['id']; ?>" class="view-btn">View Details</a>
+                    <p class="puppy-meta"><?= htmlspecialchars($row['breed']); ?> • <?= htmlspecialchars($row['age']); ?> • <?= htmlspecialchars($row['sex']); ?></p>
+                    <p class="puppy-price">$<?= number_format((float)$row['price'], 2); ?></p>
+                    <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$row['id']; ?>" class="btn-primary">View Details</a>
                 </div>
-            </div>
+            </article>
         <?php endforeach; ?>
     </div>
 </section>
