@@ -85,15 +85,27 @@
   background: none;
   border: none;
   cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.hamburger-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .hamburger-line {
   width: 22px;
   height: 2px;
   background: var(--neutral-900);
+  border-radius: 2px;
   transition:
-    transform var(--dur-fast) var(--ease),
-    opacity var(--dur-fast) var(--ease);
+    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.22s ease,
+    background 0.22s ease;
+}
+
+.hamburger-toggle.is-active .hamburger-line {
+  background: #d4af37;
 }
 
 .hamburger-toggle.is-active .hamburger-line:nth-child(1) {
@@ -102,6 +114,7 @@
 
 .hamburger-toggle.is-active .hamburger-line:nth-child(2) {
   opacity: 0;
+  transform: scaleX(0);
 }
 
 .hamburger-toggle.is-active .hamburger-line:nth-child(3) {
@@ -415,11 +428,12 @@
   bottom: 0;
   width: 300px;
   max-width: 85vw;
-  background: var(--surface-card);
+  background: linear-gradient(160deg, #1a1f2e 0%, #242c3d 60%, #1d2430 100%);
   transform: translateX(-100%);
-  transition: transform var(--dur-base) var(--ease);
+  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 200;
   overflow-y: auto;
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.35);
 }
 
 .mobile-drawer.drawer-open {
@@ -427,16 +441,32 @@
 }
 
 .drawer-content {
-  padding: var(--space-6);
+  padding: 28px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .drawer-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--text-secondary);
+  align-self: flex-end;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
-  margin-bottom: var(--space-4);
+  margin-bottom: 28px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.drawer-close:hover {
+  background: rgba(212, 175, 55, 0.18);
+  color: #d4af37;
 }
 
 .drawer-nav ul {
@@ -446,22 +476,40 @@
 }
 
 .drawer-nav a {
-  display: block;
-  padding: var(--space-3) 0;
-  font: var(--text-body);
-  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  padding: 13px 14px;
+  margin-bottom: 4px;
+  font-size: 0.97rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
   text-decoration: none;
-  border-bottom: 1px solid var(--border);
+  border-radius: 10px;
+  border-bottom: none;
+  letter-spacing: 0.01em;
+  transition: background 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+}
+
+.drawer-nav a:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  padding-left: 20px;
 }
 
 .drawer-nav .divider {
-  border-bottom: none;
-  height: var(--space-2);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 12px 0 16px;
 }
 
 .drawer-login {
-  color: var(--accent-500) !important;
-  font-weight: 500;
+  color: #d4af37 !important;
+  font-weight: 600 !important;
+}
+
+.drawer-login:hover {
+  background: rgba(212, 175, 55, 0.14) !important;
+  color: #f0cc5a !important;
 }
 
 .search-overlay {
