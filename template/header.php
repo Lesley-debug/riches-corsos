@@ -88,9 +88,6 @@ $bodyClass = trim(($pageClass ?? '') . ' ' . $routeBodyClass);
     gtag('js', new Date());
     gtag('config', 'G-LZ5V31BCDM');
   </script>
-  <?php if ($routePath === 'index.php'): ?>
-  <link rel="preload" as="image" href="<?= $basePath; ?>/assets/images/lena1.jpeg" media="(max-width: 768px)">
-  <?php endif; ?>
   <?php foreach ($stylesToLoad as $styleFile): ?>
     <?php
       $stylePath = app_path('assets/css/' . $styleFile);

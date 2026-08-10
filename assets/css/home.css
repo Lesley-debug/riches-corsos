@@ -34,16 +34,6 @@
   z-index: 0;
 }
 
-@media (max-width: 768px) {
-  .hero-video {
-    display: none;
-  }
-  .hero-section {
-    background: linear-gradient(140deg, rgba(16,18,24,0.72), rgba(23,26,33,0.5)),
-      url('../images/lena1.jpeg') center/cover no-repeat;
-  }
-}
-
 .hero-overlay-glow {
   position: absolute;
   inset: 0;

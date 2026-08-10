@@ -15,7 +15,8 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
 <!-- ================== HERO ================== -->
 <section class="hero-section">
     <video class="hero-video" autoplay muted loop playsinline preload="none">
-        <source src="<?= $basePath; ?>/assets/videos/bg.mp4" type="video/mp4">
+        <source src="<?= $basePath; ?>/assets/videos/bg_mobile.mp4" type="video/mp4" media="(max-width: 768px)">
+        <source src="<?= $basePath; ?>/assets/videos/bg_desktop.mp4" type="video/mp4">
     </video>
     <div class="hero-overlay-glow"></div>
 
