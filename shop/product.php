@@ -243,5 +243,31 @@ require __DIR__ . '/../template/header.php';
 <?php endif; ?>
 
 <script src="<?= $basePath; ?>/assets/js/product.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var track   = document.getElementById('relatedTrack');
+    var prevBtn = document.getElementById('relatedPrev');
+    var nextBtn = document.getElementById('relatedNext');
+    if (!track || !prevBtn || !nextBtn) return;
+    var cards = Array.from(track.querySelectorAll('.related-card'));
+    if (!cards.length) { prevBtn.hidden = nextBtn.hidden = true; return; }
+    var current = 0;
+    var gap = 22;
+    var perView  = function () { return window.innerWidth <= 640 ? 1 : window.innerWidth <= 1024 ? 2 : 3; };
+    var maxSlide = function () { return Math.max(0, cards.length - perView()); };
+    var goTo = function (n) {
+        current = Math.max(0, Math.min(n, maxSlide()));
+        var w = cards[0].offsetWidth + gap;
+        track.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
+        track.style.transform  = 'translateX(-' + (current * w) + 'px)';
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current >= maxSlide();
+    };
+    prevBtn.addEventListener('click', function () { goTo(current - 1); });
+    nextBtn.addEventListener('click', function () { goTo(current + 1); });
+    window.addEventListener('resize', function () { goTo(current); });
+    goTo(0);
+});
+</script>
 
 <?php require __DIR__ . '/../template/footer.php'; ?>
