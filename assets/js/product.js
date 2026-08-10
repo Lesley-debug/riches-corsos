@@ -87,7 +87,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.15 });
-        cards.forEach((card) => observer.observe(card));
+        }, { threshold: 0.1 });
+        cards.forEach((card) => {
+            card.classList.add('animate-hidden');
+            observer.observe(card);
+        });
     }
 });
