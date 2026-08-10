@@ -50,41 +50,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── You May Also Like slider ──
+    const wrap    = document.querySelector('.related-track-wrap');
     const track   = document.getElementById('relatedTrack');
     const prevBtn = document.getElementById('relatedPrev');
     const nextBtn = document.getElementById('relatedNext');
 
-    if (track && prevBtn && nextBtn && cards.length > 0) {
-        const cards    = Array.from(track.querySelectorAll('.related-card'));
-        let current    = 0;
-        const visible  = () => window.innerWidth <= 640 ? 1 : window.innerWidth <= 1024 ? 2 : 3;
-        const maxIndex = () => Math.max(0, cards.length - visible());
+    if (wrap && track && prevBtn && nextBtn) {
+        const cards = Array.from(track.querySelectorAll('.related-card'));
+        if (cards.length === 0) { prevBtn.hidden = nextBtn.hidden = true; }
 
-        const cardWidth = () => {
-            const w = cards[0].getBoundingClientRect().width
-                   || cards[0].offsetWidth
-                   || (track.getBoundingClientRect().width - (visible() - 1) * 22) / visible();
-            return w + 22;
+        const updateBtns = () => {
+            prevBtn.disabled = wrap.scrollLeft <= 0;
+            nextBtn.disabled = wrap.scrollLeft >= wrap.scrollWidth - wrap.clientWidth - 1;
         };
 
-        const goTo = (index) => {
-            current = Math.max(0, Math.min(index, maxIndex()));
-            track.style.transform = `translateX(-${current * cardWidth()}px)`;
-            prevBtn.disabled = current === 0;
-            nextBtn.disabled = current >= maxIndex();
+        const scrollBy = (dir) => {
+            const cardW = cards[0] ? cards[0].offsetWidth + 22 : wrap.clientWidth;
+            wrap.scrollBy({ left: dir * cardW, behavior: 'smooth' });
         };
 
-        prevBtn.addEventListener('click', () => goTo(current - 1));
-        nextBtn.addEventListener('click', () => goTo(current + 1));
-        window.addEventListener('resize', () => goTo(current));
-        goTo(0);
+        prevBtn.addEventListener('click', () => scrollBy(-1));
+        nextBtn.addEventListener('click', () => scrollBy(1));
+        wrap.addEventListener('scroll', updateBtns, { passive: true });
+        updateBtns();
 
-        let startX = 0, isDragging = false;
-        track.addEventListener('mousedown',  (e) => { isDragging = true; startX = e.clientX; });
-        track.addEventListener('mouseup',    (e) => { if (!isDragging) return; isDragging = false; if (Math.abs(startX - e.clientX) > 50) goTo(startX - e.clientX > 0 ? current + 1 : current - 1); });
-        track.addEventListener('mouseleave', ()  => { isDragging = false; });
-        track.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
-        track.addEventListener('touchend',   (e) => { const diff = startX - e.changedTouches[0].clientX; if (Math.abs(diff) > 50) goTo(diff > 0 ? current + 1 : current - 1); });
+        let startX = 0;
+        wrap.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+        wrap.addEventListener('touchend',   (e) => { const diff = startX - e.changedTouches[0].clientX; if (Math.abs(diff) > 50) scrollBy(diff > 0 ? 1 : -1); });
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry, i) => {
@@ -94,9 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }, { threshold: 0.1 });
-        cards.forEach((card) => {
-            card.classList.add('animate-hidden');
-            observer.observe(card);
-        });
+        cards.forEach((card) => { card.classList.add('animate-hidden'); observer.observe(card); });
     }
 });

@@ -493,9 +493,16 @@
 }
 
 .related-track-wrap {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   cursor: grab;
   user-select: none;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.related-track-wrap::-webkit-scrollbar {
+  display: none;
 }
 
 .related-track-wrap:active {
@@ -505,8 +512,6 @@
 .related-track {
   display: flex;
   gap: 22px;
-  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
 }
 
 .related-card {
