@@ -81,7 +81,7 @@ if ($types) {
 
 ?>
 
-<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.jpeg')">
+<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.webp')">
   <div class="page-hero-inner">
     <span class="page-hero-eyebrow">Our Blog</span>
     <h1>Insights & Stories</h1>

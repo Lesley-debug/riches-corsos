@@ -1,6 +1,6 @@
 <?php require __DIR__ . '/../template/header.php'; ?>
 
-<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.jpeg')">
+<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.webp')">
   <div class="page-hero-inner">
     <span class="page-hero-eyebrow">Frequently Asked Questions</span>
     <h1>Riches Corsos FAQs</h1>
@@ -142,6 +142,6 @@
     <a href="<?= $basePath; ?>/pages/contact.php" class="cta-btn">Contact Us Today</a>
 </section>
 
-<script src="<?= $basePath; ?>/assets/js/faqs.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/faqs.min.js" defer></script>
 
 <?php require __DIR__ . '/../template/footer.php'; ?>

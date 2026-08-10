@@ -154,7 +154,7 @@ p {
   padding: 80px 24px 60px;
   background:
     linear-gradient(135deg, rgba(29, 36, 48, 0.88), rgba(26, 18, 10, 0.78)),
-    url("../images/happy_puppy.jpeg") center/cover;
+    url("../images/happy_puppy.webp") center/cover;
   color: #fff;
 }
 
@@ -236,7 +236,7 @@ p {
   padding: 72px 24px 56px;
   background:
     linear-gradient(135deg, rgba(29, 36, 48, 0.88), rgba(26, 18, 10, 0.72)),
-    url("../images/happy_puppy.jpeg") center/cover;
+    url("../images/happy_puppy.webp") center/cover;
   color: #fff;
 }
 

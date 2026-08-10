@@ -66,7 +66,8 @@ $pageStyles = [
   'account/settings.php' => ['dashboard.css']
 ];
 
-$globalStyles = ['tokens.css', 'style.css', 'header.css', 'mobile.css', 'footer.css'];
+$globalStyles = ['tokens.min.css', 'style.min.css', 'header.min.css', 'mobile.min.css', 'footer.min.css'];
+$pageStyles = array_map(fn($files) => array_map(fn($f) => str_replace('.css', '.min.css', $f), $files), $pageStyles);
 $stylesToLoad = array_merge($globalStyles, $pageStyles[$routePath] ?? []);
 
 $routeBodyClass = 'page-' . preg_replace('/[^a-z0-9]+/i', '-', strtolower(str_replace('.php', '', $routePath)));
@@ -79,7 +80,7 @@ $bodyClass = trim(($pageClass ?? '') . ' ' . $routeBodyClass);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Riches Corsos'; ?></title>
-  <link rel="icon" type="image/png" href="<?= $basePath; ?>/assets/images/logo1.png">
+  <link rel="icon" type="image/webp" href="<?= $basePath; ?>/assets/images/logo1.webp">
   <!-- Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-LZ5V31BCDM"></script>
   <script>
@@ -135,7 +136,7 @@ $bodyClass = trim(($pageClass ?? '') . ' ' . $routeBodyClass);
         <!-- LOGO (center) -->
         <div class="site-logo">
           <a href="<?= $basePath; ?>/index.php" aria-label="Site logo">
-            <img src="<?= $basePath; ?>/assets/images/logo1.png" alt="Riches Corsos" class="logo-img" width="300" height="50">
+            <img src="<?= $basePath; ?>/assets/images/logo1.webp" alt="Riches Corsos" class="logo-img" width="300" height="50">
           </a>
         </div>
 

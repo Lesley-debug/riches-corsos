@@ -1,6 +1,6 @@
 <?php require __DIR__ . '/../template/header.php'; ?>
 
-<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.jpeg')">
+<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.webp')">
   <div class="page-hero-inner">
     <span class="page-hero-eyebrow">Testimonials</span>
     <h1>What Our Customers Are Saying</h1>

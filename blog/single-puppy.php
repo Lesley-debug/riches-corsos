@@ -102,7 +102,7 @@ $shareUrl = 'https://richescorsos.com/blog/single-puppy.php?slug=' . urlencode($
 
 <?php include '../template/header.php'; ?>
 
-<section class="page-hero page-hero--post" style="background-image: url('<?= !empty($post['featured_image']) ? htmlspecialchars($normalizeImagePath($post['featured_image'])) : $basePath . '/assets/images/happy_puppy.jpeg'; ?>')">
+<section class="page-hero page-hero--post" style="background-image: url('<?= !empty($post['featured_image']) ? htmlspecialchars($normalizeImagePath($post['featured_image'])) : $basePath . '/assets/images/happy_puppy.webp'; ?>')">
   <div class="page-hero-inner">
     <span class="page-hero-eyebrow"><?= htmlspecialchars($post['category_name'] ?? 'Blog'); ?></span>
     <h1><?= htmlspecialchars($post['title']); ?></h1>

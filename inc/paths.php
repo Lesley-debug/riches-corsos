@@ -102,7 +102,7 @@ if (!function_exists('app_path')) {
 }
 
 if (!function_exists('normalize_site_url')) {
-    function normalize_site_url(?string $path, string $fallback = 'assets/images/luna.jpeg'): string
+    function normalize_site_url(?string $path, string $fallback = 'assets/images/luna.webp'): string
     {
         global $basePath;
         $path = str_replace('\\', '/', trim((string)$path));

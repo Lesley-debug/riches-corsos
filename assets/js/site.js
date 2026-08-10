@@ -10,7 +10,7 @@
 
     const normalizeImageUrl = (path) => {
         const value = String(path || '').trim();
-        if (!value) return siteUrl('/assets/images/luna.jpeg');
+        if (!value) return siteUrl('/assets/images/luna.webp');
         if (/^https?:\/\//i.test(value)) return value;
         if (basePath && value.startsWith(`${basePath}/`)) return value;
         if (value.startsWith('/richescorsos/')) {

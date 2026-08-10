@@ -1,6 +1,6 @@
 <?php require __DIR__ . '/../template/header.php'; ?>
 
-<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.jpeg')">
+<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.webp')">
   <div class="page-hero-inner">
     <span class="page-hero-eyebrow">Our Story</span>
     <h1>Who We Are</h1>
@@ -18,7 +18,7 @@
 <section class="about-story section-wrap reveal-up">
     <div class="story-grid">
         <div class="story-media">
-            <img src="<?= $basePath; ?>/assets/images/about.jpeg" alt="Cane Corso puppies at Riches Corsos" loading="lazy" decoding="async">
+            <img src="<?= $basePath; ?>/assets/images/about.webp" alt="Cane Corso puppies at Riches Corsos" loading="lazy" decoding="async">
         </div>
 
         <div class="story-content">
@@ -157,6 +157,6 @@
     </div>
 </section>
 
-<script src="<?= $basePath; ?>/assets/js/about.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/about.min.js" defer></script>
 
 <?php require __DIR__ . '/../template/footer.php'; ?>

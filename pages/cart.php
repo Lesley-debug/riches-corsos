@@ -102,6 +102,6 @@ $normalizeImage = static fn($path): string => normalize_site_url($path);
     </div>
 </div>
 
-<script src="<?= $basePath; ?>/assets/js/cart.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/cart.min.js" defer></script>
 
 <?php require __DIR__ . '/../template/footer.php'; ?>

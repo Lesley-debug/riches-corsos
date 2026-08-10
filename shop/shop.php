@@ -7,7 +7,7 @@ $normalizeImagePath = static fn(?string $path): string => normalize_site_url($pa
 
 <div class="shop-page">
     <div class="shop-shell">
-        <section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.jpeg')">
+        <section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.webp')">
             <div class="page-hero-inner">
                 <span class="page-hero-eyebrow">Available Puppies</span>
                 <h1>Find Your Perfect Cane Corso</h1>

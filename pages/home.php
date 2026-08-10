@@ -102,22 +102,22 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
     <p>We ensure every puppy is healthy, socialized, and ready to thrive in their new family.</p>
     <div class="trust-grid">
         <div class="trust-item">
-            <img src="<?= $basePath; ?>/assets/images/happy_puppy.jpeg" alt="Playtime" loading="lazy" decoding="async">
+            <img src="<?= $basePath; ?>/assets/images/happy_puppy.webp" alt="Playtime" loading="lazy" decoding="async">
             <h3>Happy & Socialized</h3>
             <p>Playtime, cuddles, and exploration are part of their daily routine.</p>
         </div>
         <div class="trust-item">
-            <img src="<?= $basePath; ?>/assets/images/health.jpeg" alt="Care" loading="lazy" decoding="async">
+            <img src="<?= $basePath; ?>/assets/images/health.webp" alt="Care" loading="lazy" decoding="async">
             <h3>Health & Care</h3>
             <p>Regular vet check-ups, vaccinations, and proper nutrition for peak health.</p>
         </div>
         <div class="trust-item">
-            <img src="<?= $basePath; ?>/assets/images/training.jpeg" alt="Training" loading="lazy" decoding="async">
+            <img src="<?= $basePath; ?>/assets/images/training.webp" alt="Training" loading="lazy" decoding="async">
             <h3>Early Training</h3>
             <p>Basic commands and social skills are introduced early for confident pups.</p>
         </div>
         <div class="trust-item">
-            <img src="<?= $basePath; ?>/assets/images/family.jpeg" alt="Family" loading="lazy" decoding="async">
+            <img src="<?= $basePath; ?>/assets/images/family.webp" alt="Family" loading="lazy" decoding="async">
             <h3>Family Raised</h3>
             <p>Raised in a loving home environment for loyalty, confidence, and affection.</p>
         </div>
@@ -182,7 +182,7 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
 
         <div class="testimonial-summary">
             <div class="google-rating">
-                <img src="<?= $basePath; ?>/assets/images/rating.png" alt="Google 5 Star Rating" loading="lazy" decoding="async">
+                <img src="<?= $basePath; ?>/assets/images/rating.webp" alt="Google 5 Star Rating" loading="lazy" decoding="async">
                 <span>5.0 Rating on Google</span>
             </div>
             <p>Trusted by hundreds of families for healthy, socialized Cane Corso puppies and a supportive adoption experience.</p>
@@ -193,7 +193,7 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
             <div class="testimonial-card">
                 <div class="review-header">
                     <strong>Sarah Thompson</strong>
-                    <img src="<?= $basePath; ?>/assets/images/rating.png" alt="5 star review" loading="lazy" decoding="async">
+                    <img src="<?= $basePath; ?>/assets/images/rating.webp" alt="5 star review" loading="lazy" decoding="async">
                 </div>
                 <div class="testimonial-text">
                     <p>
@@ -206,7 +206,7 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
             <div class="testimonial-card">
                 <div class="review-header">
                     <strong>Michael Davis</strong>
-                    <img src="<?= $basePath; ?>/assets/images/rating.png" alt="5 star review" loading="lazy" decoding="async">
+                    <img src="<?= $basePath; ?>/assets/images/rating.webp" alt="5 star review" loading="lazy" decoding="async">
                 </div>
                 <div class="testimonial-text">
                     <p>
@@ -219,7 +219,7 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
             <div class="testimonial-card">
                 <div class="review-header">
                     <strong>Jessica Martinez</strong>
-                    <img src="<?= $basePath; ?>/assets/images/rating.png" alt="5 star review" loading="lazy" decoding="async">
+                    <img src="<?= $basePath; ?>/assets/images/rating.webp" alt="5 star review" loading="lazy" decoding="async">
                 </div>
                 <div class="testimonial-text">
                     <p>
@@ -249,4 +249,4 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
 </section>
 
 
-<script src="<?= $basePath; ?>/assets/js/home.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/home.min.js" defer></script>

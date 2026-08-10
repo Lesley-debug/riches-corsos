@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require __DIR__ . '/../template/header.php';
 ?>
 
-<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.jpeg')">
+<section class="page-hero" style="background-image: url('<?= $basePath; ?>/assets/images/happy_puppy.webp')">
   <div class="page-hero-inner">
     <span class="page-hero-eyebrow">Get In Touch</span>
     <h1>Contact Us</h1>
@@ -125,12 +125,12 @@ require __DIR__ . '/../template/header.php';
             <h3 class="team-text">Dedicated breeders committed to healthy, well-socialized puppies.</h3>
 
             <div class="image-wrapper">
-                <img src="<?= $basePath; ?>/assets/images/luna.jpeg" alt="Riches Corsos" class="main-image" id="mainImage">
+                <img src="<?= $basePath; ?>/assets/images/luna.webp" alt="Riches Corsos" class="main-image" id="mainImage">
             </div>
 
             <div class="thumb-scroll">
-                <img src="<?= $basePath; ?>/assets/images/luna.jpeg" alt="Puppy" class="thumb active" data-src="<?= $basePath; ?>/assets/images/luna.jpeg">
-                <img src="<?= $basePath; ?>/assets/images/happy_puppy.jpeg" alt="Puppy" class="thumb" data-src="<?= $basePath; ?>/assets/images/happy_puppy.jpeg">
+                <img src="<?= $basePath; ?>/assets/images/luna.webp" alt="Puppy" class="thumb active" data-src="<?= $basePath; ?>/assets/images/luna.webp">
+                <img src="<?= $basePath; ?>/assets/images/happy_puppy.webp" alt="Puppy" class="thumb" data-src="<?= $basePath; ?>/assets/images/happy_puppy.webp">
                 <img src="<?= $basePath; ?>/assets/images/contact1.jpeg" alt="Puppy" class="thumb" data-src="<?= $basePath; ?>/assets/images/contact1.jpeg">
                 <img src="<?= $basePath; ?>/assets/images/contact2.jpeg" alt="Puppy" class="thumb" data-src="<?= $basePath; ?>/assets/images/contact2.jpeg">
             </div>
@@ -144,6 +144,6 @@ require __DIR__ . '/../template/header.php';
     </div>
 </section>
 
-<script src="<?= $basePath; ?>/assets/js/contact.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/contact.min.js" defer></script>
 
 <?php require __DIR__ . '/../template/footer.php'; ?>

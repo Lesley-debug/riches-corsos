@@ -6,7 +6,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background:
         linear-gradient(160deg, rgba(13,10,7,0.88) 0%, rgba(26,18,10,0.72) 100%),
-        url('../images/lena1.jpeg') center/cover no-repeat fixed;
+        url('../images/lena1.webp') center/cover no-repeat fixed;
     min-height: 100vh;
     display: flex;
     align-items: center;

@@ -54,6 +54,6 @@ require_once __DIR__ . '/../template/header.php';
 
 
 
-<script src="<?= $basePath; ?>/assets/js/wishlist.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/wishlist.min.js" defer></script>
 
 <?php require_once __DIR__ . '/../template/footer.php'; ?>

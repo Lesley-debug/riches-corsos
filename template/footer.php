@@ -1,7 +1,7 @@
 <footer class="footer-container">
     <div class="footer-main container">
         <div class="footer-column footer-brand">
-            <img src="<?= $basePath; ?>/assets/images/logo1.png" alt="Riches Corsos Logo" class="logo-img footer-logo" loading="lazy" decoding="async">
+            <img src="<?= $basePath; ?>/assets/images/logo1.webp" alt="Riches Corsos Logo" class="logo-img footer-logo" loading="lazy" decoding="async">
             <p>
                 Riches Corsos breeds Cane Corso puppies with a focus on health, temperament, and family readiness.
                 Our breeding program offers trusted bloodlines, thoughtful socialization, and ongoing support.
@@ -63,7 +63,7 @@
                         'wishlistCount' => (int)($wishlistCount ?? 0),
                     ], JSON_HEX_TAG | JSON_HEX_AMP); ?>;
 </script>
-<script src="<?= $basePath; ?>/assets/js/site.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/site.min.js" defer></script>
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();

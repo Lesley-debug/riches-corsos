@@ -242,7 +242,7 @@ require __DIR__ . '/../template/header.php';
 </section>
 <?php endif; ?>
 
-<script src="<?= $basePath; ?>/assets/js/product.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/product.min.js" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var track   = document.getElementById('relatedTrack');
