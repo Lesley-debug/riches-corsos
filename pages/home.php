@@ -90,6 +90,9 @@ if (!empty($_SESSION['just_logged_in']) && !empty($_SESSION['user_name'])) {
             </article>
         <?php endforeach; ?>
     </div>
+        <div style="text-align:center; margin-top: 36px;">
+            <a href="<?= $basePath; ?>/shop/shop.php" class="view-all-puppies-btn">View All Available Puppies</a>
+        </div>
 </section>
 
 <!-- ================== TRUST / WELLBEING ================== -->
