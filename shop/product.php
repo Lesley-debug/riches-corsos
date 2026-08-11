@@ -125,7 +125,7 @@ require __DIR__ . '/../template/header.php';
                 </a>
                 <a class="share-link share-tiktok" href="https://www.tiktok.com/@canecorsopuppies60?_r=1&amp;_t=ZS-98aYUPnTKDM" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/>
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z" />
                     </svg>
                 </a>
             </div>
@@ -198,76 +198,93 @@ require __DIR__ . '/../template/header.php';
 </div>
 
 <?php if (!empty($relatedPuppies)): ?>
-<section class="related-section">
-    <div class="related-inner">
-        <div class="related-header">
-            <span class="related-eyebrow">Explore More</span>
-            <h2>You May Also Like</h2>
-            <p>More healthy, family-raised Cane Corso puppies available now.</p>
-        </div>
-        <div class="related-track-wrap">
-            <div class="related-track" id="relatedTrack">
-                <?php foreach ($relatedPuppies as $r): ?>
-                    <?php $isReserved = strtolower(trim($r['status'])) === 'reserved'; ?>
-                    <article class="related-card">
-                        <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$r['id']; ?>" class="related-card-img-wrap">
-                            <img src="<?= htmlspecialchars($normalizeImagePath($r['featured_image'] ?? '')); ?>" alt="<?= htmlspecialchars($r['name']); ?>" loading="lazy">
-                            <?php if ($isReserved): ?>
-                                <span class="related-badge reserved">Reserved</span>
-                            <?php else: ?>
-                                <span class="related-badge available">Available</span>
-                            <?php endif; ?>
-                        </a>
-                        <div class="related-card-body">
-                            <h3><?= htmlspecialchars($r['name']); ?></h3>
-                            <p class="related-meta"><?= htmlspecialchars($r['breed']); ?> &bull; <?= htmlspecialchars($r['age']); ?> &bull; <?= htmlspecialchars($r['sex']); ?></p>
-                            <div class="related-footer">
-                                <span class="related-price">$<?= number_format((float)$r['price'], 2); ?></span>
-                                <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$r['id']; ?>" class="related-btn">View Details</a>
+    <section class="related-section">
+        <div class="related-inner">
+            <div class="related-header">
+                <span class="related-eyebrow">Explore More</span>
+                <h2>You May Also Like</h2>
+                <p>More healthy, family-raised Cane Corso puppies available now.</p>
+            </div>
+            <div class="related-track-wrap">
+                <div class="related-track" id="relatedTrack">
+                    <?php foreach ($relatedPuppies as $r): ?>
+                        <?php $isReserved = strtolower(trim($r['status'])) === 'reserved'; ?>
+                        <article class="related-card">
+                            <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$r['id']; ?>" class="related-card-img-wrap">
+                                <img src="<?= htmlspecialchars($normalizeImagePath($r['featured_image'] ?? '')); ?>" alt="<?= htmlspecialchars($r['name']); ?>" loading="lazy">
+                                <?php if ($isReserved): ?>
+                                    <span class="related-badge reserved">Reserved</span>
+                                <?php else: ?>
+                                    <span class="related-badge available">Available</span>
+                                <?php endif; ?>
+                            </a>
+                            <div class="related-card-body">
+                                <h3><?= htmlspecialchars($r['name']); ?></h3>
+                                <p class="related-meta"><?= htmlspecialchars($r['breed']); ?> &bull; <?= htmlspecialchars($r['age']); ?> &bull; <?= htmlspecialchars($r['sex']); ?></p>
+                                <div class="related-footer">
+                                    <span class="related-price">$<?= number_format((float)$r['price'], 2); ?></span>
+                                    <a href="<?= $basePath; ?>/shop/product.php?id=<?= (int)$r['id']; ?>" class="related-btn">View Details</a>
+                                </div>
                             </div>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <div class="related-nav">
+                <button class="related-prev" id="relatedPrev" aria-label="Previous">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </button>
+                <button class="related-next" id="relatedNext" aria-label="Next">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                </button>
             </div>
         </div>
-        <div class="related-nav">
-            <button class="related-prev" id="relatedPrev" aria-label="Previous">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-            </button>
-            <button class="related-next" id="relatedNext" aria-label="Next">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-        </div>
-    </div>
-</section>
+    </section>
 <?php endif; ?>
 
-<script src="<?= $basePath; ?>/assets/js/product.min.js" defer></script>
+<script src="<?= $basePath; ?>/assets/js/product.min.js?v=<?= filemtime(__DIR__ . '/../assets/js/product.min.js') ?? time(); ?>" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var track   = document.getElementById('relatedTrack');
-    var prevBtn = document.getElementById('relatedPrev');
-    var nextBtn = document.getElementById('relatedNext');
-    if (!track || !prevBtn || !nextBtn) return;
-    var cards = Array.from(track.querySelectorAll('.related-card'));
-    if (!cards.length) { prevBtn.hidden = nextBtn.hidden = true; return; }
-    var current = 0;
-    var gap = 22;
-    var perView  = function () { return window.innerWidth <= 640 ? 1 : window.innerWidth <= 1024 ? 2 : 3; };
-    var maxSlide = function () { return Math.max(0, cards.length - perView()); };
-    var goTo = function (n) {
-        current = Math.max(0, Math.min(n, maxSlide()));
-        var w = cards[0].offsetWidth + gap;
-        track.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
-        track.style.transform  = 'translateX(-' + (current * w) + 'px)';
-        prevBtn.disabled = current === 0;
-        nextBtn.disabled = current >= maxSlide();
-    };
-    prevBtn.addEventListener('click', function () { goTo(current - 1); });
-    nextBtn.addEventListener('click', function () { goTo(current + 1); });
-    window.addEventListener('resize', function () { goTo(current); });
-    goTo(0);
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        var track = document.getElementById('relatedTrack');
+        var prevBtn = document.getElementById('relatedPrev');
+        var nextBtn = document.getElementById('relatedNext');
+        if (!track || !prevBtn || !nextBtn) return;
+        var cards = Array.from(track.querySelectorAll('.related-card'));
+        if (!cards.length) {
+            prevBtn.hidden = nextBtn.hidden = true;
+            return;
+        }
+        var current = 0;
+        var gap = 22;
+        var perView = function() {
+            return window.innerWidth <= 640 ? 1 : window.innerWidth <= 1024 ? 2 : 3;
+        };
+        var maxSlide = function() {
+            return Math.max(0, cards.length - perView());
+        };
+        var goTo = function(n) {
+            current = Math.max(0, Math.min(n, maxSlide()));
+            var w = cards[0].offsetWidth + gap;
+            track.style.transition = 'transform 0.45s cubic-bezier(0.4,0,0.2,1)';
+            track.style.transform = 'translateX(-' + (current * w) + 'px)';
+            prevBtn.disabled = current === 0;
+            nextBtn.disabled = current >= maxSlide();
+        };
+        prevBtn.addEventListener('click', function() {
+            goTo(current - 1);
+        });
+        nextBtn.addEventListener('click', function() {
+            goTo(current + 1);
+        });
+        window.addEventListener('resize', function() {
+            goTo(current);
+        });
+        goTo(0);
+    });
 </script>
 
 <?php require __DIR__ . '/../template/footer.php'; ?>
