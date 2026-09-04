@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title>Riches Corsos app icon</title>
+  <rect width="512" height="512" fill="#2f6b4f"/>
+  <circle cx="256" cy="256" r="178" fill="#f7f3e8"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="#c79a44" stroke-width="16"/>
+  <path
+    d="M166 320V188h72c31 0 51 18 51 46 0 20-10 35-28 42l39 44h-39l-34-39h-28v39h-33Zm33-66h35c14 0 22-8 22-20 0-13-8-20-22-20h-35v40Zm151 68c-42 0-72-29-72-68s30-68 72-68c27 0 50 13 62 34l-28 16c-7-13-19-20-34-20-23 0-39 16-39 38s16 38 39 38c15 0 27-7 35-20l28 16c-13 21-35 34-63 34Z"
+    fill="#2f6b4f"
+  />
+  <path d="M160 358c54 38 137 38 192 0" fill="none" stroke="#c79a44" stroke-width="14" stroke-linecap="round"/>
+</svg>

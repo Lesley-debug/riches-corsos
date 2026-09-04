@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "laravel-vite-plugin": "^1.0.5",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@inertiajs/react": "^2.3.27",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ziggy-js": "^2.0.0"
+  }
+}
