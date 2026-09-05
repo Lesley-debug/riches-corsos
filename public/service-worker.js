@@ -1,5 +1,5 @@
 const CACHE_NAME = 'riches-corsos-v1';
-const PRECACHE_URLS = ['/', '/manifest.json'];
+const PRECACHE_URLS = ['/manifest.json'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -22,10 +22,13 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).catch(() => caches.match('/'))
-    );
+  // Skip navigations and let the browser handle them normally.
+  // Skip cross-origin requests (Vite HMR) and non-GET methods (POST etc.).
+  if (
+    request.mode === 'navigate' ||
+    request.method !== 'GET' ||
+    new URL(request.url).origin !== self.location.origin
+  ) {
     return;
   }
 
@@ -33,6 +36,7 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cached) => {
       if (cached) return cached;
       return fetch(request).then((response) => {
+        if (!response.ok) return response;
         const clone = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         return response;
