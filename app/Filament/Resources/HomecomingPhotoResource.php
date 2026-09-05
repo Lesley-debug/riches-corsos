@@ -14,9 +14,10 @@ class HomecomingPhotoResource extends Resource
 {
     protected static ?string $model = HomecomingPhoto::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
-
+    protected static ?string $navigationIcon  = 'heroicon-o-photo';
     protected static ?string $navigationLabel = 'Homecoming Photos';
+    protected static ?string $navigationGroup = 'Content';
+    protected static ?int    $navigationSort  = 3;
 
     public static function form(Form $form): Form
     {

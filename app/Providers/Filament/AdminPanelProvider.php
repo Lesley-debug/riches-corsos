@@ -36,6 +36,13 @@ class AdminPanelProvider extends PanelProvider
             )
             ->pages([
                 Dashboard::class,
+                \App\Filament\Pages\ManageSiteSettings::class,
+            ])
+            ->navigationItems([
+                \Filament\Navigation\NavigationItem::make('View Website')
+                    ->url('/', shouldOpenInNewTab: true)
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->sort(99),
             ])
             ->discoverWidgets(
                 in: app_path('Filament/Widgets'),
