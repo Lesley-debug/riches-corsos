@@ -36,15 +36,22 @@ class PublicSiteController extends Controller
 
     public function puppyShow(Puppy $puppy)
     {
-        $puppy->load('images');
+        $puppy->load([
+            'images',
+            'videos',
+            'documents' => fn ($q) => $q->where('visibility', 'public'),
+            'parents.images',
+        ]);
 
         $isWishlisted = auth()->check()
             ? auth()->user()->wishlists()->where('puppy_id', $puppy->id)->exists()
             : false;
 
         return Inertia::render('Puppies/Show', [
-            'puppy' => $puppy,
-            'isWishlisted' => $isWishlisted,
+            'puppy'       => $puppy,
+            'sire'        => $puppy->parents->firstWhere('pivot.role', 'sire'),
+            'dam'         => $puppy->parents->firstWhere('pivot.role', 'dam'),
+            'isWishlisted'=> $isWishlisted,
         ]);
     }
 
@@ -70,6 +77,11 @@ class PublicSiteController extends Controller
     public function faqs()
     {
         return Inertia::render('Faqs');
+    }
+
+    public function testimonials()
+    {
+        return Inertia::render('Testimonials');
     }
 
     public function contactShow()
