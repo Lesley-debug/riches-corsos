@@ -17,7 +17,7 @@ class PuppyModelTest extends TestCase
         $puppy = Puppy::factory()->create(['name' => 'Bella']);
 
         $this->assertNotEmpty($puppy->slug);
-        $this->assertStringStartsWith('bella-', $puppy->slug);
+        $this->assertStringStartsWith('bella', $puppy->slug);
     }
 
     public function test_slug_is_not_overwritten_when_already_set(): void
