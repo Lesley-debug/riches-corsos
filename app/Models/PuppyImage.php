@@ -10,7 +10,9 @@ class PuppyImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['puppy_id', 'path', 'sort_order'];
+    protected $fillable = ['puppy_id', 'path', 'alt_text', 'sort_order', 'is_featured'];
+
+    protected $casts = ['is_featured' => 'boolean'];
 
     public function puppy(): BelongsTo
     {
