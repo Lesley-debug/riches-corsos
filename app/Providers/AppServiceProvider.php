@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Models\ContactMessage;
 use App\Models\Order;
+use App\Models\User;
 use App\Observers\ContactMessageObserver;
 use App\Observers\OrderObserver;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,5 +18,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Order::observe(OrderObserver::class);
         ContactMessage::observe(ContactMessageObserver::class);
+
+        // Gate used by PuppyDocumentController to restrict document routes to admins.
+        Gate::define('admin-only', fn (User $user) => $user->isAdmin());
     }
 }
