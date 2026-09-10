@@ -1645,22 +1645,107 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   position: relative;
   overflow: hidden;
 }
-.hero-full-bg {
+/* --- Hero Slideshow Layers --- */
+.hero-slides-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.hero-slide-layer {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+  will-change: filter, opacity, transform;
+}
+
+/* Active incoming slide: enters blurred & scaled, sharpens to clear, holds, then blurs & scales back */
+.hero-slide-active {
+  z-index: 2;
+  animation: heroBlurSequence 6s ease-in-out forwards;
+}
+
+/* Previous outgoing slide sits underneath */
+.hero-slide-prev {
   z-index: 1;
+  filter: blur(20px);
+  transform: scale(0.95);
+  opacity: 0;
+  transition: opacity 1.2s ease-out;
 }
-.hero-ken-burns {
-  animation: kenBurnsZoom 24s ease-in-out infinite alternate;
-  will-change: transform;
+
+@keyframes heroBlurSequence {
+  0% {
+    opacity: 0;
+    filter: blur(24px) brightness(0.7);
+    transform: scale(1.08);
+  }
+  16% {
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+    transform: scale(1.04);
+  }
+  74% {
+    opacity: 1;
+    filter: blur(0px) brightness(1);
+    transform: scale(1.01);
+  }
+  92% {
+    opacity: 0.85;
+    filter: blur(18px) brightness(0.75);
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(28px) brightness(0.65);
+    transform: scale(0.94);
+  }
 }
-@keyframes kenBurnsZoom {
-  0% { transform: scale(1.0); }
-  50% { transform: scale(1.07); }
-  100% { transform: scale(1.0); }
+
+/* Hero dots indicator */
+.hero-slide-dots {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
+
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.hero-dot:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.hero-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--white);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+.hero-full-bg { display: none; }
+
 .hero-live-badge {
   position: relative;
   z-index: 5;

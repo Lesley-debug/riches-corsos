@@ -64,6 +64,15 @@ const MILESTONES = [
     },
 ];
 
+const HERO_SLIDES = [
+    '/images/bg/homepagehero.jpg',
+    '/images/bg/hero1.jpg',
+    '/images/bg/hero2.jpg',
+    '/images/bg/hero3.jpg',
+    '/images/bg/homepagebg.jpg',
+    '/images/bg/Homepagebg.jpg',
+];
+
 function DiamondDivider() {
     return (
         <div className="diamond-divider">
@@ -125,6 +134,27 @@ export default function Home({
     // Milestones tab
     const [activeMilestone, setActiveMilestone] = useState('8w');
 
+    // Hero slideshow: cycles through all 6 images in public/images/bg
+    // Each slide comes in blurred & zoomed, sharpens, holds, then blurs & scales back
+    const [heroSlide, setHeroSlide] = useState(0);
+    const [prevSlide, setPrevSlide] = useState(null);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setHeroSlide((curr) => {
+                setPrevSlide(curr);
+                return (curr + 1) % HERO_SLIDES.length;
+            });
+        }, 6000);
+        return () => clearInterval(timer);
+    }, []);
+
+    function handleHeroDot(idx) {
+        if (idx === heroSlide) return;
+        setPrevSlide(heroSlide);
+        setHeroSlide(idx);
+    }
+
     // 43 seconds total across 8 thumbnails = 5375ms per slide
     const SLIDE_DURATION_MS = 5375;
 
@@ -167,14 +197,24 @@ export default function Home({
         <SiteLayout>
             <Head title="Riches Corsos — Health-Tested Cane Corso Puppies" />
 
-            {/* ===== 1. HERO WITH CINEMATIC MOTION & LIVE STATUS PILL ===== */}
+            {/* ===== 1. HERO SLIDESHOW: blur-in → clear → blur-out → next image ===== */}
             <section className="hero-full hero-cinematic-wrap">
-                <div
-                    className="hero-full-bg hero-ken-burns"
-                    style={{
-                        backgroundImage: `url(${heroImage ? '/storage/' + heroImage : '/images/bg/homepagehero.jpg'})`,
-                    }}
-                />
+                {/* Stacked background slideshow layers */}
+                <div className="hero-slides-container">
+                    {prevSlide !== null && prevSlide !== heroSlide && (
+                        <div
+                            key={`prev-${prevSlide}`}
+                            className="hero-slide-layer hero-slide-prev"
+                            style={{ backgroundImage: `url(${HERO_SLIDES[prevSlide]})` }}
+                        />
+                    )}
+                    <div
+                        key={`curr-${heroSlide}`}
+                        className="hero-slide-layer hero-slide-active"
+                        style={{ backgroundImage: `url(${HERO_SLIDES[heroSlide]})` }}
+                    />
+                </div>
+
                 <div className="hero-full-overlay" />
                 <div className="hero-full-content">
                     {/* Live status badge */}
@@ -238,6 +278,19 @@ export default function Home({
                             Available Puppies
                         </Link>
                     </div>
+                </div>
+
+                {/* Subtle Dots for all 6 slides */}
+                <div className="hero-slide-dots" aria-label="Hero background slideshow navigation">
+                    {HERO_SLIDES.map((_, idx) => (
+                        <button
+                            key={idx}
+                            type="button"
+                            className={`hero-dot ${idx === heroSlide ? 'active' : ''}`}
+                            onClick={() => handleHeroDot(idx)}
+                            aria-label={`Go to slide ${idx + 1}`}
+                        />
+                    ))}
                 </div>
             </section>
 
