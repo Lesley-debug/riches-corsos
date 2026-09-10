@@ -1,407 +1,594 @@
 import { useState } from 'react';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
+import PuppyCard from '@/Components/PuppyCard';
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-function ageLabel(weeks) {
-  if (weeks < 4)  return `${weeks} week${weeks !== 1 ? 's' : ''} old`;
-  if (weeks < 52) {
-    const m = Math.round(weeks / 4.33);
-    return `${m} month${m !== 1 ? 's' : ''} old`;
-  }
-  const y = Math.floor(weeks / 52);
-  return `${y} year${y !== 1 ? 's' : ''} old`;
-}
-
-function statusColor(s) {
-  return { available: '#2d7a4f', reserved: '#b45309', pending: '#b45309', sold: '#6b7280', not_available: '#6b7280' }[s] ?? '#6b7280';
-}
-
-function Check() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="8" cy="8" r="8" fill="#2d7a4f" opacity=".12" />
-      <path d="M4.5 8l2.5 2.5 4.5-5" stroke="#2d7a4f" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function DocIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-    </svg>
-  );
-}
-
-// ── Main Component ────────────────────────────────────────────────────────────
-export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishlisted }) {
-  const { props } = usePage();
-  const flashSuccess = props.flash?.success;
-  const user = props.auth?.user;
-
-  const [activeImg, setActiveImg]   = useState(0);
-  const [showForm, setShowForm]     = useState(false);
-  const [wishlisted, setWishlisted] = useState(initialWishlisted ?? false);
-
-  const toggleWishlist = () => {
-    if (!user) { router.visit('/login'); return; }
-    setWishlisted(w => !w);
-    router.post('/wishlist/toggle', { puppy_id: puppy.id }, { preserveScroll: true });
-  };
-
-  const { data, setData, post, processing, errors, reset } = useForm({
-    puppy_id:     puppy.id,
-    buyer_name:   '',
-    buyer_email:  '',
-    buyer_phone:  '',
-    buyer_address:'',
-    notes:        '',
-  });
-
-  const submit = e => {
-    e.preventDefault();
-    post('/orders', { onSuccess: () => reset() });
-  };
-
-  const images     = puppy.images?.length ? puppy.images : [];
-  const isAvailable = puppy.status === 'available';
-  const age        = ageLabel(puppy.age_in_weeks);
-
-  const docTypeLabel = {
-    health_certificate:   'Health Certificate',
-    vaccination_record:   'Vaccination Record',
-    pedigree_certificate: 'Pedigree Certificate',
-    registration_papers:  'Registration Papers',
-    genetic_test:         'Genetic Test Results',
-    hip_elbow_results:    'Hip/Elbow Results',
-    purchase_agreement:   'Purchase Agreement',
-    health_guarantee:     'Health Guarantee',
-    other:                'Document',
-  };
-
-  const vaccinationLabel = {
-    not_started:        'Not Started',
-    first_vaccination:  'First Vaccination',
+const VACCINATION_LABELS = {
+    not_started: 'Not Started',
+    first_vaccination: 'First Vaccination',
     second_vaccination: 'Second Vaccination',
-    fully_vaccinated:   'Fully Vaccinated',
-  };
+    fully_vaccinated: 'Fully Vaccinated',
+};
 
-  return (
-    <SiteLayout>
-      <Head title={`${puppy.name} — Riches Corsos`} />
+function ageLabel(weeks) {
+    if (weeks == null) {
+        return null;
+    }
 
-      <div className="home-page">
+    if (weeks < 4) {
+        return `${weeks} week${weeks === 1 ? '' : 's'} old`;
+    }
 
-        {/* ── HERO SECTION: Gallery + Info Card ── */}
-        <section className="puppy-show-hero section">
-          {/* Gallery */}
-          <div className="puppy-gallery">
-            <div className="puppy-gallery-main">
-              {images[activeImg] ? (
-                <img
-                  key={activeImg}
-                  src={`/storage/${images[activeImg].path}`}
-                  alt={images[activeImg].alt_text || puppy.name}
-                  className="puppy-gallery-main-img"
-                />
-              ) : (
-                <div className="puppy-gallery-placeholder" />
-              )}
-            </div>
-            {images.length > 1 && (
-              <div className="puppy-gallery-thumbs">
-                {images.map((img, i) => (
-                  <button
-                    key={img.id}
-                    onClick={() => setActiveImg(i)}
-                    className={`puppy-thumb-btn${i === activeImg ? ' active' : ''}`}
-                  >
-                    <img src={`/storage/${img.path}`} alt={img.alt_text || puppy.name} />
-                  </button>
-                ))}
-              </div>
-            )}
-            {/* Videos row */}
-            {puppy.videos?.length > 0 && (
-              <div className="puppy-videos-row">
-                {puppy.videos.map(v => (
-                  <a
-                    key={v.id}
-                    href={v.video_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="puppy-video-thumb"
-                  >
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-                    <span>{v.title || 'Watch Video'}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
+    if (weeks < 52) {
+        const months = Math.round(weeks / 4.33);
+        return `${months} month${months === 1 ? '' : 's'} old`;
+    }
 
-          {/* Info Card */}
-          <div className="puppy-info-card card-3d">
-            {/* Status + wishlist */}
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
-              <span
-                className="puppy-badge"
-                style={{ background: statusColor(puppy.status)+'1a', color: statusColor(puppy.status), textTransform:'capitalize' }}
-              >
-                {puppy.status.replace('_',' ')}
-              </span>
-              <button onClick={toggleWishlist} aria-label="Toggle wishlist" className="wishlist-btn">
-                <svg viewBox="0 0 24 24" width="22" height="22">
-                  <path
-                    d="M12 21s-7-4.5-9.3-8.8C1.2 8.6 2.8 5 6.3 5c2 0 3.3 1.1 4 2.1.7-1 2-2.1 4-2.1 3.5 0 5.1 3.6 3.6 7.2C19 16.5 12 21 12 21z"
-                    stroke="var(--green-dark)" strokeWidth="1.6"
-                    fill={wishlisted ? 'var(--green-dark)' : 'none'}
-                  />
-                </svg>
-              </button>
-            </div>
+    const years = Math.floor(weeks / 52);
+    return `${years} year${years === 1 ? '' : 's'} old`;
+}
 
-            <h1 className="puppy-show-name">{puppy.name}</h1>
-            <p className="puppy-show-meta">{puppy.breed} · {puppy.sex === 'male' ? '♂ Male' : '♀ Female'} · {age}</p>
-            {puppy.color && <p className="puppy-show-meta" style={{ marginTop:2 }}>Color: {puppy.color}{puppy.markings ? ` · ${puppy.markings}` : ''}</p>}
+function dateLabel(value) {
+    if (!value) {
+        return null;
+    }
 
-            <p className="puppy-price" style={{ fontSize:30, margin:'16px 0' }}>${Number(puppy.price).toLocaleString()}</p>
+    const date = new Date(String(value).includes('T') ? value : `${value}T00:00:00`);
 
-            {/* Badges */}
-            {puppy.badges?.length > 0 && (
-              <div className="puppy-badges-row">
-                {puppy.badges.map(b => (
-                  <span key={b} className="puppy-badge-chip">{b.replace(/_/g,' ')}</span>
-                ))}
-              </div>
-            )}
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
 
-            {puppy.description && (
-              <p className="puppy-show-desc">{puppy.description}</p>
-            )}
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
 
-            {flashSuccess && <div className="form-success" style={{ marginBottom:16 }}>{flashSuccess}</div>}
+function priceLabel(price) {
+    return price ? `$${Number(price).toLocaleString()}` : 'Contact for price';
+}
 
-            {isAvailable ? (
-              !showForm ? (
-                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                  <button className="btn-solid" onClick={() => setShowForm(true)} style={{ width:'100%' }}>
-                    Reserve This Puppy
-                  </button>
-                  <a href="/contact" className="btn-outline" style={{ textAlign:'center', display:'block' }}>
-                    Inquire About {puppy.name}
-                  </a>
-                </div>
-              ) : (
-                <form onSubmit={submit} className="reserve-form">
-                  <p className="form-note" style={{ marginBottom:16 }}>
-                    No payment is taken here — we'll contact you to confirm next steps.
-                  </p>
-                  {[
-                    { label:'Full name', key:'buyer_name', type:'text', required:true },
-                    { label:'Email',     key:'buyer_email', type:'email', required:true },
-                    { label:'Phone',     key:'buyer_phone', type:'text', required:true },
-                  ].map(f => (
-                    <div className="form-field" key={f.key}>
-                      <label>{f.label}</label>
-                      <input type={f.type} value={data[f.key]} onChange={e => setData(f.key, e.target.value)} required={f.required} />
-                      {errors[f.key] && <div className="form-error">{errors[f.key]}</div>}
+function labelize(value) {
+    return String(value ?? '').replace(/_/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function cleanList(value) {
+    return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+
+function CheckIcon() {
+    return (
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+            <circle cx="8.5" cy="8.5" r="8.5" fill="#2F6B4F" opacity=".12" />
+            <path d="M5 8.6l2.1 2.1L12 5.8" stroke="#234F3A" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+    );
+}
+
+function DocumentIcon() {
+    return (
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z" />
+            <path d="M14 2v5h5" />
+            <path d="M8 13h8M8 17h5" />
+        </svg>
+    );
+}
+
+function HeartIcon({ filled }) {
+    return (
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path
+                d="M12 21s-7-4.5-9.3-8.8C1.2 8.6 2.8 5 6.3 5c2 0 3.3 1.1 4 2.1.7-1 2-2.1 4-2.1 3.5 0 5.1 3.6 3.6 7.2C19 16.5 12 21 12 21z"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                fill={filled ? 'currentColor' : 'none'}
+            />
+        </svg>
+    );
+}
+
+function ShareIcon() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4" />
+        </svg>
+    );
+}
+
+function CopyIcon() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="12" height="12" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+    );
+}
+
+function PlayIcon() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+        </svg>
+    );
+}
+
+export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishlisted, related = [] }) {
+    const { props } = usePage();
+    const flashSuccess = props.flash?.success;
+    const user = props.auth?.user;
+
+    const [activeImage, setActiveImage] = useState(0);
+    const [showForm, setShowForm] = useState(false);
+    const [wishlisted, setWishlisted] = useState(initialWishlisted ?? false);
+    const [copied, setCopied] = useState(false);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        puppy_id: puppy.id,
+        buyer_name: '',
+        buyer_email: '',
+        buyer_phone: '',
+        buyer_address: '',
+        notes: '',
+    });
+
+    const images = cleanList(puppy.images);
+    const videos = cleanList(puppy.videos);
+    const documents = cleanList(puppy.documents).filter((document) => document.file_path);
+    const age = ageLabel(puppy.age_in_weeks);
+    const isAvailable = puppy.status === 'available';
+    const status = labelize(puppy.status);
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const shareText = `${puppy.name} - ${puppy.breed} puppy at Riches Corsos`;
+    const pageTitle = puppy.seo_title || `${puppy.name} | ${puppy.breed} Puppy | Riches Corsos`;
+    const metaDescription = puppy.meta_description || puppy.description?.slice(0, 155) || `Meet ${puppy.name}, a ${puppy.breed} puppy at Riches Corsos.`;
+    const ogImage = images[0] ? `/storage/${images[0].path}` : '/images/logo.png';
+
+    const detailItems = [
+        { label: 'Breed', value: puppy.breed },
+        { label: 'Sex', value: puppy.sex ? labelize(puppy.sex) : null },
+        { label: 'Age', value: age },
+        { label: 'Date Of Birth', value: dateLabel(puppy.date_of_birth) },
+        { label: 'Color', value: puppy.color },
+        { label: 'Markings', value: puppy.markings },
+        { label: 'Current Weight', value: puppy.weight },
+        { label: 'Expected Adult Weight', value: puppy.expected_adult_weight },
+        { label: 'Energy Level', value: puppy.energy_level ? labelize(puppy.energy_level) : null },
+        { label: 'Available From', value: dateLabel(puppy.available_date) || (isAvailable ? 'Available now' : null) },
+        { label: 'Deposit', value: puppy.deposit_required ? priceLabel(puppy.deposit_amount) : null },
+    ].filter((item) => item.value);
+
+    const overviewItems = [
+        { label: 'Sex', value: puppy.sex ? labelize(puppy.sex) : null },
+        { label: 'Age', value: age },
+        { label: 'Color', value: puppy.color },
+        { label: 'Ready', value: dateLabel(puppy.available_date) || (isAvailable ? 'Now' : null) },
+    ].filter((item) => item.value);
+
+    const healthItems = [
+        puppy.vet_checked ? `Vet checked${puppy.vet_check_date ? ` on ${dateLabel(puppy.vet_check_date)}` : ''}` : null,
+        puppy.vaccination_status ? `Vaccinations: ${VACCINATION_LABELS[puppy.vaccination_status] ?? labelize(puppy.vaccination_status)}` : null,
+        puppy.dewormed ? 'Dewormed' : null,
+        puppy.microchipped ? 'Microchipped' : null,
+        puppy.health_guarantee ? 'Health guarantee included' : null,
+    ].filter(Boolean);
+
+    const traitGroups = [
+        { label: 'Temperament', items: cleanList(puppy.temperament) },
+        { label: 'Family Compatibility', items: cleanList(puppy.compatibility) },
+        { label: 'Training Progress', items: cleanList(puppy.training_progress) },
+    ].filter((group) => group.items.length > 0);
+
+    const parents = [
+        { parent: sire, role: 'Father', label: 'Sire' },
+        { parent: dam, role: 'Mother', label: 'Dam' },
+    ].filter(({ parent }) => parent);
+
+    const toggleWishlist = () => {
+        if (!user) {
+            router.visit('/login');
+            return;
+        }
+
+        setWishlisted((current) => !current);
+        router.post('/wishlist/toggle', { puppy_id: puppy.id }, {
+            preserveScroll: true,
+            onError: () => setWishlisted((current) => !current),
+        });
+    };
+
+    const copyLink = () => {
+        if (typeof navigator === 'undefined') {
+            return;
+        }
+
+        navigator.clipboard?.writeText(shareUrl).then(() => {
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 2000);
+        });
+    };
+
+    const handleShare = async () => {
+        if (typeof navigator !== 'undefined' && navigator.share) {
+            try {
+                await navigator.share({ title: puppy.name, text: shareText, url: shareUrl });
+            } catch (_) {
+                return;
+            }
+        } else {
+            copyLink();
+        }
+    };
+
+    const submit = (event) => {
+        event.preventDefault();
+        post('/orders', {
+            preserveScroll: true,
+            onSuccess: () => {
+                reset();
+                setShowForm(false);
+            },
+        });
+    };
+
+    return (
+        <SiteLayout>
+            <Head>
+                <title>{pageTitle}</title>
+                <meta name="description" content={metaDescription} />
+                <meta property="og:title" content={pageTitle} />
+                <meta property="og:description" content={metaDescription} />
+                <meta property="og:image" content={ogImage} />
+                <meta property="og:url" content={shareUrl} />
+                <link rel="canonical" href={shareUrl} />
+            </Head>
+
+            <div className="puppy-show-page">
+                <nav className="puppy-breadcrumb">
+                    <div className="puppy-breadcrumb-inner">
+                        <Link href="/">Home</Link>
+                        <span>/</span>
+                        <Link href="/puppies">Available Puppies</Link>
+                        <span>/</span>
+                        <span>{puppy.name}</span>
                     </div>
-                  ))}
-                  <div className="form-field">
-                    <label>Address (optional)</label>
-                    <textarea rows={2} value={data.buyer_address} onChange={e => setData('buyer_address', e.target.value)} />
-                  </div>
-                  <div className="form-field">
-                    <label>Anything else? (optional)</label>
-                    <textarea rows={3} value={data.notes} onChange={e => setData('notes', e.target.value)} />
-                  </div>
-                  {errors.puppy_id && <div className="form-error" style={{ marginBottom:12 }}>{errors.puppy_id}</div>}
-                  <button type="submit" className="btn-solid" disabled={processing} style={{ width:'100%' }}>
-                    {processing ? 'Sending…' : 'Send Reservation Request'}
-                  </button>
-                  <button type="button" onClick={() => setShowForm(false)} className="btn-outline" style={{ width:'100%', marginTop:8 }}>
-                    Cancel
-                  </button>
-                </form>
-              )
-            ) : (
-              <p style={{ color:'var(--stone)', lineHeight:1.6 }}>
-                This puppy is currently <strong>{puppy.status.replace('_',' ')}</strong> — check back, or view other{' '}
-                <a href="/puppies" style={{ color:'var(--green-dark)', fontWeight:600 }}>available puppies</a>.
-              </p>
-            )}
-          </div>
-        </section>
+                </nav>
 
-        {/* ── DETAILS GRID ── */}
-        <section className="section puppy-details-section">
-          <div className="sec-title-plaque">Puppy Details</div>
-          <div className="puppy-details-grid">
-            {[
-              { label:'Breed',                value: puppy.breed },
-              { label:'Date of Birth',        value: puppy.date_of_birth ? new Date(puppy.date_of_birth).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}) : null },
-              { label:'Age',                  value: age },
-              { label:'Sex',                  value: puppy.sex === 'male' ? 'Male' : 'Female' },
-              { label:'Color',                value: puppy.color },
-              { label:'Markings',             value: puppy.markings },
-              { label:'Current Weight',       value: puppy.weight },
-              { label:'Expected Adult Weight',value: puppy.expected_adult_weight },
-              { label:'Energy Level',         value: puppy.energy_level ? puppy.energy_level.charAt(0).toUpperCase()+puppy.energy_level.slice(1) : null },
-            ].filter(d => d.value).map(d => (
-              <div key={d.label} className="puppy-detail-item">
-                <span className="puppy-detail-label">{d.label}</span>
-                <span className="puppy-detail-value">{d.value}</span>
-              </div>
-            ))}
-          </div>
-        </section>
+                <section className="puppy-show-shell">
+                    <div className="puppy-show-hero">
+                        <div className="puppy-gallery-panel">
+                            <div className="puppy-gallery-main">
+                                {images[activeImage] ? (
+                                    <img
+                                        key={images[activeImage].id ?? activeImage}
+                                        src={`/storage/${images[activeImage].path}`}
+                                        alt={images[activeImage].alt_text || puppy.name}
+                                        className="puppy-gallery-main-img"
+                                    />
+                                ) : (
+                                    <div className="puppy-gallery-placeholder">
+                                        <span>{puppy.name}</span>
+                                    </div>
+                                )}
+                            </div>
 
-        {/* ── TEMPERAMENT ── */}
-        {(puppy.temperament?.length > 0 || puppy.compatibility?.length > 0 || puppy.training_progress?.length > 0) && (
-          <section className="section puppy-traits-section">
-            <div className="sec-title-plaque">Personality & Temperament</div>
-            {puppy.temperament?.length > 0 && (
-              <div style={{ marginBottom:20 }}>
-                <p className="puppy-traits-label">Temperament</p>
-                <div className="puppy-chips">
-                  {puppy.temperament.map(t => <span key={t} className="puppy-chip">{t}</span>)}
-                </div>
-              </div>
-            )}
-            {puppy.compatibility?.length > 0 && (
-              <div style={{ marginBottom:20 }}>
-                <p className="puppy-traits-label">Family Compatibility</p>
-                <div className="puppy-chips">
-                  {puppy.compatibility.map(c => <span key={c} className="puppy-chip puppy-chip--green">{c}</span>)}
-                </div>
-              </div>
-            )}
-            {puppy.training_progress?.length > 0 && (
-              <div>
-                <p className="puppy-traits-label">Training Progress</p>
-                <div className="puppy-chips">
-                  {puppy.training_progress.map(t => <span key={t} className="puppy-chip puppy-chip--outline">{t}</span>)}
-                </div>
-              </div>
-            )}
-          </section>
-        )}
+                            {images.length > 1 && (
+                                <div className="puppy-gallery-thumbs" aria-label={`${puppy.name} photo gallery`}>
+                                    {images.map((image, index) => (
+                                        <button
+                                            type="button"
+                                            key={image.id ?? image.path}
+                                            onClick={() => setActiveImage(index)}
+                                            className={`puppy-thumb-btn${index === activeImage ? ' active' : ''}`}
+                                            aria-label={`View photo ${index + 1}`}
+                                        >
+                                            <img src={`/storage/${image.path}`} alt={image.alt_text || puppy.name} />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
-        {/* ── HEALTH & CARE ── */}
-        {(puppy.vet_checked || puppy.vaccination_status || puppy.dewormed || puppy.microchipped || puppy.health_guarantee) && (
-          <section className="section puppy-health-section">
-            <div className="sec-title-plaque">Health & Care</div>
-            <div className="puppy-health-grid">
-              {puppy.vet_checked && (
-                <div className="puppy-health-item"><Check /><span>Vet Checked{puppy.vet_check_date ? ` — ${new Date(puppy.vet_check_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}` : ''}</span></div>
-              )}
-              {puppy.vaccination_status && (
-                <div className="puppy-health-item"><Check /><span>Vaccinations: {vaccinationLabel[puppy.vaccination_status] ?? puppy.vaccination_status}</span></div>
-              )}
-              {puppy.dewormed && (
-                <div className="puppy-health-item"><Check /><span>Dewormed</span></div>
-              )}
-              {puppy.microchipped && (
-                <div className="puppy-health-item"><Check /><span>Microchipped</span></div>
-              )}
-              {puppy.health_guarantee && (
-                <div className="puppy-health-item"><Check /><span>Health Guarantee Included</span></div>
-              )}
-            </div>
-            {puppy.vaccination_notes && (
-              <p className="puppy-health-notes">{puppy.vaccination_notes}</p>
-            )}
-            {puppy.health_guarantee && puppy.health_guarantee_notes && (
-              <p className="puppy-health-notes">{puppy.health_guarantee_notes}</p>
-            )}
-          </section>
-        )}
+                            {videos.length > 0 && (
+                                <div className="puppy-video-list">
+                                    {videos.map((video) => (
+                                        <a key={video.id ?? video.video_url} href={video.video_url} target="_blank" rel="noopener noreferrer" className="puppy-video-link">
+                                            <span><PlayIcon /></span>
+                                            {video.title || 'Watch Video'}
+                                        </a>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
-        {/* ── MEET THE PARENTS ── */}
-        {(sire || dam) && (
-          <section className="section puppy-parents-section">
-            <div className="sec-title-plaque">Meet The Parents</div>
-            <div className="puppy-parents-grid">
-              {[{ parent: sire, role:'Father (Sire)' }, { parent: dam, role:'Mother (Dam)' }]
-                .filter(p => p.parent)
-                .map(({ parent, role }) => {
-                  const img = parent.images?.[0];
-                  return (
-                    <div key={parent.id} className="puppy-parent-card card-3d">
-                      <div className="puppy-parent-img-wrap">
-                        {img ? (
-                          <img src={`/storage/${img.path}`} alt={parent.name} className="puppy-parent-img" />
-                        ) : (
-                          <div className="puppy-parent-img-placeholder" />
-                        )}
-                      </div>
-                      <div className="puppy-parent-body">
-                        <span className="puppy-parent-role">{role}</span>
-                        <h3 className="puppy-parent-name">{parent.name}</h3>
-                        {parent.color && <p className="puppy-parent-meta">{parent.color}{parent.weight ? ` · ${parent.weight}` : ''}</p>}
-                        {parent.description && <p className="puppy-parent-desc">{parent.description}</p>}
-                        {parent.titles?.length > 0 && (
-                          <div className="puppy-chips" style={{ marginTop:10 }}>
-                            {parent.titles.map(t => <span key={t} className="puppy-chip puppy-chip--gold">{t}</span>)}
-                          </div>
-                        )}
-                        {parent.health_tests && Object.keys(parent.health_tests).length > 0 && (
-                          <div className="puppy-parent-health">
-                            {Object.entries(parent.health_tests).map(([test, result]) => (
-                              <div key={test} className="puppy-health-item" style={{ fontSize:13 }}>
-                                <Check /><span>{test}: {result}</span>
-                              </div>
+                        <aside className="puppy-summary-panel">
+                            <div className="puppy-summary-top">
+                                <span className={`puppy-status-pill puppy-status-pill--${puppy.status}`}>
+                                    {status}
+                                </span>
+                                <div className="puppy-summary-tools">
+                                    <button type="button" className="puppy-icon-btn" onClick={toggleWishlist} aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}>
+                                        <HeartIcon filled={wishlisted} />
+                                    </button>
+                                    <button type="button" className="puppy-icon-btn" onClick={handleShare} aria-label="Share puppy">
+                                        <ShareIcon />
+                                    </button>
+                                    <button type="button" className="puppy-icon-btn" onClick={copyLink} aria-label="Copy puppy link">
+                                        <CopyIcon />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p className="puppy-summary-kicker">{puppy.breed}</p>
+                                <h1 className="puppy-show-name">{puppy.name}</h1>
+                                <p className="puppy-summary-price">{priceLabel(puppy.price)}</p>
+                            </div>
+
+                            {copied && <p className="puppy-copy-note">Link copied</p>}
+
+                            {puppy.badges?.length > 0 && (
+                                <div className="puppy-badges-row">
+                                    {puppy.badges.map((badge) => (
+                                        <span key={badge} className="puppy-badge-chip">{badge.replace(/_/g, ' ')}</span>
+                                    ))}
+                                </div>
+                            )}
+
+                            {overviewItems.length > 0 && (
+                                <div className="puppy-overview-grid">
+                                    {overviewItems.map((item) => (
+                                        <div key={item.label}>
+                                            <span>{item.label}</span>
+                                            <strong>{item.value}</strong>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {flashSuccess && <div className="form-success">{flashSuccess}</div>}
+
+                            {isAvailable ? (
+                                showForm ? (
+                                    <form onSubmit={submit} className="reserve-form">
+                                        <p className="form-note">No payment is taken here. We will contact you to confirm the next step.</p>
+                                        <div className="form-field">
+                                            <label htmlFor="buyer_name">Full Name</label>
+                                            <input id="buyer_name" type="text" value={data.buyer_name} onChange={(event) => setData('buyer_name', event.target.value)} required />
+                                            {errors.buyer_name && <div className="form-error">{errors.buyer_name}</div>}
+                                        </div>
+                                        <div className="form-field">
+                                            <label htmlFor="buyer_email">Email</label>
+                                            <input id="buyer_email" type="email" value={data.buyer_email} onChange={(event) => setData('buyer_email', event.target.value)} required />
+                                            {errors.buyer_email && <div className="form-error">{errors.buyer_email}</div>}
+                                        </div>
+                                        <div className="form-field">
+                                            <label htmlFor="buyer_phone">Phone</label>
+                                            <input id="buyer_phone" type="text" value={data.buyer_phone} onChange={(event) => setData('buyer_phone', event.target.value)} required />
+                                            {errors.buyer_phone && <div className="form-error">{errors.buyer_phone}</div>}
+                                        </div>
+                                        <div className="form-field">
+                                            <label htmlFor="buyer_address">Address</label>
+                                            <textarea id="buyer_address" rows={2} value={data.buyer_address} onChange={(event) => setData('buyer_address', event.target.value)} />
+                                            {errors.buyer_address && <div className="form-error">{errors.buyer_address}</div>}
+                                        </div>
+                                        <div className="form-field">
+                                            <label htmlFor="notes">Notes</label>
+                                            <textarea id="notes" rows={3} value={data.notes} onChange={(event) => setData('notes', event.target.value)} />
+                                            {errors.notes && <div className="form-error">{errors.notes}</div>}
+                                        </div>
+                                        {errors.puppy_id && <div className="form-error">{errors.puppy_id}</div>}
+                                        <div className="reserve-form-actions">
+                                            <button type="submit" className="btn-solid" disabled={processing}>
+                                                {processing ? 'Sending...' : 'Send Reservation Request'}
+                                            </button>
+                                            <button type="button" className="btn-outline" onClick={() => setShowForm(false)}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <div className="puppy-summary-actions">
+                                        <button type="button" className="btn-solid" onClick={() => setShowForm(true)}>
+                                            Reserve This Puppy
+                                        </button>
+                                        <Link href="/contact" className="btn-outline">Ask About {puppy.name}</Link>
+                                    </div>
+                                )
+                            ) : (
+                                <div className="puppy-unavailable-note">
+                                    <p>{puppy.name} is currently {labelize(puppy.status)}.</p>
+                                    <Link href="/puppies">View available puppies</Link>
+                                </div>
+                            )}
+
+                            <div className="puppy-summary-assurance">
+                                {healthItems.slice(0, 3).map((item) => (
+                                    <span key={item}><CheckIcon />{item}</span>
+                                ))}
+                                {documents.length > 0 && <span><DocumentIcon />{documents.length} public {documents.length === 1 ? 'document' : 'documents'}</span>}
+                            </div>
+                        </aside>
+                    </div>
+
+                    <div className="puppy-profile-panel">
+                        <div className="puppy-profile-heading">
+                            <div>
+                                <p className="shop-eyebrow">Complete Profile</p>
+                                <h2>{puppy.name}'s Puppy Information</h2>
+                            </div>
+                            <Link href="/puppies" className="puppy-profile-back">Back To Puppies</Link>
+                        </div>
+
+                        <div className="puppy-profile-layout">
+                            <div className="puppy-profile-main">
+                                {puppy.description && (
+                                    <section className="puppy-profile-block">
+                                        <h3>About {puppy.name}</h3>
+                                        <p className="puppy-profile-description">{puppy.description}</p>
+                                    </section>
+                                )}
+
+                                {detailItems.length > 0 && (
+                                    <section className="puppy-profile-block">
+                                        <h3>Details</h3>
+                                        <div className="puppy-details-grid">
+                                            {detailItems.map((item) => (
+                                                <div key={item.label} className="puppy-detail-item">
+                                                    <span>{item.label}</span>
+                                                    <strong>{item.value}</strong>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {traitGroups.length > 0 && (
+                                    <section className="puppy-profile-block">
+                                        <h3>Personality, Family Fit, And Training</h3>
+                                        <div className="puppy-trait-groups">
+                                            {traitGroups.map((group) => (
+                                                <div key={group.label}>
+                                                    <p>{group.label}</p>
+                                                    <div className="puppy-chips">
+                                                        {group.items.map((item) => (
+                                                            <span key={item} className="puppy-chip">{item}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </div>
+
+                            <aside className="puppy-profile-side">
+                                {healthItems.length > 0 && (
+                                    <section className="puppy-profile-block puppy-side-block">
+                                        <h3>Health And Care</h3>
+                                        <div className="puppy-health-list">
+                                            {healthItems.map((item) => (
+                                                <div key={item}>
+                                                    <CheckIcon />
+                                                    <span>{item}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {puppy.vaccination_notes && <p className="puppy-care-note">{puppy.vaccination_notes}</p>}
+                                        {puppy.health_guarantee_notes && <p className="puppy-care-note">{puppy.health_guarantee_notes}</p>}
+                                    </section>
+                                )}
+
+                                {documents.length > 0 && (
+                                    <section className="puppy-profile-block puppy-side-block">
+                                        <h3>Documents</h3>
+                                        <div className="puppy-doc-list">
+                                            {documents.map((document) => (
+                                                <a key={document.id} href={`/storage/${document.file_path}`} target="_blank" rel="noopener noreferrer" className="puppy-doc-card">
+                                                    <span className="puppy-doc-icon"><DocumentIcon /></span>
+                                                    <span>
+                                                        <strong>{document.title || document.type_label || labelize(document.document_type)}</strong>
+                                                        <small>{document.type_label || labelize(document.document_type)}</small>
+                                                        {document.document_number && <small>{document.document_number}</small>}
+                                                        {(document.issued_at || document.generated_at || document.uploaded_at) && (
+                                                            <small>{dateLabel(document.issued_at || document.generated_at || document.uploaded_at)}</small>
+                                                        )}
+                                                    </span>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </aside>
+                        </div>
+                    </div>
+                </section>
+
+                {parents.length > 0 && (
+                    <section className="puppy-support-section">
+                        <div className="puppy-section-heading">
+                            <p className="shop-eyebrow">Pedigree</p>
+                            <h2>Meet The Parents</h2>
+                        </div>
+                        <div className="puppy-parents-grid">
+                            {parents.map(({ parent, role, label }) => {
+                                const image = parent.images?.[0];
+                                const parentVideos = cleanList(parent.videos);
+
+                                return (
+                                    <article key={parent.id} className="puppy-parent-card">
+                                        <div className="puppy-parent-img-wrap">
+                                            {image ? (
+                                                <img src={`/storage/${image.path}`} alt={image.alt_text || parent.name} className="puppy-parent-img" />
+                                            ) : (
+                                                <div className="puppy-parent-img-placeholder" />
+                                            )}
+                                        </div>
+                                        <div className="puppy-parent-body">
+                                            <p className="puppy-parent-role">{role} ({label})</p>
+                                            <h3>{parent.name}</h3>
+                                            <p className="puppy-parent-meta">
+                                                {[parent.breed, parent.color, parent.weight, parent.height].filter(Boolean).join(' - ')}
+                                            </p>
+                                            {parent.description && <p className="puppy-parent-desc">{parent.description}</p>}
+                                            {(parent.registration_organization || parent.registration_number) && (
+                                                <p className="puppy-parent-registration">
+                                                    {[parent.registration_organization, parent.registration_number].filter(Boolean).join(' ')}
+                                                </p>
+                                            )}
+                                            {parent.titles?.length > 0 && (
+                                                <div className="puppy-chips">
+                                                    {parent.titles.map((title) => (
+                                                        <span key={title} className="puppy-chip puppy-chip--gold">{title}</span>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {parent.health_tests && Object.keys(parent.health_tests).length > 0 && (
+                                                <div className="puppy-parent-health">
+                                                    {Object.entries(parent.health_tests).map(([test, result]) => (
+                                                        <div key={test}>
+                                                            <CheckIcon />
+                                                            <span>{labelize(test)}: {result}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {parent.health_notes && <p className="puppy-care-note">{parent.health_notes}</p>}
+                                            {parentVideos.length > 0 && (
+                                                <div className="puppy-video-list puppy-video-list--compact">
+                                                    {parentVideos.map((video) => (
+                                                        <a key={video.id ?? video.video_url} href={video.video_url} target="_blank" rel="noopener noreferrer" className="puppy-video-link">
+                                                            <span><PlayIcon /></span>
+                                                            {video.title || `${parent.name} Video`}
+                                                        </a>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </article>
+                                );
+                            })}
+                        </div>
+                    </section>
+                )}
+
+                {related.length > 0 && (
+                    <section className="puppy-support-section puppy-related-section">
+                        <div className="puppy-section-heading puppy-section-heading--row">
+                            <div>
+                                <p className="shop-eyebrow">You May Also Like</p>
+                                <h2>Related Puppies</h2>
+                            </div>
+                            <Link href="/puppies" className="btn-outline">View All Puppies</Link>
+                        </div>
+                        <div className="puppy-grid shop-puppy-grid">
+                            {related.map((relatedPuppy) => (
+                                <PuppyCard key={relatedPuppy.id} puppy={relatedPuppy} />
                             ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                        </div>
+                    </section>
+                )}
             </div>
-          </section>
-        )}
-
-        {/* ── DOCUMENTS ── */}
-        {puppy.documents?.length > 0 && (
-          <section className="section puppy-docs-section">
-            <div className="sec-title-plaque">Documents & Health Records</div>
-            <div className="puppy-docs-grid">
-              {puppy.documents.map(doc => (
-                <a
-                  key={doc.id}
-                  href={`/storage/${doc.file_path}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="puppy-doc-card card-3d"
-                >
-                  <span className="puppy-doc-icon"><DocIcon /></span>
-                  <div>
-                    <p className="puppy-doc-type">{docTypeLabel[doc.document_type] ?? 'Document'}</p>
-                    <p className="puppy-doc-title">{doc.title}</p>
-                    {doc.description && <p className="puppy-doc-desc">{doc.description}</p>}
-                  </div>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── BOTTOM CTA ── */}
-        <section className="section" style={{ textAlign:'center', padding:'48px 24px' }}>
-          <p style={{ color:'var(--stone)', marginBottom:20 }}>
-            Questions about {puppy.name}? We're happy to help.
-          </p>
-          <div style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
-            <a href="/contact" className="btn-solid">Contact Us</a>
-            <a href="/puppies" className="btn-outline">View All Puppies</a>
-          </div>
-        </section>
-
-      </div>
-    </SiteLayout>
-  );
+        </SiteLayout>
+    );
 }

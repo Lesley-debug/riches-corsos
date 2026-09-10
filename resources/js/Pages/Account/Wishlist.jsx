@@ -17,7 +17,7 @@ export default function Wishlist({ puppies = [] }) {
           {puppies.length > 0 ? (
             <div className="puppy-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
               {puppies.map((puppy) => (
-                <PuppyCard key={puppy.id} puppy={puppy} />
+                <PuppyCard key={puppy.id} puppy={puppy} wishlisted />
               ))}
             </div>
           ) : (

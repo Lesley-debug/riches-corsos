@@ -73,6 +73,9 @@ export default function SiteLayout({ children }) {
 
   const searchPuppies = props.searchPuppies ?? [];
   const searchPosts = props.searchPosts ?? [];
+  const cartItems = props.cartItems ?? [];
+  const cartCount = props.cartCount ?? 0;
+  const wishlistCount = props.wishlistCount ?? 0;
 
   useEffect(() => {
     const onScroll = () => setStuck(window.scrollY > 4);
@@ -109,7 +112,7 @@ export default function SiteLayout({ children }) {
           </button>
           <button className="m-icon-btn m-cart" onClick={() => setCartOpen(true)} aria-label="Open cart">
             <CartIcon />
-            <span className="cart-count">0</span>
+            {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </button>
         </div>
       </div>
@@ -129,16 +132,14 @@ export default function SiteLayout({ children }) {
             <div className="topbar-icons">
               <button className="icon-btn" onClick={() => setSearchOpen(true)} aria-label="Search">
                 <SearchIcon />
-                <span className="icon-label">Search</span>
               </button>
-              <Link href={user ? '/wishlist' : '/login'} className="icon-btn" aria-label="Wishlist">
+              <Link href={user ? '/wishlist' : '/login'} className="icon-btn icon-btn--wishlist" aria-label="Wishlist">
                 <HeartIcon />
-                <span className="icon-label">Wishlist</span>
+                {wishlistCount > 0 && <span className="cart-badge">{wishlistCount}</span>}
               </Link>
               <button className="icon-btn icon-btn--cart" onClick={() => setCartOpen(true)} aria-label="Open cart">
                 <CartIcon />
-                <span className="cart-badge">0</span>
-                <span className="icon-label">Cart</span>
+                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
               </button>
             </div>
           </div>
@@ -286,7 +287,7 @@ export default function SiteLayout({ children }) {
         puppies={searchPuppies}
         posts={searchPosts}
       />
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cartItems} />
     </>
   );
 }

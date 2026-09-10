@@ -29,10 +29,12 @@ class WishlistController extends Controller
 
         if ($existing) {
             $existing->delete();
+
+            return back()->with('success', 'Removed from your wishlist.');
         } else {
             $user->wishlists()->create(['puppy_id' => $validated['puppy_id']]);
-        }
 
-        return back();
+            return back()->with('success', 'Added to your wishlist.');
+        }
     }
 }

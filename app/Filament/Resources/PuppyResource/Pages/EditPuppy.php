@@ -10,7 +10,6 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Facades\Storage;
 
 class EditPuppy extends EditRecord
 {
@@ -31,6 +30,13 @@ class EditPuppy extends EditRecord
                         ->required()
                         ->searchable(),
 
+                    Forms\Components\Select::make('visibility')
+                        ->label('Visibility')
+                        ->options(['public' => 'Public (visible on website)', 'admin_only' => 'Admin Only (private)'])
+                        ->default('admin_only')
+                        ->required()
+                        ->helperText('Public documents appear on the puppy\'s public page for download.'),
+
                     Forms\Components\Textarea::make('notes')
                         ->label('Internal Notes (optional)')
                         ->rows(2)
@@ -39,6 +45,9 @@ class EditPuppy extends EditRecord
                 ->action(function (array $data): void {
                     $service = app(PuppyDocumentService::class);
                     $doc     = $service->generate($this->record, $data['document_type'], $data);
+                    if (isset($data['visibility'])) {
+                        $doc->update(['visibility' => $data['visibility']]);
+                    }
 
                     Notification::make()
                         ->title('Document generated: '.$doc->title)
@@ -52,55 +61,29 @@ class EditPuppy extends EditRecord
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('gray')
                 ->form([
-                    Forms\Components\TextInput::make('title')
-                        ->label('Document Title')
+                    Forms\Components\Select::make('document_id')
+                        ->label('Select Generated Document')
+                        ->options(
+                            fn () => PuppyDocument::where('puppy_id', $this->record->id)
+                                ->get()
+                                ->mapWithKeys(fn ($d) => [$d->id => $d->document_number.' — '.$d->title])
+                        )
                         ->required()
-                        ->placeholder('e.g. Vet Health Certificate'),
-
-                    Forms\Components\Select::make('document_type')
-                        ->label('Document Type')
-                        ->options(array_merge(
-                            PuppyDocument::$generatableTypes,
-                            ['other' => 'Other']
-                        ))
-                        ->required(),
-
-                    Forms\Components\FileUpload::make('file')
-                        ->label('File')
-                        ->required()
-                        ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
-                        ->maxSize(10240)
-                        ->disk('public')
-                        ->directory('puppy-documents/uploaded')
-                        ->storeFileNamesIn('original_filename'),
+                        ->searchable()
+                        ->helperText('Choose from documents already generated for this puppy.'),
 
                     Forms\Components\Textarea::make('notes')
                         ->label('Notes (optional)')
                         ->rows(2),
                 ])
                 ->action(function (array $data): void {
-                    $filePath = $data['file'];
-                    $mime     = Storage::disk('public')->mimeType($filePath) ?? 'application/pdf';
-                    $service  = app(PuppyDocumentService::class);
-                    $docNum   = $service->generateDocumentNumber('other');
-
-                    PuppyDocument::create([
-                        'puppy_id'        => $this->record->id,
-                        'document_type'   => $data['document_type'],
-                        'title'           => $data['title'],
-                        'document_number' => $docNum,
-                        'status'          => PuppyDocument::STATUS_UPLOADED,
-                        'source'          => PuppyDocument::SOURCE_UPLOADED,
-                        'file_path'       => $filePath,
-                        'mime_type'       => $mime,
-                        'visibility'      => 'admin_only',
-                        'uploaded_at'     => now(),
-                        'created_by'      => auth()->id(),
-                        'notes'           => $data['notes'] ?? null,
-                    ]);
-
+                    $doc = PuppyDocument::find($data['document_id']);
+                    if ($data['notes'] ?? null) {
+                        $doc->update(['notes' => $data['notes']]);
+                    }
                     Notification::make()
-                        ->title('Document uploaded: '.$data['title'])
+                        ->title($doc->title.' is ready')
+                        ->body('Use Preview or Download in the Documents tab.')
                         ->success()
                         ->send();
                 }),

@@ -6,6 +6,7 @@ use App\Models\BlogPost;
 use App\Models\ContactMessage;
 use App\Models\HomecomingPhoto;
 use App\Models\Puppy;
+use App\Models\PuppyDocument;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
@@ -28,7 +29,8 @@ class PublicSiteController extends Controller
     {
         return Inertia::render('Puppies/Index', [
             'puppies' => Puppy::with('images')
-                ->whereIn('status', ['available', 'pending'])
+                ->whereIn('status', ['available', 'pending', 'reserved'])
+                ->where('visibility', 'published')
                 ->latest()
                 ->get(),
         ]);
@@ -36,22 +38,53 @@ class PublicSiteController extends Controller
 
     public function puppyShow(Puppy $puppy)
     {
+        abort_unless($puppy->visibility === 'published', 404);
+
         $puppy->load([
             'images',
             'videos',
-            'documents' => fn ($q) => $q->where('visibility', 'public'),
+            'documents' => fn ($q) => $q
+                ->where('visibility', 'public')
+                ->whereIn('status', [PuppyDocument::STATUS_GENERATED, PuppyDocument::STATUS_UPLOADED])
+                ->latest(),
             'parents.images',
+            'parents.videos',
         ]);
+
+        $puppy->documents->each(fn (PuppyDocument $document) => $document->append(['type_label', 'status_label']));
+
+        $related = Puppy::with('images')
+            ->where('id', '!=', $puppy->id)
+            ->where('visibility', 'published')
+            ->whereIn('status', ['available', 'pending', 'reserved'])
+            ->where('breed', $puppy->breed)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        if ($related->count() < 4) {
+            $ids = $related->pluck('id')->push($puppy->id);
+            $extra = Puppy::with('images')
+                ->whereNotIn('id', $ids)
+                ->where('visibility', 'published')
+                ->whereIn('status', ['available', 'pending', 'reserved'])
+                ->latest()
+                ->take(4 - $related->count())
+                ->get();
+            $related = $related->concat($extra);
+        }
+        $related = $related->values();
 
         $isWishlisted = auth()->check()
             ? auth()->user()->wishlists()->where('puppy_id', $puppy->id)->exists()
             : false;
 
         return Inertia::render('Puppies/Show', [
-            'puppy'       => $puppy,
-            'sire'        => $puppy->parents->firstWhere('pivot.role', 'sire'),
-            'dam'         => $puppy->parents->firstWhere('pivot.role', 'dam'),
-            'isWishlisted'=> $isWishlisted,
+            'puppy'        => $puppy,
+            'sire'         => $puppy->parents->firstWhere('pivot.role', 'sire'),
+            'dam'          => $puppy->parents->firstWhere('pivot.role', 'dam'),
+            'isWishlisted' => $isWishlisted,
+            'related'      => $related,
         ]);
     }
 

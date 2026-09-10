@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\WishlistController;
@@ -21,10 +22,14 @@ Route::get('/testimonials', [PublicSiteController::class, 'testimonials'])->name
 Route::get('/contact', [PublicSiteController::class, 'contactShow'])->name('contact.show');
 Route::post('/contact', [PublicSiteController::class, 'contactStore'])->name('contact.store');
 
-// "Reserve this puppy" — writes an order request, does not charge any card.
-// Guests can order (no ->middleware('auth') here) since requiring an account
-// to reserve a puppy would just lose hesitant buyers at the worst moment.
+// Legacy direct order endpoint kept for existing links and integrations.
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+// Cart and checkout. Orders are confirmed by the breeder; no card payment is taken here.
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+Route::delete('/cart/{puppy}', [CartController::class, 'destroy'])->name('cart.destroy');
+Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.store');
 
 // Guest-only auth routes
 Route::middleware('guest')->group(function () {
