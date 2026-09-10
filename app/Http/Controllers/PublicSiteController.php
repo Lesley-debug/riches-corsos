@@ -17,7 +17,12 @@ class PublicSiteController extends Controller
     public function home()
     {
         return Inertia::render('Home', [
-            'featuredPuppies' => Puppy::with('images')->where('status', 'available')->latest()->take(3)->get(),
+            'featuredPuppies' => Puppy::with('images')
+                ->where('status', 'available')
+                ->where('visibility', 'published')
+                ->latest()
+                ->take(6)
+                ->get(),
             'recentPosts' => BlogPost::published()->latest('published_at')->take(3)->get(),
             'testimonials' => Testimonial::where('is_featured', true)->take(3)->get(),
             'heroImage' => SiteSetting::current()->hero_image,

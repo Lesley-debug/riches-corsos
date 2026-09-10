@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\BlogPost;
 use App\Models\Puppy;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -19,8 +20,10 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
+                    'isAdmin' => $request->user()->isAdmin(),
                 ] : null,
             ],
+            'siteSettings' => fn () => SiteSetting::current(),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'status' => fn () => $request->session()->get('status'),

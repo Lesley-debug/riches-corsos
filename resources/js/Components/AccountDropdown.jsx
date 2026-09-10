@@ -37,6 +37,11 @@ export default function AccountDropdown({ user }) {
             <Link href="/account" className="acct-panel-link">My Account</Link>
             <Link href="/orders" className="acct-panel-link">My Orders</Link>
             <Link href="/wishlist" className="acct-panel-link">Wishlist</Link>
+            {user.isAdmin && (
+              <a href="/admin" className="acct-panel-link acct-panel-link--admin">
+                Admin Dashboard
+              </a>
+            )}
             <div className="acct-panel-divider" />
             <Link href="/logout" method="post" as="button" className="acct-panel-link acct-panel-link--danger">
               Sign Out

@@ -20,32 +20,74 @@ const SYNONYMS = {
 // Static site pages always available for search
 const STATIC_PAGES = [
   {
-    id: 'about',
-    title: 'About Us',
-    href: '/about',
-    description: 'Our story, our breeding program, health testing, and what makes Riches Corsos different.',
-    tags: 'about breeder story program health tested cane corso',
-  },
-  {
-    id: 'faqs',
-    title: 'FAQs',
-    href: '/faqs',
-    description: 'Frequently asked questions about our puppies, the reservation process, and what to expect.',
-    tags: 'faq questions help reservation process deposit payment',
-  },
-  {
-    id: 'contact',
-    title: 'Contact Us',
-    href: '/contact',
-    description: 'Get in touch — email, phone, or send us a message directly.',
-    tags: 'contact email phone message inquiry reach us',
-  },
-  {
     id: 'puppies',
     title: 'Available Puppies',
     href: '/puppies',
-    description: 'Browse all available and upcoming Cane Corso puppies.',
-    tags: 'puppies available for sale reserve cane corso vaccinated health tested',
+    description: 'Browse our current litter of health-tested, home-raised Cane Corso puppies.',
+    tags: 'puppies puppy available for sale reserve buy adoption litters cane corso dogs price',
+  },
+  {
+    id: 'about',
+    title: 'Our Story & Breeding Program',
+    href: '/about',
+    description: 'Learn about our 9+ years of breeding experience, health testing protocols, and home environment.',
+    tags: 'about breeder story program health tested parents sire dam pedigree history who we are',
+  },
+  {
+    id: 'special',
+    title: 'What Makes Us Special',
+    href: '/about#what-makes-us-special',
+    description: 'Early neurological stimulation, home socialization, health guarantees, and lifetime support.',
+    tags: 'special socialization health guarantee stimulation puppy culture standards raising',
+  },
+  {
+    id: 'faqs',
+    title: 'Frequently Asked Questions',
+    href: '/faqs',
+    description: 'Answers about puppy adoption, deposits, pickup/delivery, vaccines, and contracts.',
+    tags: 'faq faqs questions help deposit reservation payment shipping delivery pickup contract',
+  },
+  {
+    id: 'health',
+    title: 'Health Testing & Guarantees',
+    href: '/faqs#health',
+    description: 'Our comprehensive health screening standards: hips, cardiac, genetic panels, and health warranty.',
+    tags: 'health testing guaranteed warranty hip cardiac genetics clear vet vaccinated shots medical',
+  },
+  {
+    id: 'testimonials',
+    title: 'Customer Testimonials & Reviews',
+    href: '/testimonials',
+    description: 'Read real stories and 5-star reviews from families across the country who welcomed our Corsos.',
+    tags: 'testimonials reviews feedback rating google families stories happy clients',
+  },
+  {
+    id: 'blog',
+    title: 'Blog & Cane Corso Care Guides',
+    href: '/blog',
+    description: 'Training tips, nutrition, puppy development, and living with the Cane Corso breed.',
+    tags: 'blog articles guide care feeding training tips crate leash socialization diet grooming',
+  },
+  {
+    id: 'contact',
+    title: 'Contact Us & Visiting Hours',
+    href: '/contact',
+    description: 'Reach our team directly by phone, email, WhatsApp, or submit an inquiry.',
+    tags: 'contact email phone reach call message inquiry whatsapp dallas texas location hours',
+  },
+  {
+    id: 'account',
+    title: 'Customer Account & Profile',
+    href: '/account',
+    description: 'Manage your customer profile, saved puppies, and order history.',
+    tags: 'account profile login customer portal register my account sign in',
+  },
+  {
+    id: 'orders',
+    title: 'Order Status & Reservations',
+    href: '/orders',
+    description: 'Track your pending applications, puppy reservations, and payment receipts.',
+    tags: 'orders order tracking status reservation invoice checkout receipts cart',
   },
 ];
 
@@ -60,7 +102,6 @@ function expandQuery(q) {
     if (alts.includes(q) || q === canonical) {
       terms.push(canonical, ...alts);
     }
-    // partial match — e.g. "vacc" should still expand
     if (canonical.startsWith(q) || alts.some((a) => a.startsWith(q))) {
       terms.push(canonical, ...alts);
     }
@@ -78,19 +119,27 @@ function scoreText(text, terms) {
   return terms.reduce((acc, term) => acc + (t.includes(term) ? 1 : 0), 0);
 }
 
-export default function SearchOverlay({ open, onClose, puppies = [], posts = [] }) {
+export default function SearchOverlay({
+  open,
+  onClose,
+  puppies = [],
+  posts = [],
+  topOffset = 108,
+}) {
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (open) {
       setQuery('');
-      setTimeout(() => inputRef.current?.focus(), 60);
+      setTimeout(() => inputRef.current?.focus(), 80);
     }
   }, [open]);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
@@ -102,11 +151,13 @@ export default function SearchOverlay({ open, onClose, puppies = [], posts = [] 
     ? puppies
         .map((p) => ({
           ...p,
-          _score: scoreText(p.name, terms) * 3
-            + scoreText(p.breed, terms) * 2
-            + scoreText(p.sex, terms) * 2
-            + scoreText(p.status, terms)
-            + scoreText(p.description, terms),
+          _score:
+            scoreText(p.name, terms) * 4 +
+            scoreText(p.breed, terms) * 2 +
+            scoreText(p.sex, terms) * 3 +
+            scoreText(p.status, terms) * 2 +
+            scoreText(p.color, terms) * 2 +
+            scoreText(p.description, terms),
         }))
         .filter((p) => p._score > 0)
         .sort((a, b) => b._score - a._score)
@@ -116,23 +167,26 @@ export default function SearchOverlay({ open, onClose, puppies = [], posts = [] 
     ? posts
         .map((p) => ({
           ...p,
-          _score: scoreText(p.title, terms) * 3
-            + scoreText(p.category, terms) * 2
-            + scoreText(p.excerpt, terms),
+          _score:
+            scoreText(p.title, terms) * 3 +
+            scoreText(p.category, terms) * 2 +
+            scoreText(p.excerpt, terms),
         }))
         .filter((p) => p._score > 0)
         .sort((a, b) => b._score - a._score)
     : [];
 
   const matchedPages = q
-    ? STATIC_PAGES.filter((p) =>
-        matches(p.title, terms) ||
-        matches(p.description, terms) ||
-        matches(p.tags, terms),
+    ? STATIC_PAGES.filter(
+        (p) =>
+          matches(p.title, terms) ||
+          matches(p.description, terms) ||
+          matches(p.tags, terms)
       )
     : [];
 
-  const hasResults = matchedPuppies.length > 0 || matchedPosts.length > 0 || matchedPages.length > 0;
+  const hasResults =
+    matchedPuppies.length > 0 || matchedPosts.length > 0 || matchedPages.length > 0;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -144,114 +198,174 @@ export default function SearchOverlay({ open, onClose, puppies = [], posts = [] 
   if (!open) return null;
 
   return (
-    <div className="search-overlay" role="dialog" aria-modal="true" aria-label="Search">
+    <div className="search-overlay" role="dialog" aria-modal="true" aria-label="Site Search">
       <div className="search-overlay-backdrop" onClick={onClose} />
-      <div className="search-overlay-panel">
-        <form className="search-bar-wrap" onSubmit={handleSubmit}>
-          <svg className="search-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M21 21l-4.3-4.3" />
-          </svg>
-          <input
-            ref={inputRef}
-            className="search-bar-input"
-            type="text"
-            placeholder="Search puppies, blog, vaccinated, health tested…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoComplete="off"
-          />
-          {query && (
-            <button type="button" className="search-bar-clear" onClick={() => setQuery('')} aria-label="Clear">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" width="16" height="16">
-                <path d="M18 6L6 18M6 6l12 12" />
+      <div
+        className="search-draw-drawer"
+        style={{ top: `${topOffset}px` }}
+      >
+        {/* Clean, minimalist search bar */}
+        <div className="search-draw-header">
+          <div className="search-draw-header-inner">
+            <form className="search-draw-bar" onSubmit={handleSubmit}>
+              <svg
+                className="search-draw-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="M21 21l-4.3-4.3" />
               </svg>
-            </button>
-          )}
-          <button type="button" className="search-close-btn" onClick={onClose}>Cancel</button>
-        </form>
+              <input
+                ref={inputRef}
+                className="search-draw-input"
+                type="text"
+                placeholder="Search puppies, pedigree, care, blog, or anything on Riches Corsos…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                autoComplete="off"
+              />
+              {query && (
+                <button
+                  type="button"
+                  className="search-draw-clear"
+                  onClick={() => setQuery('')}
+                  aria-label="Clear query"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="18" height="18">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+              <button
+                type="button"
+                className="search-draw-close-btn"
+                onClick={onClose}
+                aria-label="Close search"
+              >
+                <span>Close</span>
+                <kbd>ESC</kbd>
+              </button>
+            </form>
+          </div>
+        </div>
 
-        <div className="search-results">
-          {!q && (
-            <div className="search-hint">
-              <p>Search puppies, blog posts, or anything on the site.</p>
-              <div className="search-quick-links">
-                <Link href="/puppies" onClick={onClose} className="search-quick-chip">Available Puppies</Link>
-                <Link href="/puppies?q=vaccinated" onClick={onClose} className="search-quick-chip">Vaccinated</Link>
-                <Link href="/puppies?q=male" onClick={onClose} className="search-quick-chip">Male Puppies</Link>
-                <Link href="/puppies?q=female" onClick={onClose} className="search-quick-chip">Female Puppies</Link>
-                <Link href="/blog" onClick={onClose} className="search-quick-chip">Blog</Link>
-                <Link href="/faqs" onClick={onClose} className="search-quick-chip">FAQs</Link>
-                <Link href="/contact" onClick={onClose} className="search-quick-chip">Contact</Link>
+        {/* Blank clean body — only displays matched results when user types */}
+        <div className="search-draw-body">
+          <div className="search-draw-content-wrap">
+            {q && !hasResults && (
+              <div className="search-no-results-box">
+                <p>No results found for "<strong>{query}</strong>"</p>
               </div>
-            </div>
-          )}
+            )}
 
-          {q && !hasResults && (
-            <div className="search-no-results">
-              <p>No results for "<strong>{query}</strong>"</p>
-              <p className="search-no-results-hint">Try "vaccinated", "male", "health tested", or browse <Link href="/puppies" onClick={onClose}>all puppies</Link>.</p>
-            </div>
-          )}
+            {q && hasResults && (
+              <div className="search-results-canvas">
+                {matchedPuppies.length > 0 && (
+                  <div className="search-canvas-section">
+                    <div className="search-canvas-header">
+                      <h4>Puppies <span>({matchedPuppies.length})</span></h4>
+                      <Link href={`/puppies?q=${encodeURIComponent(query)}`} onClick={onClose}>
+                        View All In Store →
+                      </Link>
+                    </div>
+                    <div className="search-puppies-list">
+                      {matchedPuppies.map((puppy) => (
+                        <Link
+                          key={puppy.id}
+                          href={`/puppies/${puppy.slug}`}
+                          className="search-puppy-item"
+                          onClick={onClose}
+                        >
+                          <div className="search-puppy-thumb">
+                            {puppy.images?.[0] ? (
+                              <img src={`/storage/${puppy.images[0].path}`} alt={puppy.name} />
+                            ) : (
+                              <div className="search-puppy-placeholder">🐾</div>
+                            )}
+                          </div>
+                          <div className="search-puppy-details">
+                            <div className="search-puppy-title-row">
+                              <span className="search-puppy-name">{puppy.name}</span>
+                              <span className={`search-puppy-status status--${puppy.status}`}>{puppy.status}</span>
+                            </div>
+                            <p className="search-puppy-specs">
+                              {puppy.breed} · {puppy.sex} {puppy.color ? `· ${puppy.color}` : ''}
+                            </p>
+                            <span className="search-puppy-price">${Number(puppy.price).toLocaleString()}</span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-          {matchedPuppies.length > 0 && (
-            <div className="search-group">
-              <div className="search-group-label">Puppies</div>
-              {matchedPuppies.map((puppy) => (
-                <Link key={puppy.id} href={`/puppies/${puppy.slug}`} className="search-result-row" onClick={onClose}>
-                  <div className="search-result-thumb">
-                    {puppy.images?.[0]
-                      ? <img src={`/storage/${puppy.images[0].path}`} alt={puppy.name} />
-                      : <span />}
+                {matchedPosts.length > 0 && (
+                  <div className="search-canvas-section">
+                    <div className="search-canvas-header">
+                      <h4>Articles &amp; Blog <span>({matchedPosts.length})</span></h4>
+                      <Link href="/blog" onClick={onClose}>
+                        All Articles →
+                      </Link>
+                    </div>
+                    <div className="search-posts-list">
+                      {matchedPosts.map((post) => (
+                        <Link
+                          key={post.id}
+                          href={`/blog/${post.slug}`}
+                          className="search-post-item"
+                          onClick={onClose}
+                        >
+                          {post.cover_image && (
+                            <div className="search-post-thumb">
+                              <img src={`/storage/${post.cover_image}`} alt={post.title} />
+                            </div>
+                          )}
+                          <div className="search-post-body">
+                            {post.category && <span className="search-post-tag">{post.category}</span>}
+                            <h5 className="search-post-title">{post.title}</h5>
+                            {post.excerpt && <p className="search-post-excerpt">{post.excerpt}</p>}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <div className="search-result-body">
-                    <div className="search-result-title">{puppy.name}</div>
-                    <div className="search-result-sub">{puppy.breed} · {puppy.sex} · {puppy.status}</div>
-                  </div>
-                  <div className="search-result-price">${Number(puppy.price).toLocaleString()}</div>
-                </Link>
-              ))}
-            </div>
-          )}
+                )}
 
-          {matchedPosts.length > 0 && (
-            <div className="search-group">
-              <div className="search-group-label">Blog</div>
-              {matchedPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="search-result-row" onClick={onClose}>
-                  <div className="search-result-thumb search-result-thumb--blog">
-                    {post.cover_image
-                      ? <img src={`/storage/${post.cover_image}`} alt={post.title} />
-                      : <span />}
+                {matchedPages.length > 0 && (
+                  <div className="search-canvas-section">
+                    <div className="search-canvas-header">
+                      <h4>Pages <span>({matchedPages.length})</span></h4>
+                    </div>
+                    <div className="search-pages-list">
+                      {matchedPages.map((page) => (
+                        <Link
+                          key={page.id}
+                          href={page.href}
+                          className="search-page-item"
+                          onClick={onClose}
+                        >
+                          <div className="search-page-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                              <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+                            </svg>
+                          </div>
+                          <div className="search-page-content">
+                            <h5 className="search-page-title">{page.title}</h5>
+                            <p className="search-page-desc">{page.description}</p>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                  <div className="search-result-body">
-                    <div className="search-result-title">{post.title}</div>
-                    <div className="search-result-sub">{post.category || 'Article'}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {matchedPages.length > 0 && (
-            <div className="search-group">
-              <div className="search-group-label">Pages</div>
-              {matchedPages.map((page) => (
-                <Link key={page.id} href={page.href} className="search-result-row" onClick={onClose}>
-                  <div className="search-result-thumb search-result-thumb--page">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                      <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
-                    </svg>
-                  </div>
-                  <div className="search-result-body">
-                    <div className="search-result-title">{page.title}</div>
-                    <div className="search-result-sub">{page.description}</div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

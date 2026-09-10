@@ -56,6 +56,7 @@ export default function Home({
     featuredPuppies = [],
     recentPosts = [],
     homecomingPhotos = [],
+    heroImage,
 }) {
     const [activeThumb, setActiveThumb] = useState(0);
 
@@ -66,7 +67,7 @@ export default function Home({
             {/* ===== HERO ===== */}
             <section
                 className="hero-full"
-                style={{ backgroundImage: 'url(/images/bg/homepagehero.jpeg)' }}
+                style={{ backgroundImage: `url(${heroImage ? '/storage/' + heroImage : '/images/bg/homepagehero.jpg'})` }}
             >
                 <div className="hero-full-overlay" />
                 <div className="hero-full-content">
@@ -157,16 +158,22 @@ export default function Home({
 
                 <SectionDivider />
 
-                {/* ===== 02 APPEARANCE ===== */}
-                <SectionTitle number="02" title="Appearance" />
+                {/* ===== 02 AVAILABLE PUPPIES ===== */}
+                <SectionTitle number="02" title="Available Puppies" sub="Each one health-tested, vaccinated, and raised in-home before they meet you." />
                 <div className="home-section-wrap">
                     <div className="card-3d">
-                        <DiamondDivider />
-                        <div className="appearance-body">
-                            <p>The Cane Corso is a large, muscular dog with a rectangular body, broad skull, and a distinctly square muzzle. Their eyes are medium-sized, slightly oval, and dark in colour — conveying alertness and intelligence. The nose is large and black, the ears naturally drop forward but are often cropped to a short, equilateral triangle. The tail is thick at the base and traditionally docked, though many breeders now leave it natural.</p>
-                            <p>The coat is short, dense, and slightly coarse with a light undercoat — available in black, grey (light to dark), fawn (light to dark), and brindle variations. Coat maintenance is minimal: a weekly brush and a bath every 4–6 weeks keeps them clean and healthy. Some owners opt for professional grooming every 8–10 weeks. Males stand 25–27.5 inches at the shoulder and weigh 99–110 lbs; females 23.5–26 inches and 85–99 lbs. Despite their size, they move with surprising agility and grace.</p>
+                        <div className="puppy-grid">
+                            {featuredPuppies.length > 0 ? (
+                                featuredPuppies.map((puppy) => <PuppyCard key={puppy.id} puppy={puppy} />)
+                            ) : (
+                                <p style={{ color: 'var(--stone)', gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0' }}>
+                                    No puppies listed right now — check back soon.
+                                </p>
+                            )}
                         </div>
-                        <DiamondDivider />
+                        <div className="section-cta">
+                            <Link href="/puppies" className="dark-btn">View All Available Puppies</Link>
+                        </div>
                     </div>
                 </div>
 
@@ -211,29 +218,8 @@ export default function Home({
 
                 <SectionDivider />
 
-                {/* ===== 04 PUPPIES ===== */}
-                <SectionTitle number="04" title="Puppies Available Now" sub="Each one health-tested, vaccinated, and raised in-home before they meet you." />
-                <div className="home-section-wrap">
-                    <div className="card-3d">
-                        <div className="puppy-grid">
-                            {featuredPuppies.length > 0 ? (
-                                featuredPuppies.map((puppy) => <PuppyCard key={puppy.id} puppy={puppy} />)
-                            ) : (
-                                <p style={{ color: 'var(--stone)', gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0' }}>
-                                    No puppies listed right now — check back soon.
-                                </p>
-                            )}
-                        </div>
-                        <div className="section-cta">
-                            <Link href="/puppies" className="dark-btn">View All Available Puppies</Link>
-                        </div>
-                    </div>
-                </div>
-
-                <SectionDivider />
-
-                {/* ===== 05 WHAT RAISING THEM MEANS ===== */}
-                <SectionTitle number="05" title="What Raising Them This Way Means" sub="This section explains the actual practices, environment, and ongoing care that go into raising each puppy." />
+                {/* ===== 04 WHAT RAISING THEM MEANS ===== */}
+                <SectionTitle number="04" title="What Raising Them This Way Means" sub="This section explains the actual practices, environment, and ongoing care that go into raising each puppy." />
                 <div className="home-section-wrap">
                     <div className="card-3d">
                         <div className="why-grid-full">
@@ -296,8 +282,8 @@ export default function Home({
 
                 <SectionDivider />
 
-                {/* ===== 06 TESTIMONIALS ===== */}
-                <SectionTitle number="06" title="What Our Customers Are Saying" />
+                {/* ===== 05 TESTIMONIALS ===== */}
+                <SectionTitle number="05" title="What Our Customers Are Saying" />
                 <div className="home-section-wrap">
                     <div className="card-3d">
                         <DiamondDivider />
@@ -331,8 +317,8 @@ export default function Home({
 
                 <SectionDivider />
 
-                {/* ===== 07 BLOG ===== */}
-                <SectionTitle number="07" title="From The Blog" sub="Care guides, training tips, and stories from families who've brought a Corso home." />
+                {/* ===== 06 BLOG ===== */}
+                <SectionTitle number="06" title="From The Blog" sub="Care guides, training tips, and stories from families who've brought a Corso home." />
                 <div className="home-section-wrap">
                     <div className="card-3d">
                         <div className="blog-grid">
