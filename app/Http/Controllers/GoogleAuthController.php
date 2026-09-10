@@ -26,7 +26,6 @@ class GoogleAuthController extends Controller
 
         try {
             return Socialite::driver('google')
-                ->scopes(['openid', 'profile', 'email'])
                 ->redirect();
         } catch (Exception $e) {
             return redirect()->route('login')->withErrors([
@@ -41,7 +40,13 @@ class GoogleAuthController extends Controller
             $googleUser = Socialite::driver('google')->user();
         } catch (Exception $e) {
             try {
-                $googleUser = Socialite::driver('google')->stateless()->user();
+                $googleProvider = Socialite::driver('google');
+
+                if (!method_exists($googleProvider, 'stateless')) {
+                    throw new Exception('Stateless Google authentication is unavailable.');
+                }
+
+                $googleUser = $googleProvider->stateless()->user();
             } catch (Exception $e2) {
                 return redirect()->route('login')->withErrors([
                     'google' => 'Google authentication was cancelled or encountered an error. Please try again.',
@@ -88,6 +93,6 @@ class GoogleAuthController extends Controller
 
         Auth::login($user, true);
 
-        return redirect()->route('account.dashboard')->with('success', 'Successfully signed in with Google.');
+        return redirect()->route('home')->with('login_notice', 'Welcome! You can visit your Account Dashboard anytime to track your puppy reservations and site activity.');
     }
 }

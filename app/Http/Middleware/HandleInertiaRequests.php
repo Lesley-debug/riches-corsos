@@ -28,6 +28,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'status' => fn () => $request->session()->get('status'),
+                'login_notice' => fn () => $request->session()->get('login_notice'),
             ],
             'wishlistCount' => fn () => $request->user()?->wishlists()->count() ?? 0,
             'wishlistPuppyIds' => fn () => $request->user()?->wishlists()->pluck('puppy_id')->all() ?? [],

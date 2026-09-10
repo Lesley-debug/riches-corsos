@@ -92,6 +92,14 @@ export default function SiteLayout({ children }) {
   const cartCount = props.cartCount ?? 0;
   const wishlistCount = props.wishlistCount ?? 0;
   const unreadNotificationsCount = props.unreadNotificationsCount ?? 0;
+  const loginNotice = props.flash?.login_notice;
+  const [dismissedNotice, setDismissedNotice] = useState(false);
+
+  useEffect(() => {
+    if (loginNotice) {
+      setDismissedNotice(false);
+    }
+  }, [loginNotice]);
 
   const updateNavBottom = () => {
     if (window.innerWidth <= 860) {
@@ -212,6 +220,54 @@ export default function SiteLayout({ children }) {
           </div>
         </div>
       </div>
+
+      {loginNotice && !dismissedNotice && (
+        <aside className="login-dashboard-notice" role="alert" aria-live="polite">
+          <div className="login-notice-container">
+            <div className="login-notice-left">
+              <div className="login-notice-icon-wrap">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div className="login-notice-content">
+                <div className="login-notice-headline">
+                  <span className="login-notice-tag">Account Active</span>
+                  <span className="login-notice-greeting">Welcome back{user?.name ? `, ${user.name}` : ''}!</span>
+                </div>
+                <p className="login-notice-text">
+                  {loginNotice}{' '}
+                  <Link href="/account" className="login-notice-inline-link">
+                    Open your dashboard to track your progress &rarr;
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <div className="login-notice-right">
+              <Link href="/account" className="login-notice-cta-btn">
+                <span>Go to Dashboard</span>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setDismissedNotice(true)}
+                className="login-notice-dismiss-btn"
+                aria-label="Close notification"
+                title="Dismiss message"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </aside>
+      )}
 
       <main>{children}</main>
 

@@ -33,7 +33,8 @@ class AuthControllerTest extends TestCase
         ]);
 
         $this->assertAuthenticatedAs($user);
-        $response->assertRedirect(route('account.dashboard'));
+        $response->assertRedirect(route('home'));
+        $response->assertSessionHas('login_notice');
     }
 
     public function test_user_cannot_authenticate_with_invalid_password(): void
@@ -60,8 +61,9 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => 'new-password-123',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('account.dashboard'));
+        $this->assertGuest();
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('users', [
             'name' => 'John Doe',

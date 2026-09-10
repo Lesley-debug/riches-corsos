@@ -34,7 +34,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('account.dashboard');
+        return redirect()->route('home')->with('login_notice', 'Welcome back! You can visit your Account Dashboard anytime to track your puppy reservations and site activity.');
     }
 
     public function showRegister()
@@ -59,9 +59,7 @@ class AuthController extends Controller
 
         $user->notify(new \App\Notifications\WelcomeNotification());
 
-        Auth::login($user);
-
-        return redirect()->route('account.dashboard');
+        return redirect()->route('login')->with('success', 'Account created successfully! Welcome to Riches Corsos. Please log in with your email and password to access your account.');
     }
 
     public function logout(Request $request)

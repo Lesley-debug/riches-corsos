@@ -45,7 +45,8 @@ class GoogleAuthTest extends TestCase
         $response = $this->get(route('auth.google.callback'));
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('account.dashboard'));
+        $response->assertRedirect(route('home'));
+        $response->assertSessionHas('login_notice');
 
         $user = User::where('email', 'marcus@example.com')->first();
         $this->assertNotNull($user);
@@ -80,7 +81,8 @@ class GoogleAuthTest extends TestCase
         $response = $this->get(route('auth.google.callback'));
 
         $this->assertAuthenticatedAs($existingUser);
-        $response->assertRedirect(route('account.dashboard'));
+        $response->assertRedirect(route('home'));
+        $response->assertSessionHas('login_notice');
 
         $existingUser->refresh();
         $this->assertEquals('google-789012', $existingUser->google_id);

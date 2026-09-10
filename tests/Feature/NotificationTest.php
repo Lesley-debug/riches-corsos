@@ -28,7 +28,8 @@ class NotificationTest extends TestCase
             'password_confirmation' => 'password-1234',
         ]);
 
-        $response->assertRedirect(route('account.dashboard'));
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('success');
 
         $user = User::where('email', 'sarah@example.com')->first();
         $this->assertNotNull($user);
