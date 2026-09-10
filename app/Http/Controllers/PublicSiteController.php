@@ -122,6 +122,16 @@ class PublicSiteController extends Controller
         return Inertia::render('Testimonials');
     }
 
+    public function privacy()
+    {
+        return Inertia::render('Privacy');
+    }
+
+    public function terms()
+    {
+        return Inertia::render('Terms');
+    }
+
     public function contactShow()
     {
         return Inertia::render('Contact');

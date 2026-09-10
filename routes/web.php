@@ -17,6 +17,8 @@ Route::get('/blog/{blogPost:slug}', [PublicSiteController::class, 'blogShow'])->
 Route::get('/about', [PublicSiteController::class, 'about'])->name('about');
 Route::get('/faqs', [PublicSiteController::class, 'faqs'])->name('faqs');
 Route::get('/testimonials', [PublicSiteController::class, 'testimonials'])->name('testimonials');
+Route::get('/privacy', [PublicSiteController::class, 'privacy'])->name('privacy');
+Route::get('/terms', [PublicSiteController::class, 'terms'])->name('terms');
 
 // Contact page + form submission
 Route::get('/contact', [PublicSiteController::class, 'contactShow'])->name('contact.show');
