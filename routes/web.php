@@ -19,6 +19,7 @@ Route::get('/faqs', [PublicSiteController::class, 'faqs'])->name('faqs');
 Route::get('/testimonials', [PublicSiteController::class, 'testimonials'])->name('testimonials');
 Route::get('/privacy', [PublicSiteController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [PublicSiteController::class, 'terms'])->name('terms');
+Route::get('/sitemap.xml', [PublicSiteController::class, 'sitemap'])->name('sitemap');
 
 // Contact page + form submission
 Route::get('/contact', [PublicSiteController::class, 'contactShow'])->name('contact.show');

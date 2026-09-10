@@ -151,4 +151,38 @@ class PublicSiteController extends Controller
 
         return back()->with('success', "Thanks — we'll get back to you shortly.");
     }
+
+    public function sitemap()
+    {
+        $sitemap = \Spatie\Sitemap\Sitemap::create()
+            ->add(\Spatie\Sitemap\Tags\Url::create('/')->setPriority(1.0)->setChangeFrequency('daily'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/puppies')->setPriority(0.9)->setChangeFrequency('daily'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/about')->setPriority(0.7)->setChangeFrequency('monthly'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/contact')->setPriority(0.8)->setChangeFrequency('monthly'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/faqs')->setPriority(0.6)->setChangeFrequency('monthly'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/testimonials')->setPriority(0.7)->setChangeFrequency('weekly'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/blog')->setPriority(0.8)->setChangeFrequency('weekly'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/privacy')->setPriority(0.3)->setChangeFrequency('yearly'))
+            ->add(\Spatie\Sitemap\Tags\Url::create('/terms')->setPriority(0.3)->setChangeFrequency('yearly'));
+
+        foreach (Puppy::where('visibility', 'published')->get() as $puppy) {
+            $sitemap->add(
+                \Spatie\Sitemap\Tags\Url::create("/puppies/{$puppy->slug}")
+                    ->setLastModificationDate($puppy->updated_at)
+                    ->setPriority(0.9)
+                    ->setChangeFrequency('daily')
+            );
+        }
+
+        foreach (BlogPost::published()->get() as $post) {
+            $sitemap->add(
+                \Spatie\Sitemap\Tags\Url::create("/blog/{$post->slug}")
+                    ->setLastModificationDate($post->updated_at)
+                    ->setPriority(0.7)
+                    ->setChangeFrequency('weekly')
+            );
+        }
+
+        return $sitemap->toResponse(request());
+    }
 }

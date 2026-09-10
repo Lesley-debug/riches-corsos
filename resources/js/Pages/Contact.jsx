@@ -32,7 +32,16 @@ function SectionTitle({ title, sub }) {
 export default function Contact() {
     const { props } = usePage();
     const flashSuccess = props.flash?.success;
+    const siteSettings = props.siteSettings ?? {};
     const [activeThumb, setActiveThumb] = useState(0);
+
+    const contactPhone = siteSettings.phone || '+1 (214) 212-3023';
+    const cleanPhone = contactPhone.replace(/[^\d+]/g, '');
+    const contactWhatsapp = siteSettings.whatsapp
+        ? siteSettings.whatsapp.replace(/[^\d+]/g, '')
+        : (cleanPhone.replace('+', '') || '12142123023');
+    const contactEmail = siteSettings.email || 'info@richescorsos.com';
+    const contactAddress = siteSettings.address || 'Dallas, Texas';
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -178,7 +187,7 @@ export default function Contact() {
                                     </svg>
                                 </div>
                                 <h4>Visit Us</h4>
-                                <p>Dallas, Texas</p>
+                                <p>{contactAddress}</p>
                                 <p className="contact-info-note">Visits by appointment only</p>
                             </div>
                             <div className="contact-info-card">
@@ -188,7 +197,7 @@ export default function Contact() {
                                     </svg>
                                 </div>
                                 <h4>Call Us</h4>
-                                <a href="tel:+12142123023">+1 (214) 212-3023</a>
+                                <a href={`tel:${cleanPhone}`}>{contactPhone}</a>
                                 <p className="contact-info-note">Mon–Fri 9am–6pm CT</p>
                             </div>
                             <div className="contact-info-card">
@@ -198,7 +207,7 @@ export default function Contact() {
                                     </svg>
                                 </div>
                                 <h4>WhatsApp</h4>
-                                <a href="https://wa.me/12142123023" target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>
+                                <a href={`https://wa.me/${contactWhatsapp}`} target="_blank" rel="noopener noreferrer">Message on WhatsApp</a>
                                 <p className="contact-info-note">Quick responses during business hours</p>
                             </div>
                             <div className="contact-info-card">
@@ -208,7 +217,7 @@ export default function Contact() {
                                     </svg>
                                 </div>
                                 <h4>Email Us</h4>
-                                <a href="mailto:info@richescorsos.com">info@richescorsos.com</a>
+                                <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                                 <p className="contact-info-note">We respond within 24 hours</p>
                             </div>
                             <div className="contact-info-card contact-info-card--hours">

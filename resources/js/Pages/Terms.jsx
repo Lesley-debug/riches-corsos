@@ -1,8 +1,13 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
 import PageHero from '@/Components/PageHero';
 
 export default function Terms() {
+    const { props } = usePage();
+    const siteSettings = props.siteSettings ?? {};
+    const contactEmail = siteSettings.email || 'info@richescorsos.com';
+    const contactPhone = siteSettings.phone || '+1 (214) 212-3023';
+    const cleanPhone = contactPhone.replace(/[^\d+]/g, '');
     return (
         <SiteLayout>
             <Head title="Terms & Conditions — Riches Corsos" />
@@ -106,7 +111,8 @@ export default function Terms() {
                                     </p>
                                     <div className="legal-contact-block">
                                         <p><strong>Riches Corsos</strong></p>
-                                        <p>Email: <a href="mailto:contact@richescorsos.com">contact@richescorsos.com</a></p>
+                                        <p>Email: <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
+                                        <p>Phone: <a href={`tel:${cleanPhone}`}>{contactPhone}</a></p>
                                         <p>Direct Inquiries: <Link href="/contact" className="legal-inline-link">Contact Page</Link></p>
                                         <p>Puppy Showcase: <Link href="/puppies" className="legal-inline-link">Available Puppies</Link></p>
                                     </div>
