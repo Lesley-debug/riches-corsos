@@ -3,6 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 import CartDrawer from '@/Components/CartDrawer';
 import SearchOverlay from '@/Components/SearchOverlay';
 import AccountDropdown from '@/Components/AccountDropdown';
+import FloatingContact from '@/Components/FloatingContact';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -337,6 +338,7 @@ export default function SiteLayout({ children }) {
         topOffset={navBottom}
       />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cartItems} />
+      <FloatingContact />
     </>
   );
 }
