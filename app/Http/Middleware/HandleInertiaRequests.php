@@ -23,6 +23,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
+                'status' => fn () => $request->session()->get('status'),
             ],
             'wishlistCount' => fn () => $request->user()?->wishlists()->count() ?? 0,
             'cartCount' => fn () => count(array_unique(array_map(

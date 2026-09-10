@@ -37,8 +37,26 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+// ── Legacy 301 Permanent Redirects ──
+Route::permanentRedirect('/shop', '/puppies');
+Route::permanentRedirect('/shop/index.php', '/puppies');
+Route::permanentRedirect('/shop/product.php', '/puppies');
+Route::permanentRedirect('/puppy.php', '/puppies');
+Route::permanentRedirect('/about.php', '/about');
+Route::permanentRedirect('/about-us.php', '/about');
+Route::permanentRedirect('/contact.php', '/contact');
+Route::permanentRedirect('/contact-us.php', '/contact');
+Route::permanentRedirect('/blog.php', '/blog');
+Route::permanentRedirect('/faq.php', '/faqs');
+Route::permanentRedirect('/faqs.php', '/faqs');
+Route::permanentRedirect('/testimonials.php', '/testimonials');
 
 // Customer account area — requires login
 Route::middleware('auth')->group(function () {

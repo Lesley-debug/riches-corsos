@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
 
 function EyeIcon({ visible }) {
@@ -19,58 +19,40 @@ function EyeIcon({ visible }) {
   );
 }
 
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
-export default function Login() {
-  const { props } = usePage();
-  const flashSuccess = props.flash?.success;
+export default function ResetPassword({ token, email = '' }) {
   const [showPassword, setShowPassword] = useState(false);
-
   const { data, setData, post, processing, errors } = useForm({
-    email: '',
+    token: token,
+    email: email,
     password: '',
-    remember: false,
+    password_confirmation: '',
   });
 
   const submit = (e) => {
     e.preventDefault();
-    post('/login');
+    post(route('password.update'));
   };
 
   return (
     <SiteLayout>
-      <Head title="Log In — Riches Corsos" />
+      <Head title="Choose New Password — Riches Corsos" />
 
       <main className="auth-page">
         <div className="auth-card">
           <div className="auth-header">
             <span className="auth-badge">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-              Customer Portal
+              Secure Reset
             </span>
-            <h1>Welcome back</h1>
-            <p>Log in to track your puppy reservations and saved favorites.</p>
+            <h1>Choose a new password</h1>
+            <p>Please enter your email and set a new password of at least 8 characters.</p>
           </div>
 
-          {flashSuccess && (
-            <div className="auth-status-alert">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              <span>{flashSuccess}</span>
-            </div>
-          )}
-
           <form onSubmit={submit} className="auth-form">
+            <input type="hidden" name="token" value={data.token} />
+
             <div className="auth-field">
               <label htmlFor="email" className="auth-field-label">Email address</label>
               <input
@@ -80,20 +62,13 @@ export default function Login() {
                 value={data.email}
                 onChange={(e) => setData('email', e.target.value)}
                 autoComplete="email"
-                placeholder="you@example.com"
                 required
-                autoFocus
               />
               {errors.email && <div className="form-error">{errors.email}</div>}
             </div>
 
             <div className="auth-field">
-              <div className="auth-field-label-row">
-                <label htmlFor="password" className="auth-field-label">Password</label>
-                <Link href={route('password.request')} className="auth-forgot-link">
-                  Forgot password?
-                </Link>
-              </div>
+              <label htmlFor="password" className="auth-field-label">New password</label>
               <div className="password-input-wrap">
                 <input
                   id="password"
@@ -101,8 +76,8 @@ export default function Login() {
                   className={`auth-input ${errors.password ? 'has-error' : ''}`}
                   value={data.password}
                   onChange={(e) => setData('password', e.target.value)}
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
+                  autoComplete="new-password"
+                  placeholder="At least 8 characters"
                   required
                 />
                 <button
@@ -117,34 +92,30 @@ export default function Login() {
               {errors.password && <div className="form-error">{errors.password}</div>}
             </div>
 
-            <label className="auth-checkbox-label">
-              <input
-                type="checkbox"
-                checked={data.remember}
-                onChange={(e) => setData('remember', e.target.checked)}
-              />
-              <span>Remember this device for 30 days</span>
-            </label>
+            <div className="auth-field">
+              <label htmlFor="password_confirmation" className="auth-field-label">Confirm new password</label>
+              <div className="password-input-wrap">
+                <input
+                  id="password_confirmation"
+                  type={showPassword ? 'text' : 'password'}
+                  className="auth-input"
+                  value={data.password_confirmation}
+                  onChange={(e) => setData('password_confirmation', e.target.value)}
+                  autoComplete="new-password"
+                  placeholder="Repeat your new password"
+                  required
+                />
+              </div>
+            </div>
 
             <button type="submit" className="btn-solid auth-btn-submit" disabled={processing}>
-              {processing ? 'Logging in…' : 'Log In'}
+              {processing ? 'Updating password…' : 'Reset Password'}
             </button>
           </form>
 
-          <div className="auth-perks-list">
-            <div className="auth-perk">
-              <CheckIcon />
-              <span>Track reservation updates and delivery timeline</span>
-            </div>
-            <div className="auth-perk">
-              <CheckIcon />
-              <span>Access official puppy health certificates and care guides</span>
-            </div>
-          </div>
-
           <footer className="auth-card-footer">
-            Don't have an account yet?
-            <Link href="/register">Create an account</Link>
+            Remembered your password?
+            <Link href={route('login')}>Return to log in</Link>
           </footer>
         </div>
       </main>
