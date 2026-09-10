@@ -47,15 +47,22 @@ function HeartIcon({ filled }) {
 export default function PuppyCard({ puppy, wishlisted = false }) {
     const { props } = usePage();
     const user = props.auth?.user;
+    const wishlistPuppyIds = props.wishlistPuppyIds ?? [];
+    const cartPuppyIds = props.cartPuppyIds ?? [];
+
+    const isWishlisted = wishlistPuppyIds.includes(puppy.id) || wishlisted;
+    const isInCart = cartPuppyIds.includes(puppy.id);
+
     const cover = puppy.images?.[0]?.path;
     const age = ageLabel(puppy.age_in_weeks);
-    const gender = puppy.sex === 'male' ? 'Male' : 'Female';
-    const [isWishlisted, setIsWishlisted] = useState(wishlisted);
+    const gender = puppy.sex === 'male' ? 'Male' : (puppy.sex === 'female' ? 'Female' : (puppy.sex ?? ''));
+    const subtitle = [gender, age, puppy.color].filter(Boolean).join(' - ');
+
     const [notice, setNotice] = useState('');
 
     const showNotice = (message) => {
         setNotice(message);
-        window.setTimeout(() => setNotice(''), 2400);
+        window.setTimeout(() => setNotice(''), 2600);
     };
 
     const handleWishlist = (event) => {
@@ -63,26 +70,37 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
 
         if (!user) {
             router.visit('/login');
-
             return;
         }
 
-        const nextWishlisted = !isWishlisted;
-        setIsWishlisted(nextWishlisted);
+        const willAdd = !isWishlisted;
 
         router.post('/wishlist/toggle', { puppy_id: puppy.id }, {
             preserveScroll: true,
-            onSuccess: () => showNotice(nextWishlisted ? `${puppy.name} added to your wishlist.` : `${puppy.name} removed from your wishlist.`),
-            onError: () => setIsWishlisted(!nextWishlisted),
+            onSuccess: () => {
+                showNotice(willAdd ? `You like ${puppy.name}! Added to wishlist.` : `Removed ${puppy.name} from your wishlist.`);
+            },
         });
     };
 
     const handleCart = (event) => {
         event.preventDefault();
 
+        if (!user) {
+            router.visit('/login');
+            return;
+        }
+
+        if (isInCart) {
+            showNotice(`${puppy.name} is already in your cart.`);
+            return;
+        }
+
         router.post('/cart', { puppy_id: puppy.id }, {
             preserveScroll: true,
-            onSuccess: () => showNotice(`${puppy.name} added to your cart.`),
+            onSuccess: () => {
+                showNotice(`${puppy.name} added to your cart.`);
+            },
         });
     };
 
@@ -96,21 +114,29 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
             </Link>
 
             <div className="pcard-body">
-                <p className="pcard-subtitle">
-                    {gender}{age ? ` - ${age}` : ''}{puppy.color ? ` - ${puppy.color}` : ''}
-                </p>
+                {subtitle && <p className="pcard-subtitle">{subtitle}</p>}
                 <Link href={`/puppies/${puppy.slug}`} className="pcard-name">{puppy.name}</Link>
 
                 <div className="pcard-footer">
+                    {puppy.price ? (
+                        <span className="pcard-price">${Number(puppy.price).toLocaleString()}</span>
+                    ) : <span />}
                     <div className="pcard-footer-actions">
-                        <button type="button" className="pcard-icon-btn" onClick={handleCart} aria-label={`Add ${puppy.name} to cart`}>
+                        <button
+                            type="button"
+                            className={`pcard-icon-btn ${isInCart ? 'pcard-icon-btn--active' : ''}`}
+                            onClick={handleCart}
+                            aria-label={isInCart ? `${puppy.name} in cart` : `Add ${puppy.name} to cart`}
+                            title={isInCart ? 'In cart' : 'Add to cart'}
+                        >
                             <CartIcon />
                         </button>
                         <button
                             type="button"
-                            className="pcard-icon-btn pcard-wishlist"
+                            className={`pcard-icon-btn pcard-wishlist ${isWishlisted ? 'pcard-wishlist--active' : ''}`}
                             onClick={handleWishlist}
                             aria-label={isWishlisted ? `Remove ${puppy.name} from wishlist` : `Add ${puppy.name} to wishlist`}
+                            title={isWishlisted ? 'Liked' : 'Add to wishlist'}
                         >
                             <HeartIcon filled={isWishlisted} />
                         </button>

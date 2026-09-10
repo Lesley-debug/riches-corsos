@@ -110,6 +110,10 @@ export default function SiteLayout({ children }) {
           <button className="m-icon-btn" onClick={() => setSearchOpen(true)} aria-label="Search">
             <SearchIcon />
           </button>
+          <Link href={user ? '/wishlist' : '/login'} className="m-icon-btn m-wishlist" aria-label="Wishlist">
+            <HeartIcon />
+            {wishlistCount > 0 && <span className="cart-count">{wishlistCount}</span>}
+          </Link>
           <button className="m-icon-btn m-cart" onClick={() => setCartOpen(true)} aria-label="Open cart">
             <CartIcon />
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}

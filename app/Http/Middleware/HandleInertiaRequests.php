@@ -26,7 +26,12 @@ class HandleInertiaRequests extends Middleware
                 'status' => fn () => $request->session()->get('status'),
             ],
             'wishlistCount' => fn () => $request->user()?->wishlists()->count() ?? 0,
+            'wishlistPuppyIds' => fn () => $request->user()?->wishlists()->pluck('puppy_id')->all() ?? [],
             'cartCount' => fn () => count(array_unique(array_map(
+                'intval',
+                $request->session()->get('cart.puppy_ids', []),
+            ))),
+            'cartPuppyIds' => fn () => array_values(array_unique(array_map(
                 'intval',
                 $request->session()->get('cart.puppy_ids', []),
             ))),

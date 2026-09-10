@@ -12,12 +12,31 @@ class CartControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cart_page_renders_with_cart_items(): void
+    public function test_guest_is_redirected_to_login_when_accessing_cart(): void
     {
+        $response = $this->get(route('cart.index'));
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_guest_is_redirected_to_login_when_adding_to_cart(): void
+    {
+        $puppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
+
+        $response = $this->post(route('cart.store'), [
+            'puppy_id' => $puppy->id,
+        ]);
+
+        $response->assertRedirect(route('login'));
+    }
+
+    public function test_cart_page_renders_with_cart_items_for_authenticated_user(): void
+    {
+        $user = User::factory()->create();
         $puppy1 = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
         $puppy2 = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
 
-        $response = $this->withSession(['cart.puppy_ids' => [$puppy1->id, $puppy2->id]])
+        $response = $this->actingAs($user)
+            ->withSession(['cart.puppy_ids' => [$puppy1->id, $puppy2->id]])
             ->get(route('cart.index'));
 
         $response->assertStatus(200);
@@ -29,11 +48,12 @@ class CartControllerTest extends TestCase
         );
     }
 
-    public function test_available_published_puppy_can_be_added_to_cart(): void
+    public function test_available_published_puppy_can_be_added_to_cart_by_authenticated_user(): void
     {
+        $user = User::factory()->create();
         $puppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
 
-        $response = $this->post(route('cart.store'), [
+        $response = $this->actingAs($user)->post(route('cart.store'), [
             'puppy_id' => $puppy->id,
         ]);
 
@@ -43,9 +63,11 @@ class CartControllerTest extends TestCase
 
     public function test_duplicate_puppy_cannot_be_added_twice(): void
     {
+        $user = User::factory()->create();
         $puppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
 
-        $response = $this->withSession(['cart.puppy_ids' => [$puppy->id]])
+        $response = $this->actingAs($user)
+            ->withSession(['cart.puppy_ids' => [$puppy->id]])
             ->post(route('cart.store'), [
                 'puppy_id' => $puppy->id,
             ]);
@@ -56,9 +78,10 @@ class CartControllerTest extends TestCase
 
     public function test_unavailable_puppy_cannot_be_added_to_cart(): void
     {
+        $user = User::factory()->create();
         $puppy = Puppy::factory()->create(['status' => 'sold', 'visibility' => 'published']);
 
-        $response = $this->post(route('cart.store'), [
+        $response = $this->actingAs($user)->post(route('cart.store'), [
             'puppy_id' => $puppy->id,
         ]);
 
@@ -68,9 +91,10 @@ class CartControllerTest extends TestCase
 
     public function test_unpublished_puppy_cannot_be_added_to_cart(): void
     {
+        $user = User::factory()->create();
         $puppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'private']);
 
-        $response = $this->post(route('cart.store'), [
+        $response = $this->actingAs($user)->post(route('cart.store'), [
             'puppy_id' => $puppy->id,
         ]);
 
@@ -80,10 +104,12 @@ class CartControllerTest extends TestCase
 
     public function test_puppy_can_be_removed_from_cart(): void
     {
+        $user = User::factory()->create();
         $puppy1 = Puppy::factory()->create();
         $puppy2 = Puppy::factory()->create();
 
-        $response = $this->withSession(['cart.puppy_ids' => [$puppy1->id, $puppy2->id]])
+        $response = $this->actingAs($user)
+            ->withSession(['cart.puppy_ids' => [$puppy1->id, $puppy2->id]])
             ->delete(route('cart.destroy', $puppy1));
 
         $response->assertSessionHas('cart.puppy_ids', [$puppy2->id]);
@@ -92,9 +118,11 @@ class CartControllerTest extends TestCase
 
     public function test_checkout_validates_required_contact_fields(): void
     {
+        $user = User::factory()->create();
         $puppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
 
-        $response = $this->withSession(['cart.puppy_ids' => [$puppy->id]])
+        $response = $this->actingAs($user)
+            ->withSession(['cart.puppy_ids' => [$puppy->id]])
             ->post(route('checkout.store'), []);
 
         $response->assertSessionHasErrors(['buyer_name', 'buyer_email', 'buyer_phone']);
@@ -103,7 +131,10 @@ class CartControllerTest extends TestCase
 
     public function test_checkout_fails_when_cart_is_empty(): void
     {
-        $response = $this->withSession(['cart.puppy_ids' => []])
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->withSession(['cart.puppy_ids' => []])
             ->post(route('checkout.store'), [
                 'buyer_name' => 'Jane Doe',
                 'buyer_email' => 'jane@example.com',
@@ -116,10 +147,12 @@ class CartControllerTest extends TestCase
 
     public function test_checkout_places_orders_for_cart_items_and_marks_puppy_pending(): void
     {
+        $user = User::factory()->create();
         $puppy1 = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
         $puppy2 = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
 
-        $response = $this->withSession(['cart.puppy_ids' => [$puppy1->id, $puppy2->id]])
+        $response = $this->actingAs($user)
+            ->withSession(['cart.puppy_ids' => [$puppy1->id, $puppy2->id]])
             ->post(route('checkout.store'), [
                 'buyer_name' => 'John Doe',
                 'buyer_email' => 'john@example.com',
@@ -150,10 +183,12 @@ class CartControllerTest extends TestCase
 
     public function test_checkout_fails_if_any_puppy_in_cart_is_no_longer_available(): void
     {
+        $user = User::factory()->create();
         $availablePuppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
         $soldPuppy = Puppy::factory()->create(['status' => 'sold', 'visibility' => 'published']);
 
-        $response = $this->withSession(['cart.puppy_ids' => [$availablePuppy->id, $soldPuppy->id]])
+        $response = $this->actingAs($user)
+            ->withSession(['cart.puppy_ids' => [$availablePuppy->id, $soldPuppy->id]])
             ->post(route('checkout.store'), [
                 'buyer_name' => 'John Doe',
                 'buyer_email' => 'john@example.com',

@@ -1,13 +1,18 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 
 function priceLabel(price) {
     return price ? `$${Number(price).toLocaleString()}` : 'Contact for price';
 }
 
 export default function CartDrawer({ open, onClose, items = [] }) {
+    const { props } = usePage();
+    const user = props.auth?.user;
+
     const removeItem = (puppy) => {
         router.delete(`/cart/${puppy.id}`, { preserveScroll: true });
     };
+
+    const subtotal = items.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
 
     return (
         <>
@@ -66,7 +71,17 @@ export default function CartDrawer({ open, onClose, items = [] }) {
 
                 {items.length > 0 && (
                     <div className="cart-drawer-footer">
-                        <Link href="/cart" className="btn-solid" onClick={onClose}>Proceed To Checkout</Link>
+                        {subtotal > 0 && (
+                            <div className="cart-drawer-subtotal">
+                                <span>Estimated Total</span>
+                                <strong>${subtotal.toLocaleString()}</strong>
+                            </div>
+                        )}
+                        {user ? (
+                            <Link href="/cart" className="btn-solid" onClick={onClose}>Checkout</Link>
+                        ) : (
+                            <Link href="/login" className="btn-solid" onClick={onClose}>Sign In to Checkout</Link>
+                        )}
                         <Link href="/puppies" className="cart-continue-link" onClick={onClose}>Continue browsing</Link>
                     </div>
                 )}

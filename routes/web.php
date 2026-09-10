@@ -25,12 +25,6 @@ Route::post('/contact', [PublicSiteController::class, 'contactStore'])->name('co
 // Legacy direct order endpoint kept for existing links and integrations.
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
-// Cart and checkout. Orders are confirmed by the breeder; no card payment is taken here.
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-Route::delete('/cart/{puppy}', [CartController::class, 'destroy'])->name('cart.destroy');
-Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.store');
-
 // Guest-only auth routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -58,12 +52,16 @@ Route::permanentRedirect('/faq.php', '/faqs');
 Route::permanentRedirect('/faqs.php', '/faqs');
 Route::permanentRedirect('/testimonials.php', '/testimonials');
 
-// Customer account area — requires login
+// Customer account & shopping area — requires login
 Route::middleware('auth')->group(function () {
     Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');
     Route::get('/orders', [AccountController::class, 'orders'])->name('account.orders');
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::delete('/cart/{puppy}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.store');
 });
 
 // ── Puppy document routes (admin-only, protected by Gate inside controller) ──

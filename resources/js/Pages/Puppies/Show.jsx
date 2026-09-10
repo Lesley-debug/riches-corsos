@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
 import PuppyCard from '@/Components/PuppyCard';
 
@@ -86,6 +86,16 @@ function HeartIcon({ filled }) {
     );
 }
 
+function CartIcon() {
+    return (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M3 4h2l1 12h13l2-9H7" />
+            <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none" />
+            <circle cx="18" cy="20" r="1.4" fill="currentColor" stroke="none" />
+        </svg>
+    );
+}
+
 function ShareIcon() {
     return (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -116,22 +126,23 @@ function PlayIcon() {
 
 export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishlisted, related = [] }) {
     const { props } = usePage();
-    const flashSuccess = props.flash?.success;
     const user = props.auth?.user;
+    const wishlistPuppyIds = props.wishlistPuppyIds ?? [];
+    const cartPuppyIds = props.cartPuppyIds ?? [];
+
+    const isWishlisted = wishlistPuppyIds.includes(puppy.id) || (initialWishlisted ?? false);
+    const isInCart = cartPuppyIds.includes(puppy.id);
 
     const [activeImage, setActiveImage] = useState(0);
-    const [showForm, setShowForm] = useState(false);
-    const [wishlisted, setWishlisted] = useState(initialWishlisted ?? false);
+    const [shareOpen, setShareOpen] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [selectedParentIndex, setSelectedParentIndex] = useState(0);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        puppy_id: puppy.id,
-        buyer_name: '',
-        buyer_email: '',
-        buyer_phone: '',
-        buyer_address: '',
-        notes: '',
-    });
+    const showToast = (message) => {
+        setToastMessage(message);
+        window.setTimeout(() => setToastMessage(''), 2800);
+    };
 
     const images = cleanList(puppy.images);
     const videos = cleanList(puppy.videos);
@@ -140,7 +151,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     const isAvailable = puppy.status === 'available';
     const status = labelize(puppy.status);
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const shareText = `${puppy.name} - ${puppy.breed} puppy at Riches Corsos`;
+    const shareText = `Meet ${puppy.name} - ${puppy.breed} puppy at Riches Corsos!`;
     const pageTitle = puppy.seo_title || `${puppy.name} | ${puppy.breed} Puppy | Riches Corsos`;
     const metaDescription = puppy.meta_description || puppy.description?.slice(0, 155) || `Meet ${puppy.name}, a ${puppy.breed} puppy at Riches Corsos.`;
     const ogImage = images[0] ? `/storage/${images[0].path}` : '/images/logo.png';
@@ -191,10 +202,32 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
             return;
         }
 
-        setWishlisted((current) => !current);
+        const willAdd = !isWishlisted;
+
         router.post('/wishlist/toggle', { puppy_id: puppy.id }, {
             preserveScroll: true,
-            onError: () => setWishlisted((current) => !current),
+            onSuccess: () => {
+                showToast(willAdd ? `You like ${puppy.name}! Added to wishlist.` : `Removed ${puppy.name} from your wishlist.`);
+            },
+        });
+    };
+
+    const handleCart = () => {
+        if (!user) {
+            router.visit('/login');
+            return;
+        }
+
+        if (isInCart) {
+            showToast(`${puppy.name} is already in your cart.`);
+            return;
+        }
+
+        router.post('/cart', { puppy_id: puppy.id }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                showToast(`${puppy.name} added to your cart.`);
+            },
         });
     };
 
@@ -205,32 +238,78 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
 
         navigator.clipboard?.writeText(shareUrl).then(() => {
             setCopied(true);
-            window.setTimeout(() => setCopied(false), 2000);
+            showToast('Link copied to clipboard!');
+            window.setTimeout(() => setCopied(false), 2400);
         });
     };
 
-    const handleShare = async () => {
-        if (typeof navigator !== 'undefined' && navigator.share) {
-            try {
-                await navigator.share({ title: puppy.name, text: shareText, url: shareUrl });
-            } catch (_) {
-                return;
-            }
-        } else {
-            copyLink();
-        }
-    };
-
-    const submit = (event) => {
-        event.preventDefault();
-        post('/orders', {
-            preserveScroll: true,
-            onSuccess: () => {
-                reset();
-                setShowForm(false);
+    const sharePlatforms = [
+        {
+            name: 'Facebook',
+            color: '#1877F2',
+            icon: (
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+                </svg>
+            ),
+            action: () => {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=450');
             },
-        });
-    };
+        },
+        {
+            name: 'X',
+            color: '#000000',
+            icon: (
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            ),
+            action: () => {
+                window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank', 'width=600,height=450');
+            },
+        },
+        {
+            name: 'Snapchat',
+            color: '#FFFC00',
+            textColor: '#000000',
+            icon: (
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M12.002 2C8.75 2 6.545 4.148 6.545 7.15c0 .736.147 1.838.257 2.427.073.392-.122.564-.343.686-.392.22-.98.392-1.397.662-.319.22-.392.515-.171.784.343.417 1.103.735 1.544.784.343.049.49.27.417.613-.196.931-.882 2.377-2.451 2.745-.343.074-.466.319-.441.564.049.466.833.686 1.348.809.564.123 1.054.196 1.495.662.392.417.27 1.029.074 1.544-.098.245-.049.441.171.539.735.343 2.157.613 4.902.613s4.167-.27 4.902-.613c.22-.098.27-.294.172-.539-.196-.515-.319-1.127.073-1.544.441-.466.931-.539 1.495-.662.515-.123 1.299-.343 1.348-.809.025-.245-.098-.49-.441-.564-1.569-.368-2.255-1.814-2.451-2.745-.073-.343.074-.564.417-.613.441-.049 1.201-.367 1.544-.784.22-.269.147-.564-.172-.784-.417-.27-1.005-.442-1.397-.662-.221-.122-.416-.294-.343-.686.11-.589.257-1.691.257-2.427C17.455 4.148 15.25 2 12.002 2z" />
+                </svg>
+            ),
+            action: () => {
+                window.open(`https://www.snapchat.com/share?url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=500');
+            },
+        },
+        {
+            name: 'Instagram',
+            color: '#E4405F',
+            icon: (
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8">
+                    <rect x="2" y="2" width="20" height="20" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none" />
+                </svg>
+            ),
+            action: () => {
+                copyLink();
+                showToast('Link copied! Open Instagram to share in stories or DM.');
+            },
+        },
+        {
+            name: 'TikTok',
+            color: '#010101',
+            icon: (
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z" />
+                </svg>
+            ),
+            action: () => {
+                copyLink();
+                showToast('Link copied! Open TikTok to share.');
+            },
+        },
+    ];
 
     return (
         <SiteLayout>
@@ -245,6 +324,12 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
             </Head>
 
             <div className="puppy-show-page">
+                {toastMessage && (
+                    <div className="puppy-toast-banner" role="status">
+                        <span>{toastMessage}</span>
+                    </div>
+                )}
+
                 <nav className="puppy-breadcrumb">
                     <div className="puppy-breadcrumb-inner">
                         <Link href="/">Home</Link>
@@ -307,13 +392,31 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                                     {status}
                                 </span>
                                 <div className="puppy-summary-tools">
-                                    <button type="button" className="puppy-icon-btn" onClick={toggleWishlist} aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}>
-                                        <HeartIcon filled={wishlisted} />
+                                    <button
+                                        type="button"
+                                        className={`puppy-icon-btn ${isWishlisted ? 'puppy-icon-btn--active' : ''}`}
+                                        onClick={toggleWishlist}
+                                        aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                                        title={isWishlisted ? 'Liked' : 'Add to wishlist'}
+                                    >
+                                        <HeartIcon filled={isWishlisted} />
                                     </button>
-                                    <button type="button" className="puppy-icon-btn" onClick={handleShare} aria-label="Share puppy">
+                                    <button
+                                        type="button"
+                                        className="puppy-icon-btn"
+                                        onClick={() => setShareOpen(true)}
+                                        aria-label="Share puppy"
+                                        title="Share puppy"
+                                    >
                                         <ShareIcon />
                                     </button>
-                                    <button type="button" className="puppy-icon-btn" onClick={copyLink} aria-label="Copy puppy link">
+                                    <button
+                                        type="button"
+                                        className="puppy-icon-btn"
+                                        onClick={copyLink}
+                                        aria-label="Copy puppy link"
+                                        title="Copy link"
+                                    >
                                         <CopyIcon />
                                     </button>
                                 </div>
@@ -325,7 +428,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                                 <p className="puppy-summary-price">{priceLabel(puppy.price)}</p>
                             </div>
 
-                            {copied && <p className="puppy-copy-note">Link copied</p>}
+                            {copied && <p className="puppy-copy-note">Link copied to clipboard</p>}
 
                             {puppy.badges?.length > 0 && (
                                 <div className="puppy-badges-row">
@@ -346,55 +449,20 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                                 </div>
                             )}
 
-                            {flashSuccess && <div className="form-success">{flashSuccess}</div>}
-
                             {isAvailable ? (
-                                showForm ? (
-                                    <form onSubmit={submit} className="reserve-form">
-                                        <p className="form-note">No payment is taken here. We will contact you to confirm the next step.</p>
-                                        <div className="form-field">
-                                            <label htmlFor="buyer_name">Full Name</label>
-                                            <input id="buyer_name" type="text" value={data.buyer_name} onChange={(event) => setData('buyer_name', event.target.value)} required />
-                                            {errors.buyer_name && <div className="form-error">{errors.buyer_name}</div>}
-                                        </div>
-                                        <div className="form-field">
-                                            <label htmlFor="buyer_email">Email</label>
-                                            <input id="buyer_email" type="email" value={data.buyer_email} onChange={(event) => setData('buyer_email', event.target.value)} required />
-                                            {errors.buyer_email && <div className="form-error">{errors.buyer_email}</div>}
-                                        </div>
-                                        <div className="form-field">
-                                            <label htmlFor="buyer_phone">Phone</label>
-                                            <input id="buyer_phone" type="text" value={data.buyer_phone} onChange={(event) => setData('buyer_phone', event.target.value)} required />
-                                            {errors.buyer_phone && <div className="form-error">{errors.buyer_phone}</div>}
-                                        </div>
-                                        <div className="form-field">
-                                            <label htmlFor="buyer_address">Address</label>
-                                            <textarea id="buyer_address" rows={2} value={data.buyer_address} onChange={(event) => setData('buyer_address', event.target.value)} />
-                                            {errors.buyer_address && <div className="form-error">{errors.buyer_address}</div>}
-                                        </div>
-                                        <div className="form-field">
-                                            <label htmlFor="notes">Notes</label>
-                                            <textarea id="notes" rows={3} value={data.notes} onChange={(event) => setData('notes', event.target.value)} />
-                                            {errors.notes && <div className="form-error">{errors.notes}</div>}
-                                        </div>
-                                        {errors.puppy_id && <div className="form-error">{errors.puppy_id}</div>}
-                                        <div className="reserve-form-actions">
-                                            <button type="submit" className="btn-solid" disabled={processing}>
-                                                {processing ? 'Sending...' : 'Send Reservation Request'}
-                                            </button>
-                                            <button type="button" className="btn-outline" onClick={() => setShowForm(false)}>
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <div className="puppy-summary-actions">
-                                        <button type="button" className="btn-solid" onClick={() => setShowForm(true)}>
-                                            Reserve This Puppy
-                                        </button>
-                                        <Link href="/contact" className="btn-outline">Ask About {puppy.name}</Link>
-                                    </div>
-                                )
+                                <div className="puppy-summary-actions">
+                                    <button
+                                        type="button"
+                                        className={`btn-solid ${isInCart ? 'btn-solid--in-cart' : ''}`}
+                                        onClick={handleCart}
+                                    >
+                                        <CartIcon />
+                                        <span>{isInCart ? 'In Your Cart' : 'Add to Cart'}</span>
+                                    </button>
+                                    <Link href={`/contact?puppy=${encodeURIComponent(puppy.name)}`} className="btn-outline">
+                                        Ask About {puppy.name}
+                                    </Link>
+                                </div>
                             ) : (
                                 <div className="puppy-unavailable-note">
                                     <p>{puppy.name} is currently {labelize(puppy.status)}.</p>
@@ -504,73 +572,161 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                     </div>
                 </section>
 
-                {parents.length > 0 && (
-                    <section className="puppy-support-section">
-                        <div className="puppy-section-heading">
-                            <p className="shop-eyebrow">Pedigree</p>
-                            <h2>Meet The Parents</h2>
-                        </div>
-                        <div className="puppy-parents-grid">
-                            {parents.map(({ parent, role, label }) => {
-                                const image = parent.images?.[0];
-                                const parentVideos = cleanList(parent.videos);
+                {parents.length > 0 && (() => {
+                    const activeParent = parents[selectedParentIndex] || parents[0];
+                    const parent = activeParent.parent;
+                    const parentImages = cleanList(parent.images);
+                    const parentVideos = cleanList(parent.videos);
+                    const primaryImage = parentImages[0];
 
-                                return (
-                                    <article key={parent.id} className="puppy-parent-card">
-                                        <div className="puppy-parent-img-wrap">
-                                            {image ? (
-                                                <img src={`/storage/${image.path}`} alt={image.alt_text || parent.name} className="puppy-parent-img" />
-                                            ) : (
-                                                <div className="puppy-parent-img-placeholder" />
-                                            )}
+                    return (
+                        <section className="puppy-support-section puppy-pedigree-section">
+                            <div className="puppy-section-heading puppy-section-heading--row">
+                                <div>
+                                    <p className="shop-eyebrow">Pedigree</p>
+                                    <h2>Meet The Parents</h2>
+                                </div>
+                                {parents.length > 1 && (
+                                    <div className="puppy-parent-tabs" role="tablist" aria-label="Select Parent">
+                                        {parents.map((item, index) => {
+                                            const isActive = index === selectedParentIndex;
+                                            return (
+                                                <button
+                                                    key={item.parent.id}
+                                                    type="button"
+                                                    role="tab"
+                                                    aria-selected={isActive}
+                                                    className={`puppy-parent-tab-btn ${isActive ? 'puppy-parent-tab-btn--active' : ''}`}
+                                                    onClick={() => setSelectedParentIndex(index)}
+                                                >
+                                                    <span className="puppy-parent-tab-pill">{item.label}</span>
+                                                    <span>{item.role}: {item.parent.name}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+
+                            <article className="puppy-parent-spotlight">
+                                <div className="puppy-parent-spotlight-media">
+                                    <div className="puppy-parent-spotlight-img-wrap">
+                                        {primaryImage ? (
+                                            <img
+                                                src={`/storage/${primaryImage.path}`}
+                                                alt={primaryImage.alt_text || parent.name}
+                                                className="puppy-parent-spotlight-img"
+                                            />
+                                        ) : (
+                                            <div className="puppy-parent-spotlight-placeholder">
+                                                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.4" opacity="0.35">
+                                                    <circle cx="12" cy="12" r="9" />
+                                                    <path d="M12 7v5l3 3" />
+                                                </svg>
+                                                <span>{parent.name}</span>
+                                                <small>{activeParent.role} ({activeParent.label})</small>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {parentVideos.length > 0 && (
+                                        <div className="puppy-video-list puppy-video-list--compact">
+                                            {parentVideos.map((video) => (
+                                                <a
+                                                    key={video.id ?? video.video_url}
+                                                    href={video.video_url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="puppy-video-link"
+                                                >
+                                                    <span><PlayIcon /></span>
+                                                    {video.title || `${parent.name} Video`}
+                                                </a>
+                                            ))}
                                         </div>
-                                        <div className="puppy-parent-body">
-                                            <p className="puppy-parent-role">{role} ({label})</p>
-                                            <h3>{parent.name}</h3>
-                                            <p className="puppy-parent-meta">
-                                                {[parent.breed, parent.color, parent.weight, parent.height].filter(Boolean).join(' - ')}
+                                    )}
+                                </div>
+
+                                <div className="puppy-parent-spotlight-body">
+                                    <div className="puppy-parent-spotlight-header">
+                                        <span className="puppy-parent-role-badge">
+                                            {activeParent.role} ({activeParent.label})
+                                        </span>
+                                        <h3>{parent.name}</h3>
+                                        {(parent.registration_organization || parent.registration_number) && (
+                                            <p className="puppy-parent-reg-meta">
+                                                {[parent.registration_organization, parent.registration_number ? `Reg #${parent.registration_number}` : null].filter(Boolean).join(' • ')}
                                             </p>
-                                            {parent.description && <p className="puppy-parent-desc">{parent.description}</p>}
-                                            {(parent.registration_organization || parent.registration_number) && (
-                                                <p className="puppy-parent-registration">
-                                                    {[parent.registration_organization, parent.registration_number].filter(Boolean).join(' ')}
-                                                </p>
-                                            )}
-                                            {parent.titles?.length > 0 && (
-                                                <div className="puppy-chips">
-                                                    {parent.titles.map((title) => (
-                                                        <span key={title} className="puppy-chip puppy-chip--gold">{title}</span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            {parent.health_tests && Object.keys(parent.health_tests).length > 0 && (
-                                                <div className="puppy-parent-health">
-                                                    {Object.entries(parent.health_tests).map(([test, result]) => (
-                                                        <div key={test}>
-                                                            <CheckIcon />
-                                                            <span>{labelize(test)}: {result}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            {parent.health_notes && <p className="puppy-care-note">{parent.health_notes}</p>}
-                                            {parentVideos.length > 0 && (
-                                                <div className="puppy-video-list puppy-video-list--compact">
-                                                    {parentVideos.map((video) => (
-                                                        <a key={video.id ?? video.video_url} href={video.video_url} target="_blank" rel="noopener noreferrer" className="puppy-video-link">
-                                                            <span><PlayIcon /></span>
-                                                            {video.title || `${parent.name} Video`}
-                                                        </a>
-                                                    ))}
-                                                </div>
-                                            )}
+                                        )}
+                                    </div>
+
+                                    <div className="puppy-parent-specs-grid">
+                                        {parent.breed && (
+                                            <div className="puppy-parent-spec-item">
+                                                <span>Breed</span>
+                                                <strong>{parent.breed}</strong>
+                                            </div>
+                                        )}
+                                        {parent.color && (
+                                            <div className="puppy-parent-spec-item">
+                                                <span>Color</span>
+                                                <strong>{parent.color}</strong>
+                                            </div>
+                                        )}
+                                        {parent.weight && (
+                                            <div className="puppy-parent-spec-item">
+                                                <span>Weight</span>
+                                                <strong>{parent.weight}</strong>
+                                            </div>
+                                        )}
+                                        {parent.height && (
+                                            <div className="puppy-parent-spec-item">
+                                                <span>Height</span>
+                                                <strong>{parent.height}</strong>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {parent.titles?.length > 0 && (
+                                        <div className="puppy-parent-titles">
+                                            <p className="puppy-parent-subheading">Titles & Honors</p>
+                                            <div className="puppy-chips">
+                                                {parent.titles.map((title) => (
+                                                    <span key={title} className="puppy-chip puppy-chip--gold">{title}</span>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </article>
-                                );
-                            })}
-                        </div>
-                    </section>
-                )}
+                                    )}
+
+                                    {parent.description && (
+                                        <div className="puppy-parent-bio">
+                                            <p className="puppy-parent-subheading">About {parent.name}</p>
+                                            <p className="puppy-parent-desc">{parent.description}</p>
+                                        </div>
+                                    )}
+
+                                    {parent.health_tests && Object.keys(parent.health_tests).length > 0 && (
+                                        <div className="puppy-parent-health-section">
+                                            <p className="puppy-parent-subheading">Health Clearances</p>
+                                            <div className="puppy-parent-health-grid">
+                                                {Object.entries(parent.health_tests).map(([test, result]) => (
+                                                    <div key={test} className="puppy-parent-health-chip">
+                                                        <CheckIcon />
+                                                        <span><strong>{labelize(test)}:</strong> {result}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {parent.health_notes && (
+                                        <p className="puppy-care-note">{parent.health_notes}</p>
+                                    )}
+                                </div>
+                            </article>
+                        </section>
+                    );
+                })()}
 
                 {related.length > 0 && (
                     <section className="puppy-support-section puppy-related-section">
@@ -589,6 +745,72 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                     </section>
                 )}
             </div>
+
+            {/* Social Share Modal */}
+            {shareOpen && (
+                <div className="share-modal-backdrop" onClick={() => setShareOpen(false)}>
+                    <div className="share-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="share-title">
+                        <div className="share-modal-header">
+                            <div>
+                                <p className="share-modal-kicker">Share puppy</p>
+                                <h3 id="share-title">Share {puppy.name}</h3>
+                            </div>
+                            <button
+                                type="button"
+                                className="share-modal-close"
+                                onClick={() => setShareOpen(false)}
+                                aria-label="Close share dialog"
+                            >
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                    <path d="M18 6L6 18M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div className="share-modal-body">
+                            <p className="share-modal-desc">Share this puppy with friends and family on your favorite platforms:</p>
+
+                            <div className="share-social-grid">
+                                {sharePlatforms.map((platform) => (
+                                    <button
+                                        type="button"
+                                        key={platform.name}
+                                        className="share-social-btn"
+                                        onClick={platform.action}
+                                        style={{
+                                            '--btn-brand': platform.color,
+                                            '--btn-brand-text': platform.textColor || '#ffffff',
+                                        }}
+                                    >
+                                        <span className="share-social-icon">{platform.icon}</span>
+                                        <span className="share-social-name">{platform.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="share-copy-section">
+                                <label htmlFor="share-copy-input">Or copy direct link</label>
+                                <div className="share-copy-input-row">
+                                    <input
+                                        id="share-copy-input"
+                                        type="text"
+                                        readOnly
+                                        value={shareUrl}
+                                        onClick={(e) => e.target.select()}
+                                    />
+                                    <button
+                                        type="button"
+                                        className={`btn-solid ${copied ? 'btn-solid--copied' : ''}`}
+                                        onClick={copyLink}
+                                    >
+                                        {copied ? 'Copied!' : 'Copy Link'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </SiteLayout>
     );
 }
