@@ -107,8 +107,17 @@ export default function Dashboard({
         <div className="account-content">
           {/* Welcome Header */}
           <div className="account-welcome-banner">
-            <div className="welcome-avatar-circle">
-              {user?.name ? user.name.charAt(0).toUpperCase() : 'C'}
+            <div className="welcome-avatar-circle" style={{ overflow: 'hidden' }}>
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                user?.name ? user.name.charAt(0).toUpperCase() : 'C'
+              )}
             </div>
             <div className="welcome-details">
               <span className="welcome-role-tag">VIP Client &bull; {memberSince}</span>

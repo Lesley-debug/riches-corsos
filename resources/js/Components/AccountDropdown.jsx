@@ -81,15 +81,6 @@ export default function AccountDropdown({ user }) {
         <div className="acct-panel acct-panel--form">
           <p className="acct-panel-heading">Sign in to your account</p>
 
-          <a href="/auth/google/redirect" className="acct-google-btn">
-            <GoogleIcon />
-            <span>Continue with Google</span>
-          </a>
-
-          <div className="acct-divider-text">
-            <span>or email</span>
-          </div>
-
           <form onSubmit={handleLogin} className="acct-login-form">
             <input
               type="email"
@@ -122,6 +113,16 @@ export default function AccountDropdown({ user }) {
               {processing ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
+
+          <div className="acct-divider-text">
+            <span>or continue with</span>
+          </div>
+
+          <a href="/auth/google/redirect" className="acct-google-btn">
+            <GoogleIcon />
+            <span>Continue with Google</span>
+          </a>
+
           <div className="acct-panel-divider" />
           <div className="acct-panel-footer">
             New here?{' '}

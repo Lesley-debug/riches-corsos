@@ -30,7 +30,7 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 .wrap{ max-width:1200px; margin:0 auto; padding:0 32px; }
 
 /* ===== HEADER: TOP UTILITY BAR ===== */
-.topbar{ background:var(--white); border-bottom:1px solid var(--line); position:relative; z-index:85; }
+.topbar{ background:var(--white); border-bottom:1px solid var(--line); position:relative; z-index:100; }
 .topbar-inner{
   max-width:1200px; margin:0 auto; padding:6px 32px;
   display:flex; align-items:center; justify-content:space-between;
@@ -45,7 +45,7 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 .topbar-actions{ display:flex; align-items:center; gap:12px; }
 
 /* Account dropdown trigger */
-.acct-dropdown{ position:relative; }
+.acct-dropdown{ position:relative; z-index:110; }
 .acct-trigger{
   display:flex; align-items:center; gap:5px;
   font-size:14px; font-weight:500; color:var(--ink);
@@ -56,7 +56,7 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 
 /* Account panel (dropdown) */
 .acct-panel{
-  position:absolute; top:calc(100% + 8px); right:0; z-index:90;
+  position:absolute; top:calc(100% + 8px); right:0; z-index:120;
   background:var(--white); border:1px solid var(--line); border-radius:14px;
   box-shadow:0 12px 36px rgba(30,36,32,0.12); min-width:220px; box-sizing:border-box;
   padding:8px 0; animation:fadeDown .15s ease;

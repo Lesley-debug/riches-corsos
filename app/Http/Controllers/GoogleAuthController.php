@@ -25,7 +25,9 @@ class GoogleAuthController extends Controller
         }
 
         try {
-            return Socialite::driver('google')->redirect();
+            return Socialite::driver('google')
+                ->scopes(['openid', 'profile', 'email'])
+                ->redirect();
         } catch (Exception $e) {
             return redirect()->route('login')->withErrors([
                 'email' => 'Unable to connect to Google: ' . $e->getMessage(),
@@ -38,28 +40,46 @@ class GoogleAuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (Exception $e) {
+            try {
+                $googleUser = Socialite::driver('google')->stateless()->user();
+            } catch (Exception $e2) {
+                return redirect()->route('login')->withErrors([
+                    'email' => 'Google authentication was cancelled or encountered an error. Please try again.',
+                ]);
+            }
+        }
+
+        $email = $googleUser->getEmail();
+        $googleId = $googleUser->getId();
+        $avatar = $googleUser->getAvatar();
+        $name = $googleUser->getName() ?: ($googleUser->getNickname() ?: 'Corso Client');
+
+        if (empty($email)) {
             return redirect()->route('login')->withErrors([
-                'email' => 'Google authentication was cancelled or encountered an error. Please try again.',
+                'email' => 'Unable to retrieve your email address from Google. Please sign in with email.',
             ]);
         }
 
-        $user = User::where('google_id', $googleUser->getId())
-            ->orWhere('email', $googleUser->getEmail())
+        $user = User::where('google_id', $googleId)
+            ->orWhere('email', $email)
             ->first();
 
         if ($user) {
             $user->update([
-                'google_id' => $user->google_id ?? $googleUser->getId(),
-                'avatar' => $user->avatar ?? $googleUser->getAvatar(),
+                'google_id' => $user->google_id ?? $googleId,
+                'avatar' => $avatar ?? $user->avatar,
+                'name' => $user->name ?: $name,
+                'email_verified_at' => $user->email_verified_at ?? now(),
             ]);
         } else {
             $user = User::create([
-                'name' => $googleUser->getName() ?: 'Corso Enthusiast',
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
+                'name' => $name,
+                'email' => $email,
+                'google_id' => $googleId,
+                'avatar' => $avatar,
                 'password' => Hash::make(Str::random(32)),
                 'role' => 'customer',
+                'email_verified_at' => now(),
             ]);
 
             // Dispatch welcome notification & email for new user
