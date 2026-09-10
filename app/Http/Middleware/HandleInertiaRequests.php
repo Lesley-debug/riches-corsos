@@ -30,6 +30,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'wishlistCount' => fn () => $request->user()?->wishlists()->count() ?? 0,
             'wishlistPuppyIds' => fn () => $request->user()?->wishlists()->pluck('puppy_id')->all() ?? [],
+            'unreadNotificationsCount' => fn () => $request->user()?->unreadNotifications()->count() ?? 0,
             'cartCount' => fn () => count(array_unique(array_map(
                 'intval',
                 $request->session()->get('cart.puppy_ids', []),

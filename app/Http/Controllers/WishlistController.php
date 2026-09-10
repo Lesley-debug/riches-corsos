@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Puppy;
+use App\Notifications\WishlistAddedNotification;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -33,6 +35,11 @@ class WishlistController extends Controller
             return back()->with('success', 'Removed from your wishlist.');
         } else {
             $user->wishlists()->create(['puppy_id' => $validated['puppy_id']]);
+
+            $puppy = Puppy::find($validated['puppy_id']);
+            if ($puppy) {
+                $user->notify(new WishlistAddedNotification($puppy));
+            }
 
             return back()->with('success', 'Added to your wishlist.');
         }

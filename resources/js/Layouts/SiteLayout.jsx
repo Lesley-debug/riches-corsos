@@ -40,6 +40,15 @@ function SearchIcon() {
   );
 }
 
+function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
 function FooterSocials({ siteSettings }) {
   const fb = siteSettings?.facebook || 'https://facebook.com';
   const ig = siteSettings?.instagram || 'https://instagram.com';
@@ -82,6 +91,7 @@ export default function SiteLayout({ children }) {
   const cartItems = props.cartItems ?? [];
   const cartCount = props.cartCount ?? 0;
   const wishlistCount = props.wishlistCount ?? 0;
+  const unreadNotificationsCount = props.unreadNotificationsCount ?? 0;
 
   const updateNavBottom = () => {
     if (window.innerWidth <= 860) {
@@ -142,6 +152,10 @@ export default function SiteLayout({ children }) {
           <button className="m-icon-btn" onClick={handleOpenSearch} aria-label="Search">
             <SearchIcon />
           </button>
+          <Link href={user ? '/account/notifications' : '/login'} className="m-icon-btn m-notif" aria-label="Notifications">
+            <BellIcon />
+            {unreadNotificationsCount > 0 && <span className="cart-count">{unreadNotificationsCount}</span>}
+          </Link>
           <Link href={user ? '/wishlist' : '/login'} className="m-icon-btn m-wishlist" aria-label="Wishlist">
             <HeartIcon />
             {wishlistCount > 0 && <span className="cart-count">{wishlistCount}</span>}
@@ -169,6 +183,10 @@ export default function SiteLayout({ children }) {
               <button className="icon-btn" onClick={handleOpenSearch} aria-label="Search">
                 <SearchIcon />
               </button>
+              <Link href={user ? '/account/notifications' : '/login'} className="icon-btn icon-btn--notif" aria-label="Notifications">
+                <BellIcon />
+                {unreadNotificationsCount > 0 && <span className="cart-badge">{unreadNotificationsCount}</span>}
+              </Link>
               <Link href={user ? '/wishlist' : '/login'} className="icon-btn icon-btn--wishlist" aria-label="Wishlist">
                 <HeartIcon />
                 {wishlistCount > 0 && <span className="cart-badge">{wishlistCount}</span>}

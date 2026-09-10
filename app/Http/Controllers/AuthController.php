@@ -57,6 +57,8 @@ class AuthController extends Controller
             'role' => 'customer',
         ]);
 
+        $user->notify(new \App\Notifications\WelcomeNotification());
+
         Auth::login($user);
 
         return redirect()->route('account.dashboard');
@@ -118,6 +120,8 @@ class AuthController extends Controller
                     'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
+
+                $user->notify(new \App\Notifications\PasswordResetSuccessNotification());
 
                 event(new PasswordReset($user));
             }
