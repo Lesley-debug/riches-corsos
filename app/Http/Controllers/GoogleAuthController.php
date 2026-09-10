@@ -20,7 +20,7 @@ class GoogleAuthController extends Controller
 
         if (empty($clientId) || empty($clientSecret)) {
             return redirect()->route('login')->withErrors([
-                'email' => 'Google Sign-In is currently being set up. Please sign in with your email or password.',
+                'google' => 'Google Client ID and Secret are missing in .env. Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.',
             ]);
         }
 
@@ -30,7 +30,7 @@ class GoogleAuthController extends Controller
                 ->redirect();
         } catch (Exception $e) {
             return redirect()->route('login')->withErrors([
-                'email' => 'Unable to connect to Google: ' . $e->getMessage(),
+                'google' => 'Unable to connect to Google: ' . $e->getMessage(),
             ]);
         }
     }
@@ -44,7 +44,7 @@ class GoogleAuthController extends Controller
                 $googleUser = Socialite::driver('google')->stateless()->user();
             } catch (Exception $e2) {
                 return redirect()->route('login')->withErrors([
-                    'email' => 'Google authentication was cancelled or encountered an error. Please try again.',
+                    'google' => 'Google authentication was cancelled or encountered an error. Please try again.',
                 ]);
             }
         }

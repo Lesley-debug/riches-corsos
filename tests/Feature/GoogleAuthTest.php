@@ -24,7 +24,7 @@ class GoogleAuthTest extends TestCase
         $response = $this->get(route('auth.google.redirect'));
 
         $response->assertRedirect(route('login'));
-        $response->assertSessionHasErrors('email');
+        $response->assertSessionHasErrors('google');
     }
 
     public function test_google_callback_registers_new_user_and_sends_welcome_notification(): void

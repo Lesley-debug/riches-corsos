@@ -135,6 +135,12 @@ export default function Login() {
             <span>or continue with</span>
           </div>
 
+          {errors.google && (
+            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 12, textAlign: 'center', lineHeight: 1.4 }}>
+              {errors.google}
+            </div>
+          )}
+
           <a href="/auth/google/redirect" className="auth-google-btn">
             <svg viewBox="0 0 24 24" width="20" height="20">
               <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
