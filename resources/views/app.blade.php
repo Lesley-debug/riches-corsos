@@ -34,10 +34,22 @@
     @inertia
 
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js');
-            });
+        try {
+            if ('serviceWorker' in navigator) {
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                        for (let registration of registrations) {
+                            registration.unregister();
+                        }
+                    });
+                } else {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('/service-worker.js').catch(function() {});
+                    });
+                }
+            }
+        } catch (e) {
+            // Ignored in sandboxed contexts
         }
     </script>
 </body>

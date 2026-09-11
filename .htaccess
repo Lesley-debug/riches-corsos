@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Route everything through Laravel's public folder.
+    # The Laravel project lives at: public_html/riches-corsos/
+    # so all requests are forwarded into:  public_html/riches-corsos/public/
+
+    RewriteCond %{REQUEST_URI} !^/riches-corsos/public/
+    RewriteRule ^(.*)$ /riches-corsos/public/$1 [L,QSA]
+</IfModule>

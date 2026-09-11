@@ -3,8 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import SiteLayout from '@/Layouts/SiteLayout';
 import PuppyCard from '@/Components/PuppyCard';
 import CaneCorsoQuiz from '@/Components/CaneCorsoQuiz';
-
-const STORY_THUMBS = ['1', '2', '3', '4', '5', '6', '7', '8'];
+import StoryGallery from '@/Components/StoryGallery';
 
 const TESTIMONIALS = [
     {
@@ -123,11 +122,6 @@ export default function Home({
     homecomingPhotos = [],
     heroImage,
 }) {
-    // 43-second sequential story reel state
-    const [activeThumb, setActiveThumb] = useState(0);
-    const [isStoryPaused, setIsStoryPaused] = useState(false);
-    const thumbsTrackRef = useRef(null);
-
     // Interactive Puppy filter
     const [puppyFilter, setPuppyFilter] = useState('all');
 
@@ -154,32 +148,6 @@ export default function Home({
         setPrevSlide(heroSlide);
         setHeroSlide(idx);
     }
-
-    // 43 seconds total across 8 thumbnails = 5375ms per slide
-    const SLIDE_DURATION_MS = 5375;
-
-    useEffect(() => {
-        if (isStoryPaused) return;
-
-        const interval = setInterval(() => {
-            setActiveThumb((prev) => (prev + 1) % STORY_THUMBS.length);
-        }, SLIDE_DURATION_MS);
-
-        return () => clearInterval(interval);
-    }, [isStoryPaused]);
-
-    // Smoothly auto-scroll the thumbnail strip as the active photo changes
-    useEffect(() => {
-        if (thumbsTrackRef.current) {
-            const track = thumbsTrackRef.current;
-            const activeBtn = track.children[activeThumb];
-            if (activeBtn) {
-                const scrollLeft =
-                    activeBtn.offsetLeft - track.offsetWidth / 2 + activeBtn.offsetWidth / 2;
-                track.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-            }
-        }
-    }, [activeThumb]);
 
     // Puppy counts for filter tabs
     const malesCount = featuredPuppies.filter((p) => (p.sex || '').toLowerCase() === 'male').length;
@@ -508,56 +476,7 @@ export default function Home({
                             </div>
 
                             <div className="story-img-col">
-                                <div className="story-main-img-wrapper">
-                                    <div className="story-main-img">
-                                        <img
-                                            key={activeThumb}
-                                            src={`/images/ourstory/${STORY_THUMBS[activeThumb]}.jpeg`}
-                                            alt={`Riches Corsos story photo ${activeThumb + 1}`}
-                                            className="story-fade-in"
-                                        />
-                                    </div>
-                                    {/* 43s cycle progress line */}
-                                    <div className="story-progress-indicator">
-                                        <div
-                                            className={`story-progress-bar ${isStoryPaused ? 'paused' : ''}`}
-                                            key={activeThumb}
-                                            style={{ animationDuration: `${SLIDE_DURATION_MS}ms` }}
-                                        />
-                                    </div>
-                                    <div className="story-slide-counter">
-                                        Photo {activeThumb + 1} of {STORY_THUMBS.length}
-                                        {isStoryPaused && ' (Paused)'}
-                                    </div>
-                                </div>
-
-                                {/* Smoothly auto-scrolling thumbnail track */}
-                                <div className="story-thumbs-track" ref={thumbsTrackRef}>
-                                    {STORY_THUMBS.map((n, i) => (
-                                        <button
-                                            key={n}
-                                            type="button"
-                                            className={`story-thumb ${activeThumb === i ? 'active' : ''}`}
-                                            onClick={() => setActiveThumb(i)}
-                                            aria-label={`Select photo ${i + 1}`}
-                                        >
-                                            <img src={`/images/ourstory/${n}.jpeg`} alt={`Gallery ${n}`} />
-                                            {activeThumb === i && <span className="thumb-active-marker" />}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="story-dots">
-                                    {STORY_THUMBS.map((_, i) => (
-                                        <button
-                                            key={i}
-                                            type="button"
-                                            className={`story-dot ${activeThumb === i ? 'active' : ''}`}
-                                            onClick={() => setActiveThumb(i)}
-                                            aria-label={`Photo ${i + 1}`}
-                                        />
-                                    ))}
-                                </div>
+                                <StoryGallery />
                             </div>
                         </div>
                     </div>

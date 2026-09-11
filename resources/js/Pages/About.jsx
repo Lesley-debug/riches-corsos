@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
 import PageHero from '@/Components/PageHero';
 import WhatMakesUsSpecial from '@/Components/WhatMakesUsSpecial';
-
-const STORY_THUMBS = ['1', '2', '3', '4', '5', '6', '7', '8'];
+import StoryGallery from '@/Components/StoryGallery';
 
 function DiamondDivider() {
     return (
@@ -31,8 +29,6 @@ function SectionTitle({ number, title, sub }) {
 }
 
 export default function About() {
-    const [activeThumb, setActiveThumb] = useState(0);
-
     return (
         <SiteLayout>
             <Head title="Our Story — Riches Corsos" />
@@ -60,21 +56,7 @@ export default function About() {
                                 <p>We started RICHES CORSOS because we wanted to be the kind of breeder we wished existed when we were looking for our first Corso. Someone who answered questions honestly, who didn't rush litters, who cared about where each puppy ended up. That is still the standard we hold ourselves to today.</p>
                             </div>
                             <div className="story-img-col">
-                                <div className="story-main-img">
-                                    <img src={`/images/ourstory/${STORY_THUMBS[activeThumb]}.jpeg`} alt="Our story" />
-                                </div>
-                                <div className="story-thumbs">
-                                    {STORY_THUMBS.map((n, i) => (
-                                        <button key={n} className={`story-thumb ${activeThumb === i ? 'active' : ''}`} onClick={() => setActiveThumb(i)}>
-                                            <img src={`/images/ourstory/${n}.jpeg`} alt={`Gallery ${n}`} />
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="story-dots">
-                                    {STORY_THUMBS.map((_, i) => (
-                                        <button key={i} className={`story-dot ${activeThumb === i ? 'active' : ''}`} onClick={() => setActiveThumb(i)} aria-label={`Photo ${i + 1}`} />
-                                    ))}
-                                </div>
+                                <StoryGallery />
                             </div>
                         </div>
                     </div>

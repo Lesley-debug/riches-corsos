@@ -46,7 +46,8 @@ class BlogPostResource extends Resource
                 ->columnSpanFull(),
 
             Forms\Components\DateTimePicker::make('published_at')
-                ->helperText('Leave empty to save as a draft.'),
+                ->default(now())
+                ->helperText('Leave empty to save as a draft. Defaults to current time for immediate publication.'),
         ]);
     }
 
@@ -60,7 +61,7 @@ class BlogPostResource extends Resource
                 Tables\Columns\IconColumn::make('published_at')
                     ->label('Published')
                     ->boolean()
-                    ->getStateUsing(fn ($record) => $record->published_at !== null && $record->published_at <= now()),
+                    ->getStateUsing(fn ($record) => $record->published_at !== null && $record->published_at <= now()->addHours(12)),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('M j, Y')->sortable(),
             ])
             ->actions([

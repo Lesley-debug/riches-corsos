@@ -26,6 +26,8 @@ class BlogPost extends Model
 
     public function scopePublished($query)
     {
-        return $query->whereNotNull('published_at')->where('published_at', '<=', now());
+        // Allow forward tolerance so posts published in local timezones (WAT UTC+1, etc.)
+        // appear immediately without waiting for UTC server time to catch up
+        return $query->whereNotNull('published_at')->where('published_at', '<=', now()->addHours(12));
     }
 }
