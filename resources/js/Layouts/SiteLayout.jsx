@@ -178,25 +178,6 @@ export default function SiteLayout({ children }) {
         </div>
       </header>
 
-      {/* ===== MOBILE STICKY SECOND NAV BAR (TRANSPARENT, NO HORIZONTAL SCROLL) ===== */}
-      <nav className="mobile-subnav" aria-label="Quick navigation">
-        {NAV_LINKS.map((link) => {
-          let label = link.label;
-          if (label === 'Available Puppies') label = 'Puppies';
-          else if (label === 'About Us') label = 'About';
-          else if (label === 'Contact Us') label = 'Contact';
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`mobile-subnav-link ${isActive(link.href) ? 'active' : ''}`}
-            >
-              {label}
-            </Link>
-          );
-        })}
-      </nav>
-
       {/* ===== DESKTOP TOP UTILITY BAR ===== */}
       <div className="topbar">
         <div className="topbar-inner">
@@ -393,7 +374,7 @@ export default function SiteLayout({ children }) {
         </div>
       </footer>
 
-      {/* ===== MOBILE BOTTOM NAV (6 ITEMS: SEARCH, SHOP, WISHLIST, ORDERS, NOTIFICATIONS, ACCOUNT) ===== */}
+      {/* ===== MOBILE BOTTOM NAV (5 ITEMS: SEARCH · SHOP · WISHLIST · ORDERS · ACCOUNT) ===== */}
       <div className="mobile-bottomnav">
         <button className="mn-item" onClick={handleOpenSearch} aria-label="Search puppies and articles">
           <SearchIcon />
@@ -423,18 +404,13 @@ export default function SiteLayout({ children }) {
           <span>Orders</span>
         </Link>
 
-        <Link href={user ? '/account/notifications' : '/login'} className={`mn-item ${isActive('/account/notifications') ? 'active' : ''}`}>
+        <Link href={user ? '/account' : '/login'} className={`mn-item ${isActive('/account') ? 'active' : ''}`}>
           <div className="mn-icon-wrap">
-            <BellIcon />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="20" height="20">
+              <circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" />
+            </svg>
             {unreadNotificationsCount > 0 && <span className="mn-badge">{unreadNotificationsCount}</span>}
           </div>
-          <span>Alerts</span>
-        </Link>
-
-        <Link href={user ? '/account' : '/login'} className={`mn-item ${isActive('/account') ? 'active' : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="20" height="20">
-            <circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" />
-          </svg>
           <span>Account</span>
         </Link>
       </div>
