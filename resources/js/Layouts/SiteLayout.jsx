@@ -4,6 +4,7 @@ import CartDrawer from '@/Components/CartDrawer';
 import SearchOverlay from '@/Components/SearchOverlay';
 import AccountDropdown from '@/Components/AccountDropdown';
 import FloatingContact from '@/Components/FloatingContact';
+import MobileNavDrawer from '@/Components/MobileNavDrawer';
 
 const NAV_LINKS = [
   { label: 'Home', href: '/' },
@@ -94,6 +95,7 @@ export default function SiteLayout({ children }) {
   const unreadNotificationsCount = props.unreadNotificationsCount ?? 0;
   const loginNotice = props.flash?.login_notice;
   const [dismissedNotice, setDismissedNotice] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (loginNotice) {
@@ -143,37 +145,57 @@ export default function SiteLayout({ children }) {
   return (
     <>
       {/* ===== MOBILE TOP BAR ===== */}
-      <div className="mobile-topbar">
-        <div className="m-left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="22" height="22">
+      <header className="mobile-topbar">
+        <button
+          type="button"
+          className="m-menu-btn"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open navigation menu"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" width="22" height="22">
             <path d="M4 7h16M4 12h16M4 17h16" />
           </svg>
           <span>Menu</span>
-        </div>
-        <Link href="/" className="m-logo">
+        </button>
+
+        <Link href="/" className="m-logo" aria-label="Riches Corsos Home">
           <picture>
             <source srcSet="/images/logo.webp" type="image/webp" />
             <img src="/images/logo-sm.png" alt="Riches Corsos" className="mobile-logo-img" />
           </picture>
         </Link>
+
         <div className="m-right">
-          <button className="m-icon-btn" onClick={handleOpenSearch} aria-label="Search">
-            <SearchIcon />
-          </button>
-          <Link href={user ? '/account/notifications' : '/login'} className="m-icon-btn m-notif" aria-label="Notifications">
-            <BellIcon />
-            {unreadNotificationsCount > 0 && <span className="cart-count">{unreadNotificationsCount}</span>}
-          </Link>
-          <Link href={user ? '/wishlist' : '/login'} className="m-icon-btn m-wishlist" aria-label="Wishlist">
-            <HeartIcon />
-            {wishlistCount > 0 && <span className="cart-count">{wishlistCount}</span>}
-          </Link>
-          <button className="m-icon-btn m-cart" onClick={() => setCartOpen(true)} aria-label="Open cart">
+          <button
+            type="button"
+            className="m-icon-btn m-cart"
+            onClick={() => setCartOpen(true)}
+            aria-label="Open shopping cart"
+          >
             <CartIcon />
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </button>
         </div>
-      </div>
+      </header>
+
+      {/* ===== MOBILE STICKY SECOND NAV BAR (TRANSPARENT, NO HORIZONTAL SCROLL) ===== */}
+      <nav className="mobile-subnav" aria-label="Quick navigation">
+        {NAV_LINKS.map((link) => {
+          let label = link.label;
+          if (label === 'Available Puppies') label = 'Puppies';
+          else if (label === 'About Us') label = 'About';
+          else if (label === 'Contact Us') label = 'Contact';
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`mobile-subnav-link ${isActive(link.href) ? 'active' : ''}`}
+            >
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
 
       {/* ===== DESKTOP TOP UTILITY BAR ===== */}
       <div className="topbar">
@@ -371,32 +393,46 @@ export default function SiteLayout({ children }) {
         </div>
       </footer>
 
-      {/* ===== MOBILE BOTTOM NAV ===== */}
+      {/* ===== MOBILE BOTTOM NAV (6 ITEMS: SEARCH, SHOP, WISHLIST, ORDERS, NOTIFICATIONS, ACCOUNT) ===== */}
       <div className="mobile-bottomnav">
-        <button className="mn-item" onClick={handleOpenSearch}>
+        <button className="mn-item" onClick={handleOpenSearch} aria-label="Search puppies and articles">
           <SearchIcon />
           <span>Search</span>
         </button>
+
         <Link href="/puppies" className={`mn-item ${isActive('/puppies') ? 'active' : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="21" height="21">
-            <path d="M3 4h2l1 12h13l2-9H7" />
-            <circle cx="9" cy="20" r="1.4" fill="currentColor" stroke="none" />
-            <circle cx="18" cy="20" r="1.4" fill="currentColor" stroke="none" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="20" height="20">
+            <path d="M10 2c-1 2-3.5 3-5 4.5S3 10 4 12s3 2.5 4 4 1 4 4 4 3-3 4-4 3-3 4-4 3-3 2-5-3-3-5-3.5S11 0 10 2z" />
+            <circle cx="14.5" cy="9.5" r="1" fill="currentColor" stroke="none" />
           </svg>
           <span>Shop</span>
         </Link>
+
         <Link href={user ? '/wishlist' : '/login'} className={`mn-item ${isActive('/wishlist') ? 'active' : ''}`}>
-          <HeartIcon />
+          <div className="mn-icon-wrap">
+            <HeartIcon />
+            {wishlistCount > 0 && <span className="mn-badge">{wishlistCount}</span>}
+          </div>
           <span>Wishlist</span>
         </Link>
-        <Link href="/orders" className={`mn-item ${isActive('/orders') ? 'active' : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="21" height="21">
+
+        <Link href={user ? '/orders' : '/login'} className={`mn-item ${isActive('/orders') ? 'active' : ''}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="20" height="20">
             <rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 9h8M8 13h5" />
           </svg>
           <span>Orders</span>
         </Link>
+
+        <Link href={user ? '/account/notifications' : '/login'} className={`mn-item ${isActive('/account/notifications') ? 'active' : ''}`}>
+          <div className="mn-icon-wrap">
+            <BellIcon />
+            {unreadNotificationsCount > 0 && <span className="mn-badge">{unreadNotificationsCount}</span>}
+          </div>
+          <span>Alerts</span>
+        </Link>
+
         <Link href={user ? '/account' : '/login'} className={`mn-item ${isActive('/account') ? 'active' : ''}`}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="21" height="21">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="20" height="20">
             <circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" />
           </svg>
           <span>Account</span>
@@ -412,6 +448,19 @@ export default function SiteLayout({ children }) {
         topOffset={navBottom}
       />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cartItems} />
+      <MobileNavDrawer
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        user={user}
+        wishlistCount={wishlistCount}
+        unreadNotificationsCount={unreadNotificationsCount}
+        cartCount={cartCount}
+        onOpenCart={() => {
+          setMobileMenuOpen(false);
+          setCartOpen(true);
+        }}
+        siteSettings={siteSettings}
+      />
       <FloatingContact />
     </>
   );

@@ -6,11 +6,19 @@ use App\Models\Order;
 use App\Models\Puppy;
 use App\Models\PuppyImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class PuppyModelTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Suppress PuppyObserver notification dispatches during factory creates
+        Notification::fake();
+    }
 
     public function test_slug_is_auto_generated_on_save(): void
     {

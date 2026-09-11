@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\PuppyDocumentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -24,6 +25,10 @@ class PuppyDocumentTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Fake notifications so PuppyObserver doesn't try to send real mails
+        // (which would query User::all() and potentially fail during DB refresh)
+        Notification::fake();
 
         Storage::fake('public');
 
