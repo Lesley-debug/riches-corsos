@@ -3,7 +3,6 @@ import { Link, usePage } from '@inertiajs/react';
 import CartDrawer from '@/Components/CartDrawer';
 import SearchOverlay from '@/Components/SearchOverlay';
 import AccountDropdown from '@/Components/AccountDropdown';
-import FloatingContact from '@/Components/FloatingContact';
 import MobileNavDrawer from '@/Components/MobileNavDrawer';
 
 const NAV_LINKS = [
@@ -437,7 +436,6 @@ export default function SiteLayout({ children }) {
         }}
         siteSettings={siteSettings}
       />
-      <FloatingContact />
     </>
   );
 }
