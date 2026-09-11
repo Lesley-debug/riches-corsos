@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # If the request matches a real file or directory inside public_html/,
+    # serve it directly (covers the index.php bootstrap above).
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Rewrite everything else through the bootstrap index.php above.
+    RewriteRule ^ index.php [L]
+</IfModule>
