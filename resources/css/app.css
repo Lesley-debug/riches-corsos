@@ -10,12 +10,14 @@
   --line:#E7E9E5;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
-html{ scroll-behavior:smooth; }
+html{ scroll-behavior:smooth; overflow-x:hidden; }
 body{
   font-family:'Inter', sans-serif;
   background:var(--white);
   color:var(--ink);
   line-height:1.5;
+  overflow-x:hidden;          /* NEVER scroll left/right on any page */
+  max-width:100vw;
 }
 h1,h2,h3{
   font-family:'Fraunces', serif;
@@ -28,6 +30,9 @@ img{ display:block; width:100%; height:100%; object-fit:cover; }
 button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 
 .wrap{ max-width:1200px; margin:0 auto; padding:0 32px; }
+@media(max-width:860px){
+  .wrap{ padding:0 16px; }      /* tighter side padding on mobile */
+}
 
 /* ===== HEADER: TOP UTILITY BAR ===== */
 .topbar{ background:var(--white); border-bottom:1px solid var(--line); position:relative; z-index:100; }
@@ -1055,19 +1060,49 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 .faq-question.open svg{ transform:rotate(45deg); }
 .faq-answer{ color:var(--stone); font-size:14.5px; line-height:1.7; margin-top:14px; }
 
-@media (max-width:700px){
-  .account-grid{ grid-template-columns:1fr; }
-  .account-nav{ flex-direction:row; overflow-x:auto; }
-}
+/* ===== GLOBAL MOBILE OVERFLOW FIXES (≤860px) ===== */
+@media(max-width:860px){
+  /* ── Core layout: kill any element wider than screen ── */
+  .section{ padding:56px 16px; }
+  .wrap{ padding:0 16px; }
 
-@media (max-width:900px){
+  /* Account section: stack layout, no horizontal scroll on nav tabs */
+  .account-grid{ grid-template-columns:1fr; gap:24px; padding:32px 16px; }
+  .account-nav{ flex-direction:row; flex-wrap:wrap; gap:6px; }
+  .account-nav a{ font-size:13px; padding:8px 12px; }
+
+  /* Blog article: reduce side padding */
+  .blog-article{ padding:40px 16px; }
+
+  /* Homecomings strip: constrain within viewport */
+  .homecomings-track{ padding:0 16px; }
+  .homecomings .section-head{ padding:0 16px; }
+
+  /* Puppy breadcrumb: wrap instead of single overflowing row */
+  .puppy-breadcrumb-inner{ padding:10px 16px; white-space:normal; flex-wrap:wrap; overflow-x:hidden; }
+
+  /* CTA + testimonial bands */
+  .testimonial-band{ padding:56px 16px; }
+  .cta-band{ padding:48px 16px; }
+
+  /* Page hero content */
+  .page-hero-content{ padding:48px 16px; }
+
+  /* Footer sections */
+  .footer-cta-band{ padding:48px 16px; }
+  .footer-main{ padding:40px 16px 32px; grid-template-columns:1fr; }
+  .footer-bottom-bar{ flex-direction:column; text-align:center; padding:16px; gap:8px; }
+
+  /* Forms */
+  .form-card{ padding:32px 16px; }
+
+  /* Hero / grid layout */
   .hero{ grid-template-columns:1fr; padding-top:40px; }
   .hero-image{ order:-1; }
   .trust-grid{ grid-template-columns:repeat(2,1fr); }
   .puppy-grid, .blog-grid, .testimonial-grid, .why-grid{ grid-template-columns:1fr; }
-  .nav-links{ flex-wrap:wrap; justify-content:center; gap:20px 28px; }
-  .topbar-inner{ flex-direction:column; gap:14px; }
 }
+
 
 /* ===== PAGE HERO (inner pages) ===== */
 .page-hero{ position:relative; width:100%; min-height:420px; max-height:640px; background-size:cover; background-position:center; background-repeat:no-repeat; display:flex; align-items:center; }
