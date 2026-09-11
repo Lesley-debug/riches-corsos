@@ -1,12 +1,19 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # If the request matches a real file or directory inside public_html/,
-    # serve it directly (covers the index.php bootstrap above).
+    # Serve real files/directories that exist in public_html/ directly
+    # (covers the index.php bootstrap itself)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Rewrite everything else through the bootstrap index.php above.
+    # Forward static asset requests directly to the Laravel public/ folder
+    # so /build/..., /images/..., /storage/... etc. are served correctly
+    # without going through PHP
+    RewriteCond %{REQUEST_URI} ^/(build|images|storage|css|js|fonts|manifest\.json|service-worker\.js|robots\.txt|favicon\.ico)
+    RewriteCond %{DOCUMENT_ROOT}/riches-corsos/public%{REQUEST_URI} -f
+    RewriteRule ^(.*)$ riches-corsos/public/$1 [L]
+
+    # Everything else goes through the PHP bootstrap (Laravel routing)
     RewriteRule ^ index.php [L]
 </IfModule>
