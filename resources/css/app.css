@@ -10,14 +10,14 @@
   --line:#E7E9E5;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
-html{ scroll-behavior:smooth; overflow-x:hidden; }
+html{ scroll-behavior:smooth; }
 body{
   font-family:'Inter', sans-serif;
   background:var(--white);
   color:var(--ink);
   line-height:1.5;
-  overflow-x:hidden;          /* NEVER scroll left/right on any page */
   max-width:100vw;
+  overflow-x:clip;          /* clip instead of hidden — doesn't break position:sticky */
 }
 h1,h2,h3{
   font-family:'Fraunces', serif;
@@ -814,13 +814,14 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   display:flex; align-items:center; gap:6px;
   padding:6px 8px 6px 0;
   color:#ffffff; font-family:inherit;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
 .m-menu-btn svg{ width:22px; height:22px; stroke:#ffffff; fill:none; stroke-width:1.8; }
-.m-menu-btn span{ font-size:12.5px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; color:#ffffff; }
+.m-menu-btn span{ font-size:12.5px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; color:#ffffff; text-shadow:0 1px 4px rgba(0,0,0,0.5); }
 
-.mobile-topbar.is-scrolled .m-menu-btn{ color:var(--ink); }
+.mobile-topbar.is-scrolled .m-menu-btn{ color:var(--ink); filter:none; }
 .mobile-topbar.is-scrolled .m-menu-btn svg{ stroke:var(--ink); }
-.mobile-topbar.is-scrolled .m-menu-btn span{ color:var(--ink); }
+.mobile-topbar.is-scrolled .m-menu-btn span{ color:var(--ink); text-shadow:none; }
 
 .mobile-topbar .m-logo{ display:flex; align-items:center; }
 .mobile-logo-img{ height:38px; width:auto; object-fit:contain; }
@@ -830,8 +831,9 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 .m-icon-btn{
   position:relative; background:none; border:none; cursor:pointer; padding:6px;
   display:flex; align-items:center; justify-content:center; color:#ffffff;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5));
 }
-.mobile-topbar.is-scrolled .m-icon-btn{ color:var(--ink); }
+.mobile-topbar.is-scrolled .m-icon-btn{ color:var(--ink); filter:none; }
 .mobile-topbar.is-scrolled .m-icon-btn svg{ stroke:var(--ink); }
 .m-icon-btn svg{ width:22px; height:22px; stroke:#ffffff; }
 .mobile-topbar .m-cart{ position:relative; }
