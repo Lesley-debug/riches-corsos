@@ -280,6 +280,7 @@ export default function SiteLayout({ children }) {
         </aside>
       )}
 
+      <div style={{overflowX:'clip'}}>
       <main>{children}</main>
 
       {/* ===== FOOTER ===== */}
@@ -381,6 +382,8 @@ export default function SiteLayout({ children }) {
           </div>
         </div>
       </footer>
+
+      </div>{/* end overflow-x:clip wrapper */}
 
       {/* ===== MOBILE BOTTOM NAV (5 ITEMS: SEARCH · SHOP · WISHLIST · ORDERS · ACCOUNT) ===== */}
       <div className="mobile-bottomnav">
