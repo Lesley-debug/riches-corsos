@@ -262,6 +262,26 @@ class PuppyResource extends Resource
                                             return $parent->id;
                                         })
                                         ->editOptionForm(static::parentForm('sire'))
+                                        ->editOptionUsing(function (array $data) {
+                                            $parent = ParentDog::find($data['id'] ?? null);
+                                            if (! $parent) {
+                                                return;
+                                            }
+                                            $images = $data['_images_upload'] ?? [];
+                                            unset($data['_images_upload'], $data['id']);
+                                            $parent->update($data);
+                                            if (! empty($images)) {
+                                                $parent->images()->delete();
+                                                foreach (array_values($images) as $i => $path) {
+                                                    ParentImage::create([
+                                                        'parent_id' => $parent->id,
+                                                        'path' => $path,
+                                                        'sort_order' => $i,
+                                                        'is_primary' => $i === 0,
+                                                    ]);
+                                                }
+                                            }
+                                        })
                                         ->dehydrated(false),
                                 ]),
 
@@ -290,6 +310,26 @@ class PuppyResource extends Resource
                                             return $parent->id;
                                         })
                                         ->editOptionForm(static::parentForm('dam'))
+                                        ->editOptionUsing(function (array $data) {
+                                            $parent = ParentDog::find($data['id'] ?? null);
+                                            if (! $parent) {
+                                                return;
+                                            }
+                                            $images = $data['_images_upload'] ?? [];
+                                            unset($data['_images_upload'], $data['id']);
+                                            $parent->update($data);
+                                            if (! empty($images)) {
+                                                $parent->images()->delete();
+                                                foreach (array_values($images) as $i => $path) {
+                                                    ParentImage::create([
+                                                        'parent_id' => $parent->id,
+                                                        'path' => $path,
+                                                        'sort_order' => $i,
+                                                        'is_primary' => $i === 0,
+                                                    ]);
+                                                }
+                                            }
+                                        })
                                         ->dehydrated(false),
                                 ]),
                         ]),
