@@ -95,6 +95,34 @@ export default function SiteLayout({ children }) {
   const loginNotice = props.flash?.login_notice;
   const [dismissedNotice, setDismissedNotice] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+  // Capture the beforeinstallprompt event
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      // Only show on mobile
+      if (window.innerWidth <= 860) {
+        setShowInstallBanner(true);
+        // Auto-dismiss after 8 seconds
+        window.setTimeout(() => setShowInstallBanner(false), 8000);
+      }
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!installPrompt) { return; }
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setInstallPrompt(null);
+    }
+    setShowInstallBanner(false);
+  };
 
   useEffect(() => {
     if (loginNotice) {
@@ -416,6 +444,23 @@ export default function SiteLayout({ children }) {
           <span>Account</span>
         </Link>
       </div>
+
+      {/* ===== PWA INSTALL BANNER ===== */}
+      {showInstallBanner && (
+        <div className="pwa-install-banner">
+          <div className="pwa-install-banner-left">
+            <img src="/images/pwa/icon-192.png" alt="Riches Corsos" className="pwa-install-icon" />
+            <div>
+              <strong>Add to Home Screen</strong>
+              <span>Quick access to our puppies</span>
+            </div>
+          </div>
+          <div className="pwa-install-banner-actions">
+            <button type="button" className="pwa-install-btn" onClick={handleInstall}>Install</button>
+            <button type="button" className="pwa-dismiss-btn" onClick={() => setShowInstallBanner(false)} aria-label="Dismiss">✕</button>
+          </div>
+        </div>
+      )}
 
       {/* ===== OVERLAYS ===== */}
       <SearchOverlay
