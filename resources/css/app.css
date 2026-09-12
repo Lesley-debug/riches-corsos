@@ -1113,7 +1113,8 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   .hero{ grid-template-columns:1fr; padding-top:40px; }
   .hero-image{ order:-1; }
   .trust-grid{ grid-template-columns:repeat(2,1fr); }
-  .puppy-grid, .blog-grid, .testimonial-grid, .why-grid{ grid-template-columns:1fr; }
+  .puppy-grid{ grid-template-columns:repeat(2,1fr); gap:12px; }
+  .blog-grid, .testimonial-grid, .why-grid{ grid-template-columns:1fr; }
 }
 
 
@@ -1269,7 +1270,7 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   .shop-status-strip span{ font-size:18px; }
   .shop-filters{ display:grid; grid-template-columns:1fr; }
   .shop-select, .shop-reset-btn{ width:100%; }
-  .shop-puppy-grid{ grid-template-columns:1fr; }
+  .shop-puppy-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
   .shop-empty{ grid-template-columns:1fr; padding:18px; }
   .shop-guidance{ padding:0 16px 48px; }
   .shop-guidance-inner{ padding:28px 22px; }
@@ -1597,6 +1598,17 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   .pcard-footer{ align-items:center; flex-direction:row; justify-content:space-between; }
   .pcard-footer-actions{ width:auto; justify-content:flex-end; gap:4px; }
   .pcard-view-btn{ flex:none; width:auto; padding:5px 10px; font-size:11px; }
+  /* 2-column card tweaks */
+  .pcard-body{ padding:10px; gap:4px; }
+  .pcard-name{ font-size:15px; }
+  .pcard-subtitle{ font-size:11px; }
+  .pcard-desc{ font-size:12px; -webkit-line-clamp:2; }
+  .pcard-price{ font-size:15px; }
+  .pcard-badges span{ font-size:9.5px; padding:3px 6px; }
+  .pcard-footer{ padding-top:8px; }
+  .pcard-icon-btn{ width:28px; height:28px; }
+  .pcard-view-btn{ padding:5px 8px; font-size:11px; }
+  .pcard-status-badge{ font-size:9.5px; padding:3px 7px; top:8px; left:8px; }
 }
 
 /* ===== RESTYLED AUTH PAGES (Login, Register, Forgot Password, Reset Password) ===== */
