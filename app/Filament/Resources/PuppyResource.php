@@ -4,14 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PuppyResource\Pages;
 use App\Models\ParentDog;
+use App\Models\ParentImage;
 use App\Models\Puppy;
-use App\Models\PuppyDocument;
-use App\Models\PuppyImage;
-use App\Models\PuppyVideo;
-use App\Services\PuppyDocumentService;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -21,10 +17,13 @@ class PuppyResource extends Resource
 {
     protected static ?string $model = Puppy::class;
 
-    protected static ?string $navigationIcon  = 'heroicon-o-heart';
+    protected static ?string $navigationIcon = 'heroicon-o-heart';
+
     protected static ?string $navigationLabel = 'Puppies';
+
     protected static ?string $navigationGroup = 'Kennel';
-    protected static ?int    $navigationSort  = 1;
+
+    protected static ?int $navigationSort = 1;
 
     // ─────────────────────────────────────────────────────────────────────────
     // FORM
@@ -79,10 +78,10 @@ class PuppyResource extends Resource
 
                                     Forms\Components\Select::make('status')
                                         ->options([
-                                            'available'     => 'Available',
-                                            'reserved'      => 'Reserved',
-                                            'pending'       => 'Pending',
-                                            'sold'          => 'Sold',
+                                            'available' => 'Available',
+                                            'reserved' => 'Reserved',
+                                            'pending' => 'Pending',
+                                            'sold' => 'Sold',
                                             'not_available' => 'Not Available',
                                         ])
                                         ->default('available')
@@ -92,8 +91,8 @@ class PuppyResource extends Resource
                                     Forms\Components\Select::make('visibility')
                                         ->options([
                                             'published' => 'Published',
-                                            'draft'     => 'Draft',
-                                            'private'   => 'Private',
+                                            'draft' => 'Draft',
+                                            'private' => 'Private',
                                         ])
                                         ->default('published')
                                         ->required(),
@@ -126,13 +125,13 @@ class PuppyResource extends Resource
                                 ->schema([
                                     Forms\Components\CheckboxList::make('badges')
                                         ->options([
-                                            'available_now'       => 'Available Now',
-                                            'new_arrival'         => 'New Arrival',
-                                            'featured'            => 'Featured',
-                                            'champion_bloodline'  => 'Champion Bloodline',
-                                            'health_tested'       => 'Health Tested Parents',
-                                            'family_raised'       => 'Family Raised',
-                                            'ready_soon'          => 'Ready Soon',
+                                            'available_now' => 'Available Now',
+                                            'new_arrival' => 'New Arrival',
+                                            'featured' => 'Featured',
+                                            'champion_bloodline' => 'Champion Bloodline',
+                                            'health_tested' => 'Health Tested Parents',
+                                            'family_raised' => 'Family Raised',
+                                            'ready_soon' => 'Ready Soon',
                                         ])
                                         ->columns(3),
                                 ]),
@@ -147,13 +146,13 @@ class PuppyResource extends Resource
                                 ->schema([
                                     Forms\Components\Select::make('color')
                                         ->options([
-                                            'Black'         => 'Black',
-                                            'Gray'          => 'Gray',
-                                            'Fawn'          => 'Fawn',
-                                            'Brindle'       => 'Brindle',
+                                            'Black' => 'Black',
+                                            'Gray' => 'Gray',
+                                            'Fawn' => 'Fawn',
+                                            'Brindle' => 'Brindle',
                                             'Black Brindle' => 'Black Brindle',
-                                            'Formentino'    => 'Formentino',
-                                            'Chestnut'      => 'Chestnut',
+                                            'Formentino' => 'Formentino',
+                                            'Chestnut' => 'Chestnut',
                                         ])
                                         ->searchable()
                                         ->createOptionForm([
@@ -185,24 +184,24 @@ class PuppyResource extends Resource
                                     Forms\Components\CheckboxList::make('temperament')
                                         ->options([
                                             'Affectionate' => 'Affectionate',
-                                            'Confident'    => 'Confident',
-                                            'Calm'         => 'Calm',
-                                            'Playful'      => 'Playful',
-                                            'Protective'   => 'Protective',
-                                            'Intelligent'  => 'Intelligent',
-                                            'Loyal'        => 'Loyal',
-                                            'Gentle'       => 'Gentle',
-                                            'Energetic'    => 'Energetic',
-                                            'Curious'      => 'Curious',
-                                            'Friendly'     => 'Friendly',
+                                            'Confident' => 'Confident',
+                                            'Calm' => 'Calm',
+                                            'Playful' => 'Playful',
+                                            'Protective' => 'Protective',
+                                            'Intelligent' => 'Intelligent',
+                                            'Loyal' => 'Loyal',
+                                            'Gentle' => 'Gentle',
+                                            'Energetic' => 'Energetic',
+                                            'Curious' => 'Curious',
+                                            'Friendly' => 'Friendly',
                                         ])
                                         ->columns(2),
 
                                     Forms\Components\Select::make('energy_level')
                                         ->options([
-                                            'low'      => 'Low',
+                                            'low' => 'Low',
                                             'moderate' => 'Moderate',
-                                            'high'     => 'High',
+                                            'high' => 'High',
                                         ]),
                                 ]),
 
@@ -210,11 +209,11 @@ class PuppyResource extends Resource
                                 ->schema([
                                     Forms\Components\CheckboxList::make('compatibility')
                                         ->options([
-                                            'Good with Children'         => 'Good with Children',
-                                            'Good with Other Dogs'       => 'Good with Other Dogs',
-                                            'Good with Cats'             => 'Good with Cats',
-                                            'Family Friendly'            => 'Family Friendly',
-                                            'First-Time Owner Friendly'  => 'First-Time Owner Friendly',
+                                            'Good with Children' => 'Good with Children',
+                                            'Good with Other Dogs' => 'Good with Other Dogs',
+                                            'Good with Cats' => 'Good with Cats',
+                                            'Family Friendly' => 'Family Friendly',
+                                            'First-Time Owner Friendly' => 'First-Time Owner Friendly',
                                         ])
                                         ->columns(3),
                                 ]),
@@ -223,12 +222,12 @@ class PuppyResource extends Resource
                                 ->schema([
                                     Forms\Components\CheckboxList::make('training_progress')
                                         ->options([
-                                            'Basic Handling'         => 'Basic Handling',
-                                            'Crate Introduced'       => 'Crate Introduced',
+                                            'Basic Handling' => 'Basic Handling',
+                                            'Crate Introduced' => 'Crate Introduced',
                                             'Potty Training Started' => 'Potty Training Started',
-                                            'Leash Introduced'       => 'Leash Introduced',
+                                            'Leash Introduced' => 'Leash Introduced',
                                             'Basic Commands Started' => 'Basic Commands Started',
-                                            'Socialization Started'  => 'Socialization Started',
+                                            'Socialization Started' => 'Socialization Started',
                                         ])
                                         ->columns(3),
                                 ]),
@@ -248,7 +247,19 @@ class PuppyResource extends Resource
                                         ->createOptionForm(static::parentForm('sire'))
                                         ->createOptionUsing(function (array $data) {
                                             $data['parent_type'] = 'sire';
-                                            return ParentDog::create($data)->id;
+                                            $images = $data['_images_upload'] ?? [];
+                                            unset($data['_images_upload']);
+                                            $parent = ParentDog::create($data);
+                                            foreach (array_values($images) as $i => $path) {
+                                                ParentImage::create([
+                                                    'parent_id' => $parent->id,
+                                                    'path' => $path,
+                                                    'sort_order' => $i,
+                                                    'is_primary' => $i === 0,
+                                                ]);
+                                            }
+
+                                            return $parent->id;
                                         })
                                         ->editOptionForm(static::parentForm('sire'))
                                         ->dehydrated(false),
@@ -264,7 +275,19 @@ class PuppyResource extends Resource
                                         ->createOptionForm(static::parentForm('dam'))
                                         ->createOptionUsing(function (array $data) {
                                             $data['parent_type'] = 'dam';
-                                            return ParentDog::create($data)->id;
+                                            $images = $data['_images_upload'] ?? [];
+                                            unset($data['_images_upload']);
+                                            $parent = ParentDog::create($data);
+                                            foreach (array_values($images) as $i => $path) {
+                                                ParentImage::create([
+                                                    'parent_id' => $parent->id,
+                                                    'path' => $path,
+                                                    'sort_order' => $i,
+                                                    'is_primary' => $i === 0,
+                                                ]);
+                                            }
+
+                                            return $parent->id;
                                         })
                                         ->editOptionForm(static::parentForm('dam'))
                                         ->dehydrated(false),
@@ -324,10 +347,10 @@ class PuppyResource extends Resource
                                 ->schema([
                                     Forms\Components\Select::make('vaccination_status')
                                         ->options([
-                                            'not_started'         => 'Not Started',
-                                            'first_vaccination'   => 'First Vaccination',
-                                            'second_vaccination'  => 'Second Vaccination',
-                                            'fully_vaccinated'    => 'Fully Vaccinated',
+                                            'not_started' => 'Not Started',
+                                            'first_vaccination' => 'First Vaccination',
+                                            'second_vaccination' => 'Second Vaccination',
+                                            'fully_vaccinated' => 'Fully Vaccinated',
                                         ]),
 
                                     Forms\Components\Toggle::make('dewormed')
@@ -471,8 +494,7 @@ class PuppyResource extends Resource
                                 ->imageEditor()
                                 ->reorderable()
                                 ->directory('parents')
-                                ->helperText('First photo becomes the primary profile image.')
-                                ->dehydrated(false),
+                                ->helperText('First photo becomes the primary profile image.'),
                         ]),
                 ]),
         ];
@@ -484,9 +506,9 @@ class PuppyResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListPuppies::route('/'),
+            'index' => Pages\ListPuppies::route('/'),
             'create' => Pages\CreatePuppy::route('/create'),
-            'edit'   => Pages\EditPuppy::route('/{record}/edit'),
+            'edit' => Pages\EditPuppy::route('/{record}/edit'),
         ];
     }
 
@@ -527,12 +549,12 @@ class PuppyResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'available'     => 'success',
-                        'pending'       => 'warning',
-                        'reserved'      => 'info',
-                        'sold'          => 'gray',
+                        'available' => 'success',
+                        'pending' => 'warning',
+                        'reserved' => 'info',
+                        'sold' => 'gray',
                         'not_available' => 'danger',
-                        default         => 'gray',
+                        default => 'gray',
                     }),
 
                 Tables\Columns\TextColumn::make('orders_count')
@@ -542,10 +564,10 @@ class PuppyResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'available'     => 'Available',
-                        'pending'       => 'Pending',
-                        'reserved'      => 'Reserved',
-                        'sold'          => 'Sold',
+                        'available' => 'Available',
+                        'pending' => 'Pending',
+                        'reserved' => 'Reserved',
+                        'sold' => 'Sold',
                         'not_available' => 'Not Available',
                     ]),
                 Tables\Filters\TernaryFilter::make('featured')
