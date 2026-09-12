@@ -280,7 +280,7 @@ export default function SiteLayout({ children }) {
         </aside>
       )}
 
-      <div style={{overflowX:'clip'}}>
+      <div style={{overflowX:'clip', width:'100%', maxWidth:'100vw'}}>
       <main>{children}</main>
 
       {/* ===== FOOTER ===== */}

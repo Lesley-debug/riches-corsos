@@ -18,6 +18,7 @@ body{
   line-height:1.5;
   max-width:100vw;
   overflow-x:hidden;
+  padding-top:154px; /* topbar (~100px) + navrow (~54px) */
 }
 h1,h2,h3{
   font-family:'Fraunces', serif;
@@ -35,7 +36,7 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 }
 
 /* ===== HEADER: TOP UTILITY BAR ===== */
-.topbar{ background:var(--white); border-bottom:1px solid var(--line); position:relative; z-index:100; }
+.topbar{ background:var(--white); border-bottom:1px solid var(--line); position:fixed; top:0; left:0; right:0; z-index:100; }
 .topbar-inner{
   max-width:1200px; margin:0 auto; padding:6px 32px;
   display:flex; align-items:center; justify-content:space-between;
@@ -146,7 +147,7 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 .m-wishlist .cart-count{ background:#b42318; }
 
 /* ===== HEADER: STICKY NAV ROW ===== */
-.navrow{ position:sticky; top:0; z-index:85; background:var(--white); border-bottom:1px solid var(--line); transition:box-shadow .2s ease; }
+.navrow{ position:fixed; top:100px; left:0; right:0; z-index:95; background:var(--white); border-bottom:1px solid var(--line); transition:box-shadow .2s ease; }
 .navrow.is-stuck{ box-shadow:0 4px 16px rgba(30,36,32,0.06); }
 .navrow-inner{ max-width:1200px; margin:0 auto; padding:0 32px; display:flex; align-items:center; justify-content:center; }
 .nav-links{ display:flex; gap:40px; }
@@ -788,12 +789,13 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   .mobile-topbar{ display:flex; }
   .mobile-bottomnav{ display:flex; }
   .topbar, .navrow{ display:none !important; }
-  body{ padding-bottom:64px; }
+  body{ padding-top:0 !important; padding-bottom:64px; }
 }
 
 /* --- Top bar: always visible, sticky, never disappears --- */
 .mobile-topbar{
-  position:sticky; top:0; z-index:95;
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex;
   align-items:center; justify-content:space-between;
   padding:8px 16px;
   border-bottom:1px solid rgba(255,255,255,0.12);
