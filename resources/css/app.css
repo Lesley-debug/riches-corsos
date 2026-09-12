@@ -1236,26 +1236,42 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   .shop-guidance-inner{ align-items:flex-start; flex-direction:column; }
 }
 @media(max-width:860px){
-  /* Shop buttons compact — never full row on mobile */
+  /* Shop: hide description and eyebrow, compact head */
+  .shop-page-desc{ display:none; }
+  .shop-eyebrow{ display:none; }
+  .shop-page-head{ grid-template-columns:1fr; gap:12px; margin-bottom:16px; }
+  .shop-page-head h1{ font-size:26px; margin-bottom:4px; }
+  .shop-head-actions{ justify-content:flex-start; }
   .shop-head-actions .btn-solid, .shop-head-actions .btn-outline{
-    width:auto; padding:8px 14px; font-size:12px; white-space:nowrap;
+    width:auto; padding:7px 12px; font-size:12px; white-space:nowrap;
   }
-  /* Status strip numbers smaller on mobile */
-  .shop-status-strip span{ font-size:18px; }
-  .shop-status-strip div{ font-size:11px; padding:12px 10px; }
+  /* Status strip — compact inline pills */
+  .shop-status-strip{
+    display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px;
+    background:transparent; border:none; border-radius:0;
+    padding:0 0 8px; margin-bottom:12px;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  }
+  .shop-status-strip::-webkit-scrollbar{ display:none; }
+  .shop-status-strip div{
+    flex:0 0 auto; display:flex; align-items:center; gap:5px;
+    background:var(--white); border:1px solid var(--line); border-radius:999px;
+    padding:5px 12px; font-size:12px; font-weight:600; color:var(--stone);
+    border-right:1px solid var(--line) !important; border-top:none !important;
+    white-space:nowrap;
+  }
+  .shop-status-strip span{
+    display:inline; font-family:'Fraunces',serif; font-size:14px;
+    color:var(--green-dark); margin-bottom:0; letter-spacing:0;
+  }
 }
 @media(max-width:640px){
-  .shop-shell{ padding:36px 16px 48px; }
-  .shop-page-head h1{ font-size:34px; }
-  .shop-head-actions{ flex-wrap:wrap; gap:8px; }
-  .shop-head-actions .btn-solid, .shop-head-actions .btn-outline{
-    width:auto; padding:8px 14px; font-size:12px;
-  }
-  .shop-status-strip{ grid-template-columns:1fr 1fr; }
-  .shop-status-strip div{ padding:12px 10px; font-size:11px; }
-  .shop-status-strip span{ font-size:18px; }
-  .shop-filters{ display:grid; grid-template-columns:1fr; }
-  .shop-select, .shop-reset-btn{ width:100%; }
+  .shop-shell{ padding:20px 16px 48px; }
+  .shop-toolbar{ flex-direction:column; align-items:stretch; gap:8px; }
+  .shop-search-wrap{ width:100%; }
+  .shop-filters{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .shop-select{ min-height:40px; font-size:13px; }
+  .shop-reset-btn{ grid-column:1/-1; min-height:40px; }
   .shop-puppy-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
   .shop-empty{ grid-template-columns:1fr; padding:18px; }
   .shop-guidance{ padding:0 16px 48px; }

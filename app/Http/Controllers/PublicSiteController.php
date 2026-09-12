@@ -11,6 +11,8 @@ use App\Models\SiteSetting;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
 
 class PublicSiteController extends Controller
 {
@@ -21,7 +23,7 @@ class PublicSiteController extends Controller
                 ->where('status', 'available')
                 ->where('visibility', 'published')
                 ->latest()
-                ->take(6)
+                ->take(4)
                 ->get(),
             'recentPosts' => BlogPost::published()->latest('published_at')->take(3)->get(),
             'testimonials' => Testimonial::where('is_featured', true)->take(3)->get(),
@@ -85,11 +87,11 @@ class PublicSiteController extends Controller
             : false;
 
         return Inertia::render('Puppies/Show', [
-            'puppy'        => $puppy,
-            'sire'         => $puppy->parents->firstWhere('pivot.role', 'sire'),
-            'dam'          => $puppy->parents->firstWhere('pivot.role', 'dam'),
+            'puppy' => $puppy,
+            'sire' => $puppy->parents->firstWhere('pivot.role', 'sire'),
+            'dam' => $puppy->parents->firstWhere('pivot.role', 'dam'),
             'isWishlisted' => $isWishlisted,
-            'related'      => $related,
+            'related' => $related,
         ]);
     }
 
@@ -154,20 +156,20 @@ class PublicSiteController extends Controller
 
     public function sitemap()
     {
-        $sitemap = \Spatie\Sitemap\Sitemap::create()
-            ->add(\Spatie\Sitemap\Tags\Url::create('/')->setPriority(1.0)->setChangeFrequency('daily'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/puppies')->setPriority(0.9)->setChangeFrequency('daily'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/about')->setPriority(0.7)->setChangeFrequency('monthly'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/contact')->setPriority(0.8)->setChangeFrequency('monthly'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/faqs')->setPriority(0.6)->setChangeFrequency('monthly'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/testimonials')->setPriority(0.7)->setChangeFrequency('weekly'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/blog')->setPriority(0.8)->setChangeFrequency('weekly'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/privacy')->setPriority(0.3)->setChangeFrequency('yearly'))
-            ->add(\Spatie\Sitemap\Tags\Url::create('/terms')->setPriority(0.3)->setChangeFrequency('yearly'));
+        $sitemap = Sitemap::create()
+            ->add(Url::create('/')->setPriority(1.0)->setChangeFrequency('daily'))
+            ->add(Url::create('/puppies')->setPriority(0.9)->setChangeFrequency('daily'))
+            ->add(Url::create('/about')->setPriority(0.7)->setChangeFrequency('monthly'))
+            ->add(Url::create('/contact')->setPriority(0.8)->setChangeFrequency('monthly'))
+            ->add(Url::create('/faqs')->setPriority(0.6)->setChangeFrequency('monthly'))
+            ->add(Url::create('/testimonials')->setPriority(0.7)->setChangeFrequency('weekly'))
+            ->add(Url::create('/blog')->setPriority(0.8)->setChangeFrequency('weekly'))
+            ->add(Url::create('/privacy')->setPriority(0.3)->setChangeFrequency('yearly'))
+            ->add(Url::create('/terms')->setPriority(0.3)->setChangeFrequency('yearly'));
 
         foreach (Puppy::where('visibility', 'published')->get() as $puppy) {
             $sitemap->add(
-                \Spatie\Sitemap\Tags\Url::create("/puppies/{$puppy->slug}")
+                Url::create("/puppies/{$puppy->slug}")
                     ->setLastModificationDate($puppy->updated_at)
                     ->setPriority(0.9)
                     ->setChangeFrequency('daily')
@@ -176,7 +178,7 @@ class PublicSiteController extends Controller
 
         foreach (BlogPost::published()->get() as $post) {
             $sitemap->add(
-                \Spatie\Sitemap\Tags\Url::create("/blog/{$post->slug}")
+                Url::create("/blog/{$post->slug}")
                     ->setLastModificationDate($post->updated_at)
                     ->setPriority(0.7)
                     ->setChangeFrequency('weekly')

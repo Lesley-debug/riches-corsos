@@ -89,7 +89,7 @@ export default function PuppiesIndex({ puppies = [] }) {
                         <div>
                             <p className="shop-eyebrow">Riches Corsos</p>
                             <h1>Available Puppies</h1>
-                            <p>
+                            <p className="shop-page-desc">
                                 Browse current Cane Corso puppies with updated photos, availability, pricing, and profile details.
                             </p>
                         </div>
