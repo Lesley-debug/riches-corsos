@@ -796,22 +796,31 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
   position:sticky; top:0; z-index:95;
   align-items:center; justify-content:space-between;
   padding:8px 16px;
-  border-bottom:1px solid rgba(0,0,0,0.08);
-  background:rgba(255, 255, 255, 0.97);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.12);
+  background:transparent;
   height:56px;
   box-sizing:border-box;
+  transition:background .3s ease, border-color .3s ease;
+}
+.mobile-topbar.is-scrolled{
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,0,0,0.08);
 }
 
 .m-menu-btn{
   background:none; border:none; cursor:pointer;
   display:flex; align-items:center; gap:6px;
   padding:6px 8px 6px 0;
-  color:var(--ink); font-family:inherit;
+  color:#ffffff; font-family:inherit;
 }
-.m-menu-btn svg{ width:22px; height:22px; stroke:var(--ink); fill:none; stroke-width:1.8; }
-.m-menu-btn span{ font-size:12.5px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; color:var(--ink); }
+.m-menu-btn svg{ width:22px; height:22px; stroke:#ffffff; fill:none; stroke-width:1.8; }
+.m-menu-btn span{ font-size:12.5px; font-weight:700; letter-spacing:0.02em; text-transform:uppercase; color:#ffffff; }
+
+.mobile-topbar.is-scrolled .m-menu-btn{ color:var(--ink); }
+.mobile-topbar.is-scrolled .m-menu-btn svg{ stroke:var(--ink); }
+.mobile-topbar.is-scrolled .m-menu-btn span{ color:var(--ink); }
 
 .mobile-topbar .m-logo{ display:flex; align-items:center; }
 .mobile-logo-img{ height:38px; width:auto; object-fit:contain; }
@@ -820,9 +829,11 @@ button{ font-family:inherit; border:none; background:none; cursor:pointer; }
 
 .m-icon-btn{
   position:relative; background:none; border:none; cursor:pointer; padding:6px;
-  display:flex; align-items:center; justify-content:center; color:var(--ink);
+  display:flex; align-items:center; justify-content:center; color:#ffffff;
 }
-.m-icon-btn svg{ width:22px; height:22px; stroke:var(--ink); }
+.mobile-topbar.is-scrolled .m-icon-btn{ color:var(--ink); }
+.mobile-topbar.is-scrolled .m-icon-btn svg{ stroke:var(--ink); }
+.m-icon-btn svg{ width:22px; height:22px; stroke:#ffffff; }
 .mobile-topbar .m-cart{ position:relative; }
 .mobile-topbar .m-cart .cart-count{
   position:absolute; top:-2px; right:-4px;

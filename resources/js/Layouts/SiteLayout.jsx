@@ -120,6 +120,15 @@ export default function SiteLayout({ children }) {
     const onScroll = () => {
       setStuck(window.scrollY > 4);
       updateNavBottom();
+      // Toggle transparent/solid state on mobile topbar
+      const mTopbar = document.querySelector('.mobile-topbar');
+      if (mTopbar) {
+        if (window.scrollY > 10) {
+          mTopbar.classList.add('is-scrolled');
+        } else {
+          mTopbar.classList.remove('is-scrolled');
+        }
+      }
     };
     window.addEventListener('scroll', onScroll);
     window.addEventListener('resize', updateNavBottom);
