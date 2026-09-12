@@ -113,6 +113,16 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
                     ? <img src={`/storage/${cover}`} alt={puppy.name} className="pcard-img" loading="lazy" />
                     : <div className="pcard-img-placeholder" />
                 }
+                {/* Wishlist button — top right of image */}
+                <button
+                    type="button"
+                    className={`pcard-wishlist-overlay ${isWishlisted ? 'pcard-wishlist--active' : ''}`}
+                    onClick={handleWishlist}
+                    aria-label={isWishlisted ? `Remove ${puppy.name} from wishlist` : `Add ${puppy.name} to wishlist`}
+                    title={isWishlisted ? 'Liked' : 'Add to wishlist'}
+                >
+                    <HeartIcon filled={isWishlisted} />
+                </button>
             </Link>
 
             <div className="pcard-body">
@@ -123,29 +133,15 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
                     {puppy.price ? (
                         <span className="pcard-price">${Number(puppy.price).toLocaleString()}</span>
                     ) : <span />}
-                    <div className="pcard-footer-actions">
-                        <button
-                            type="button"
-                            className={`pcard-icon-btn ${isInCart ? 'pcard-icon-btn--active' : ''}`}
-                            onClick={handleCart}
-                            aria-label={isInCart ? `${puppy.name} in cart` : `Add ${puppy.name} to cart`}
-                            title={isInCart ? 'In cart' : 'Add to cart'}
-                        >
-                            <CartIcon />
-                        </button>
-                        <button
-                            type="button"
-                            className={`pcard-icon-btn pcard-wishlist ${isWishlisted ? 'pcard-wishlist--active' : ''}`}
-                            onClick={handleWishlist}
-                            aria-label={isWishlisted ? `Remove ${puppy.name} from wishlist` : `Add ${puppy.name} to wishlist`}
-                            title={isWishlisted ? 'Liked' : 'Add to wishlist'}
-                        >
-                            <HeartIcon filled={isWishlisted} />
-                        </button>
-                        <Link href={`/puppies/${puppy.slug}`} className="pcard-view-btn">
-                            View Details
-                        </Link>
-                    </div>
+                    <button
+                        type="button"
+                        className={`pcard-icon-btn pcard-cart-btn ${isInCart ? 'pcard-icon-btn--active' : ''}`}
+                        onClick={handleCart}
+                        aria-label={isInCart ? `${puppy.name} in cart` : `Add ${puppy.name} to cart`}
+                        title={isInCart ? 'In cart' : 'Add to cart'}
+                    >
+                        <CartIcon />
+                    </button>
                 </div>
 
                 {notice && <p className="pcard-notice" role="status">{notice}</p>}
