@@ -12,7 +12,7 @@ class Order extends Model
 
     protected $fillable = [
         'user_id', 'puppy_id', 'buyer_name', 'buyer_email', 'buyer_phone',
-        'buyer_address', 'notes', 'status',
+        'buyer_address', 'notes', 'status', 'payment_method', 'payment_reference',
     ];
 
     public function user(): BelongsTo

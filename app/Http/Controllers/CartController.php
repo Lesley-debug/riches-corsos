@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Puppy;
+use App\Models\User;
+use App\Notifications\NewOrderPlaced;
+use App\Notifications\OrderPlacedCustomerNotification;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -63,12 +68,23 @@ class CartController extends Controller
 
     public function checkout(Request $request): RedirectResponse
     {
+        $paymentLabels = [
+            'paypal' => 'PayPal',
+            'bank_transfer' => 'International Bank Transfer (SWIFT/IBAN)',
+            'debit_credit_card' => 'Debit / Credit Card',
+            'zelle' => 'Zelle',
+            'cashapp' => 'Cash App',
+            'crypto' => 'Cryptocurrency',
+            'western_union' => 'Western Union / MoneyGram',
+        ];
+
         $validated = $request->validate([
             'buyer_name' => ['required', 'string', 'max:255'],
             'buyer_email' => ['required', 'email', 'max:255'],
             'buyer_phone' => ['required', 'string', 'max:30'],
             'buyer_address' => ['nullable', 'string', 'max:500'],
             'notes' => ['nullable', 'string', 'max:1000'],
+            'payment_method' => ['required', 'string', 'in:'.implode(',', array_keys($paymentLabels))],
         ]);
 
         $puppyIds = $this->cartPuppyIds($request);
@@ -79,7 +95,9 @@ class CartController extends Controller
             ]);
         }
 
-        DB::transaction(function () use ($puppyIds, $validated, $request): void {
+        $orders = [];
+
+        DB::transaction(function () use ($puppyIds, $validated, $request, &$orders): void {
             $puppies = Puppy::query()
                 ->whereKey($puppyIds)
                 ->lockForUpdate()
@@ -99,21 +117,60 @@ class CartController extends Controller
             foreach ($puppyIds as $puppyId) {
                 $puppy = $puppies->get($puppyId);
 
-                Order::create([
+                $order = Order::create([
                     ...$validated,
                     'user_id' => $request->user()?->id,
                     'puppy_id' => $puppy->id,
                 ]);
 
                 $puppy->update(['status' => 'pending']);
+                $orders[] = $order;
             }
         });
+
+        // Notify all admin users about new orders
+        $admins = User::where('role', 'admin')->get();
+        foreach ($orders as $order) {
+            $order->load('puppy');
+            Notification::send($admins, new NewOrderPlaced($order));
+        }
+
+        // Send confirmation email to the buyer (use first order for the email)
+        if (! empty($orders)) {
+            $firstOrder = $orders[0];
+            $buyerNotifiable = $request->user()
+                ?? (new class($firstOrder->buyer_email, $firstOrder->buyer_name)
+                {
+                    public string $email;
+
+                    public string $name;
+
+                    public function __construct(string $email, string $name)
+                    {
+                        $this->email = $email;
+                        $this->name = $name;
+                    }
+
+                    public function routeNotificationForMail(): string
+                    {
+                        return $this->email;
+                    }
+                });
+
+            Notification::route('mail', $firstOrder->buyer_email)
+                ->notify(new OrderPlacedCustomerNotification($firstOrder, $orders, $paymentLabels[$validated['payment_method']] ?? $validated['payment_method']));
+
+            // Also save to database if buyer has an account
+            if ($request->user()) {
+                $request->user()->notify(new OrderPlacedCustomerNotification($firstOrder, $orders, $paymentLabels[$validated['payment_method']] ?? $validated['payment_method']));
+            }
+        }
 
         $request->session()->forget('cart.puppy_ids');
 
         return redirect()
             ->route('puppies.index')
-            ->with('success', 'Your order request has been placed. We will contact you to confirm the next step.');
+            ->with('success', 'Your reservation has been placed! Check your email for confirmation details. We will contact you shortly.');
     }
 
     /**
@@ -127,7 +184,7 @@ class CartController extends Controller
         )));
     }
 
-    private function cartPuppies(Request $request): \Illuminate\Database\Eloquent\Collection
+    private function cartPuppies(Request $request): Collection
     {
         return Puppy::query()
             ->with('images')
