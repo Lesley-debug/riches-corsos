@@ -332,9 +332,6 @@ export default function SiteLayout({ children }) {
             <Link href="/contact">Contact Us</Link>
             <Link href={user ? '/account' : '/login'}>My Account</Link>
             <Link href={user ? '/orders' : '/login'}>Order Status</Link>
-            {user?.isAdmin && (
-              <a href="/admin" className="footer-admin-link">Admin Dashboard ↗</a>
-            )}
           </div>
 
           <div className="footer-col">
