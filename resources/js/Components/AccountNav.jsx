@@ -26,9 +26,6 @@ export default function AccountNav() {
           )}
         </Link>
       ))}
-      <Link href="/logout" method="post" as="button" style={{ textAlign: 'left', color: '#B3452F', marginTop: 12 }}>
-        Log Out
-      </Link>
     </nav>
   );
 }

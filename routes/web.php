@@ -3,8 +3,11 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderSuccessController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\PuppyDocumentController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,8 +43,8 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
     // Google OAuth
-    Route::get('/auth/google/redirect', [\App\Http\Controllers\GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
-    Route::get('/auth/google/callback', [\App\Http\Controllers\GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
@@ -72,17 +75,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::delete('/cart/{puppy}', [CartController::class, 'destroy'])->name('cart.destroy');
     Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.store');
+    Route::get('/order/success', [OrderSuccessController::class, '__invoke'])->name('order.success');
 });
 
 // ── Puppy document routes (admin-only, protected by Gate inside controller) ──
 Route::middleware('auth')->prefix('admin/puppies/{puppy}/documents')->name('admin.puppies.documents.')->group(function () {
-    Route::get('/',                              [\App\Http\Controllers\PuppyDocumentController::class, 'index'])     ->name('index');
-    Route::post('/generate',                     [\App\Http\Controllers\PuppyDocumentController::class, 'generate'])  ->name('generate');
-    Route::post('/upload',                       [\App\Http\Controllers\PuppyDocumentController::class, 'upload'])   ->name('upload');
-    Route::get('/{document}/preview',            [\App\Http\Controllers\PuppyDocumentController::class, 'preview'])  ->name('preview');
-    Route::get('/{document}/download',           [\App\Http\Controllers\PuppyDocumentController::class, 'download']) ->name('download');
-    Route::post('/{document}/regenerate',        [\App\Http\Controllers\PuppyDocumentController::class, 'regenerate'])->name('regenerate');
-    Route::delete('/{document}',                 [\App\Http\Controllers\PuppyDocumentController::class, 'destroy'])  ->name('destroy');
+    Route::get('/', [PuppyDocumentController::class, 'index'])->name('index');
+    Route::post('/generate', [PuppyDocumentController::class, 'generate'])->name('generate');
+    Route::post('/upload', [PuppyDocumentController::class, 'upload'])->name('upload');
+    Route::get('/{document}/preview', [PuppyDocumentController::class, 'preview'])->name('preview');
+    Route::get('/{document}/download', [PuppyDocumentController::class, 'download'])->name('download');
+    Route::post('/{document}/regenerate', [PuppyDocumentController::class, 'regenerate'])->name('regenerate');
+    Route::delete('/{document}', [PuppyDocumentController::class, 'destroy'])->name('destroy');
 });
 
 // The Filament admin panel is auto-registered by AdminPanelProvider at /admin —

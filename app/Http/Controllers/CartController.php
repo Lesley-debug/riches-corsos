@@ -168,9 +168,20 @@ class CartController extends Controller
 
         $request->session()->forget('cart.puppy_ids');
 
-        return redirect()
-            ->route('puppies.index')
-            ->with('success', 'Your reservation has been placed! Check your email for confirmation details. We will contact you shortly.');
+        // Store order summary in session for the success page
+        $request->session()->put('last_orders', collect($orders)->map(fn ($o) => [
+            'id' => $o->id,
+            'puppy_name' => $o->puppy?->name ?? 'Puppy',
+            'puppy_slug' => $o->puppy?->slug ?? null,
+            'puppy_price' => $o->puppy?->price ?? null,
+            'buyer_name' => $o->buyer_name,
+            'buyer_email' => $o->buyer_email,
+            'buyer_address' => $o->buyer_address,
+            'payment_method' => $o->payment_method,
+            'created_at' => $o->created_at?->toDateTimeString(),
+        ])->toArray());
+
+        return redirect()->route('order.success');
     }
 
     /**

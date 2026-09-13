@@ -171,7 +171,6 @@ export default function Contact() {
                                     </svg>
                                 </div>
                                 <h4>Visit Us</h4>
-                                <p>{contactAddress}</p>
                                 <p className="contact-info-note">Visits by appointment only</p>
                             </div>
                             <div className="contact-info-card">
