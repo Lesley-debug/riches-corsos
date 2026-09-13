@@ -9,5 +9,4 @@ Disallow: /register
 Disallow: /password
 Allow: /
 
-Sitemap: /sitemap.xml
-
+Sitemap: https://richescorsos.com/sitemap.xml
