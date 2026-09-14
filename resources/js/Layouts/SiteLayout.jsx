@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import CartDrawer from '@/Components/CartDrawer';
 import SearchOverlay from '@/Components/SearchOverlay';
 import AccountDropdown from '@/Components/AccountDropdown';
@@ -169,8 +169,16 @@ export default function SiteLayout({ children }) {
 
   const isActive = (href) => (href === '/' ? url === '/' : url.startsWith(href));
 
+  const CANONICAL_DOMAIN = 'https://richescorsos.com';
+  const canonicalUrl = `${CANONICAL_DOMAIN}${url}`;
+
   return (
     <>
+      {/* Global canonical — forces non-www on every page */}
+      <Head>
+        <link rel="canonical" href={canonicalUrl} />
+      </Head>
+
       {/* ===== MOBILE TOP BAR ===== */}
       <header className="mobile-topbar">
         <button

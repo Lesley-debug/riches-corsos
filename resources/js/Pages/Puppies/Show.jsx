@@ -150,7 +150,9 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     const age = ageLabel(puppy.age_in_weeks);
     const isAvailable = puppy.status === 'available';
     const status = labelize(puppy.status);
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const shareUrl = typeof window !== 'undefined'
+        ? `https://richescorsos.com${window.location.pathname}`
+        : `https://richescorsos.com/puppies/${puppy.slug}`;
     const shareText = `Meet ${puppy.name} - ${puppy.breed} puppy at Riches Corsos!`;
     const pageTitle = puppy.seo_title || `${puppy.name} | ${puppy.breed} Puppy | Riches Corsos`;
     const metaDescription = puppy.meta_description || puppy.description?.slice(0, 155) || `Meet ${puppy.name}, a ${puppy.breed} puppy at Riches Corsos.`;
