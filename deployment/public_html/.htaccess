@@ -1,6 +1,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Redirect www to non-www first — before anything else
+    RewriteCond %{HTTP_HOST} ^www\.richescorsos\.com$ [NC]
+    RewriteRule ^(.*)$ https://richescorsos.com/$1 [R=301,L,NE]
+
     # Serve real files/directories that exist in public_html/ directly
     # (covers the index.php bootstrap itself)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
