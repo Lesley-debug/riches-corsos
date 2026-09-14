@@ -1,23 +1,29 @@
 <IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
     RewriteEngine On
 
-    # Redirect www to the canonical non-www domain
+    # Redirect www to non-www
     RewriteCond %{HTTP_HOST} ^www\.richescorsos\.com$ [NC]
     RewriteRule ^(.*)$ https://richescorsos.com/$1 [R=301,L,NE]
 
-    # Serve real files/directories that exist in public_html/ directly
-    # (covers the index.php bootstrap itself)
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^ - [L]
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Forward static asset requests directly to the Laravel public/ folder
-    # so /build/..., /images/..., /storage/... etc. are served correctly
-    # without going through PHP
-    RewriteCond %{REQUEST_URI} ^/(build|images|storage|css|js|fonts|manifest\.json|service-worker\.js|robots\.txt|favicon\.ico)
-    RewriteCond %{DOCUMENT_ROOT}/riches-corsos/public%{REQUEST_URI} -f
-    RewriteRule ^(.*)$ riches-corsos/public/$1 [L]
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
-    # Everything else goes through the PHP bootstrap (Laravel routing)
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
