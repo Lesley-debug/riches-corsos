@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
+import PageHero from '@/Components/PageHero';
 
 function formatDate(dateStr) {
     if (!dateStr) return '';
@@ -48,14 +49,11 @@ export default function BlogIndex({ posts }) {
         <SiteLayout>
             <Head title="Blog — Riches Corsos" />
 
-            {/* Magazine header */}
-            <div className="mag-header">
-                <div className="mag-header-inner">
-                    <p className="mag-header-eyebrow">Riches Corsos</p>
-                    <h1 className="mag-header-title">From The Blog</h1>
-                    <p className="mag-header-sub">Care guides, training insights, breeding knowledge, and stories from families who've welcomed a champion Cane Corso into their home.</p>
-                </div>
-            </div>
+            <PageHero
+                image="/images/about/1.jpeg"
+                title="From The Blog"
+                sub="Care guides, training insights, breeding knowledge, and stories from families who've welcomed a champion Cane Corso into their home."
+            />
 
             <div className="mag-page">
 
