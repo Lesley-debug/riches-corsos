@@ -369,12 +369,6 @@ export default function SiteLayout({ children }) {
               </svg>
               WhatsApp Us
             </a>
-            <div className="footer-contact-item footer-contact-location">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" width="16" height="16">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
-              </svg>
-              {siteSettings.address || 'Dallas, Texas'}
-            </div>
             {siteSettings.representative_name && (
               <div className="footer-representative">
                 <span className="footer-rep-title">{siteSettings.representative_title || 'Authorized Representative'}: </span>
