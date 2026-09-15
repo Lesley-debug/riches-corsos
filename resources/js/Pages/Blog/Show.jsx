@@ -49,16 +49,7 @@ export default function BlogShow({ post, related = [] }) {
 
     return (
         <SiteLayout>
-            <Head>
-                <title>{post.title} — Riches Corsos Blog</title>
-                <meta name="description" content={post.excerpt || post.title} />
-                <meta property="og:title" content={post.title} />
-                <meta property="og:description" content={post.excerpt || ''} />
-                <meta property="og:image" content={ogImage} />
-                <meta property="og:url" content={canonicalUrl} />
-                <meta property="og:type" content="article" />
-                <link rel="canonical" href={canonicalUrl} />
-            </Head>
+            <Head title={`${post.title} — Riches Corsos Blog`} />
 
             <div className="article-page">
 
