@@ -123,8 +123,14 @@ class PublicSiteController extends Controller
         }
 
         return Inertia::render('Blog/Show', [
-            'post' => $blogPost,
-            'related' => $related,
+            'post' => $blogPost->only([
+                'id', 'title', 'slug', 'category', 'excerpt',
+                'body', 'cover_image', 'published_at',
+            ]),
+            'related' => $related->map(fn (BlogPost $p) => $p->only([
+                'id', 'title', 'slug', 'category', 'excerpt',
+                'cover_image', 'published_at',
+            ]))->values(),
         ]);
     }
 
