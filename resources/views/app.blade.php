@@ -8,6 +8,9 @@
     {{-- Canonical URL — server-side, visible to Google before React loads --}}
     <link rel="canonical" href="https://richescorsos.com{{ request()->getPathInfo() }}">
 
+    {{-- Search Engine Verification --}}
+    <meta name="msvalidate.01" content="20B8775CF212D199C69EBD62D9C2EF65" />
+
     {{-- SEO & Social Meta --}}
     <meta name="description" content="Riches Corsos — Premier breeder of champion-line Italian Cane Corso puppies. AKC registered, health tested, raised with world-class care and nationwide delivery.">
     <meta property="og:type" content="website">
