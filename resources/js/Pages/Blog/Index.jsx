@@ -1,153 +1,130 @@
 import { Head, Link } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
-import PageHero from '@/Components/PageHero';
-
-function DiamondDivider() {
-    return (
-        <div className="diamond-divider">
-            <span className="diamond-line" />
-            <span className="diamond-icon">◆</span>
-            <span className="diamond-icon">◆</span>
-            <span className="diamond-icon">◆</span>
-            <span className="diamond-line" />
-        </div>
-    );
-}
-
-function SectionTitle({ title, sub }) {
-    return (
-        <div className="sec-title-wrap">
-            <div className="sec-title-plaque">
-                <h2 className="sec-title-text">{title}</h2>
-            </div>
-            {sub && <p className="sec-title-sub">{sub}</p>}
-        </div>
-    );
-}
 
 function formatDate(dateStr) {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+function readingTime(body) {
+    if (!body) return '3 min read';
+    const words = body.replace(/<[^>]+>/g, '').split(/\s+/).length;
+    return `${Math.max(1, Math.round(words / 200))} min read`;
+}
+
+function CategoryPill({ category }) {
+    if (!category) return null;
+    return <span className="mag-category-pill">{category}</span>;
+}
+
+function PostCard({ post, featured = false }) {
+    const image = post.cover_image ? `/storage/${post.cover_image}` : null;
+    return (
+        <Link href={`/blog/${post.slug}`} className={`mag-card ${featured ? 'mag-card--featured' : ''}`}>
+            <div className="mag-card-img">
+                {image
+                    ? <img src={image} alt={post.title} loading="lazy" />
+                    : <div className="mag-card-img-placeholder" />}
+                <CategoryPill category={post.category} />
+            </div>
+            <div className="mag-card-body">
+                <h2 className="mag-card-title">{post.title}</h2>
+                {post.excerpt && <p className="mag-card-excerpt">{post.excerpt}</p>}
+                <div className="mag-card-meta">
+                    <span className="mag-card-date">{formatDate(post.published_at)}</span>
+                    <span className="mag-card-dot">·</span>
+                    <span className="mag-card-read">{readingTime(post.body)}</span>
+                </div>
+            </div>
+        </Link>
+    );
+}
+
 export default function BlogIndex({ posts }) {
     const items = posts?.data ?? posts ?? [];
-    const [featured, ...rest] = items;
-
-    if (items.length === 0) {
-        return (
-            <SiteLayout>
-                <Head title="Blog — Riches Corsos" />
-
-                <PageHero
-                    image="/images/about/1.jpeg"
-                    title="From The Blog"
-                    sub="Care guides, training insights, puppy preparation, breeding knowledge, and stories from families who have welcomed a RICHES CORSOS companion into their homes."
-                />
-
-                <div className="home-page">
-                    <div className="home-section-wrap" style={{ paddingTop: 48, paddingBottom: 48 }}>
-                        <div className="card-3d blog-empty">
-                            <div className="blog-empty-img">
-                                <picture>
-                                    <source srcSet="/images/aboutsite.webp" type="image/webp" />
-                                    <img src="/images/aboutsite.png" alt="RICHES CORSOS" />
-                                </picture>
-                            </div>
-                            <div className="blog-empty-content">
-                                <h2>Stories &amp; Insights Are Coming Soon</h2>
-                                <p>We're preparing helpful guides, puppy-care resources, training tips, and stories from the RICHES CORSOS community. Check back soon.</p>
-                                <div className="blog-empty-actions">
-                                    <Link href="/contact" className="btn-solid">Contact Us</Link>
-                                    <Link href="/puppies" className="btn-outline">View Available Puppies</Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style={{ height: 48 }} />
-                </div>
-            </SiteLayout>
-        );
-    }
+    const [featured, second, third, ...rest] = items;
 
     return (
         <SiteLayout>
             <Head title="Blog — Riches Corsos" />
 
-            <PageHero
-                image="/images/about/1.jpeg"
-                title="From The Blog"
-                sub="Care guides, training insights, puppy preparation, breeding knowledge, and stories from families who have welcomed a RICHES CORSOS companion into their homes."
-            />
+            {/* Magazine header */}
+            <div className="mag-header">
+                <div className="mag-header-inner">
+                    <p className="mag-header-eyebrow">Riches Corsos</p>
+                    <h1 className="mag-header-title">From The Blog</h1>
+                    <p className="mag-header-sub">Care guides, training insights, breeding knowledge, and stories from families who've welcomed a champion Cane Corso into their home.</p>
+                </div>
+            </div>
 
-            <div className="home-page">
+            <div className="mag-page">
 
-                {/* Featured Article */}
-                {featured && (
+                {items.length === 0 ? (
+                    <div className="mag-empty">
+                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                        </svg>
+                        <h2>Articles Coming Soon</h2>
+                        <p>We're preparing care guides, training tips, and stories from the Riches Corsos community. Check back soon.</p>
+                        <div className="mag-empty-actions">
+                            <Link href="/puppies" className="btn-solid">View Available Puppies</Link>
+                            <Link href="/contact" className="btn-outline">Contact Us</Link>
+                        </div>
+                    </div>
+                ) : (
                     <>
-                        <SectionTitle title="Featured Article" />
-                        <div className="home-section-wrap">
-                            <div className="card-3d">
-                                <Link href={`/blog/${featured.slug}`} className="blog-featured">
-                                    <div className="blog-featured-img">
-                                        <div className={`blog-photo ${featured.cover_image ? '' : 'placeholder'}`}>
-                                            {featured.cover_image && <img src={`/storage/${featured.cover_image}`} alt={featured.title} />}
-                                        </div>
+                        {/* Hero feature — first post full width */}
+                        {featured && (
+                            <section className="mag-hero-section">
+                                <Link href={`/blog/${featured.slug}`} className="mag-hero-card">
+                                    <div className="mag-hero-img">
+                                        {featured.cover_image
+                                            ? <img src={`/storage/${featured.cover_image}`} alt={featured.title} />
+                                            : <div className="mag-hero-img-placeholder" />}
+                                        <div className="mag-hero-overlay" />
                                     </div>
-                                    <div className="blog-featured-content">
-                                        {featured.category && <span className="blog-tag">{featured.category}</span>}
-                                        <h2 className="blog-featured-title">{featured.title}</h2>
-                                        {featured.excerpt && <p className="blog-featured-excerpt">{featured.excerpt}</p>}
-                                        <div className="blog-featured-meta">
+                                    <div className="mag-hero-content">
+                                        <CategoryPill category={featured.category} />
+                                        <h2 className="mag-hero-title">{featured.title}</h2>
+                                        {featured.excerpt && <p className="mag-hero-excerpt">{featured.excerpt}</p>}
+                                        <div className="mag-hero-meta">
                                             <span>{formatDate(featured.published_at)}</span>
+                                            <span className="mag-card-dot">·</span>
+                                            <span>{readingTime(featured.body)}</span>
+                                            <span className="mag-hero-cta">Read Article →</span>
                                         </div>
-                                        <span className="blog-read-more">
-                                            Read Article
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="16" height="16">
-                                                <path d="M5 12h14M12 5l7 7-7 7" />
-                                            </svg>
-                                        </span>
                                     </div>
                                 </Link>
-                            </div>
-                        </div>
+                            </section>
+                        )}
 
+                        {/* Second row — two cards side by side */}
+                        {(second || third) && (
+                            <section className="mag-duo-section">
+                                {second && <PostCard post={second} />}
+                                {third && <PostCard post={third} />}
+                            </section>
+                        )}
+
+                        {/* Rest — 3-column grid */}
                         {rest.length > 0 && (
-                            <>
-                                <div className="section-divider"><DiamondDivider /></div>
-                                <SectionTitle title="More Articles" />
-                                <div className="home-section-wrap">
-                                    <div className="card-3d">
-                                        <div className="blog-grid">
-                                            {rest.map((post) => (
-                                                <Link href={`/blog/${post.slug}`} key={post.id} className="blog-card">
-                                                    <div className={`blog-photo ${post.cover_image ? '' : 'placeholder'}`}>
-                                                        {post.cover_image && <img src={`/storage/${post.cover_image}`} alt={post.title} />}
-                                                    </div>
-                                                    <div className="blog-info">
-                                                        {post.category && <span className="blog-tag">{post.category}</span>}
-                                                        <h3>{post.title}</h3>
-                                                        <p>{post.excerpt}</p>
-                                                        <div className="blog-card-footer">
-                                                            <span className="blog-card-date">{formatDate(post.published_at)}</span>
-                                                            <span className="blog-card-arrow">→</span>
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
+                            <section className="mag-grid-section">
+                                <div className="mag-section-label">
+                                    <span>More Articles</span>
+                                    <div className="mag-section-line" />
                                 </div>
-                            </>
+                                <div className="mag-grid">
+                                    {rest.map((post) => <PostCard key={post.id} post={post} />)}
+                                </div>
+                            </section>
                         )}
                     </>
                 )}
-
-                <div style={{ height: 48 }} />
             </div>
 
+            {/* CTA band */}
             <div className="cta-band">
-                <h2>Have a question for RICHES CORSOS?</h2>
+                <h2>Have a question about Cane Corsos?</h2>
                 <Link href="/contact" className="btn-solid">Get In Touch</Link>
             </div>
         </SiteLayout>

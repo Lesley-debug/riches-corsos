@@ -450,11 +450,7 @@ export default function Home({
                 <SectionTitle number="03" title="Riches Corsos: Our Story" />
                 <div className="home-section-wrap">
                     <div className="card-3d">
-                        <div
-                            className="story-grid"
-                            onMouseEnter={() => setIsStoryPaused(true)}
-                            onMouseLeave={() => setIsStoryPaused(false)}
-                        >
+                        <div className="story-grid">
                             <div className="story-text-col">
                                 <p className="story-subtitle">
                                     WE ARE A TEAM OF DEDICATED PET LOVERS, CARETAKERS, AND TRAINERS.
@@ -649,24 +645,30 @@ export default function Home({
                 <SectionTitle number="06" title="From The Blog" sub="Care guides, training tips, and stories from families who've brought a Corso home." />
                 <div className="home-section-wrap">
                     <div className="card-3d">
-                        <div className="blog-grid">
-                            {recentPosts.length > 0 ? (
-                                recentPosts.map((post) => (
-                                    <Link href={`/blog/${post.slug}`} key={post.id} className="blog-card">
-                                        <div className={`blog-photo ${post.cover_image ? '' : 'placeholder'}`}>
-                                            {post.cover_image && <img src={`/storage/${post.cover_image}`} alt={post.title} />}
+                        {recentPosts.length > 0 ? (
+                            <div className="home-blog-grid">
+                                {recentPosts.map((post, i) => (
+                                    <Link href={`/blog/${post.slug}`} key={post.id} className={`home-blog-card ${i === 0 ? 'home-blog-card--featured' : ''}`}>
+                                        <div className="home-blog-img">
+                                            {post.cover_image
+                                                ? <img src={`/storage/${post.cover_image}`} alt={post.title} />
+                                                : <div className="home-blog-img-placeholder" />}
                                         </div>
-                                        <div className="blog-info">
+                                        <div className="home-blog-body">
                                             {post.category && <span className="blog-tag">{post.category}</span>}
-                                            <h3>{post.title}</h3>
-                                            <p>{post.excerpt}</p>
+                                            <h3 className="home-blog-title">{post.title}</h3>
+                                            {post.excerpt && <p className="home-blog-excerpt">{post.excerpt}</p>}
+                                            <div className="home-blog-meta">
+                                                <span>{post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}</span>
+                                                <span className="home-blog-read">Read →</span>
+                                            </div>
                                         </div>
                                     </Link>
-                                ))
-                            ) : (
-                                <p style={{ color: 'var(--stone)', gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0' }}>No posts published yet.</p>
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p style={{ color: 'var(--stone)', textAlign: 'center', padding: '40px 0' }}>No posts published yet.</p>
+                        )}
                         <div className="section-cta">
                             <Link href="/blog" className="dark-btn">View All Articles</Link>
                         </div>

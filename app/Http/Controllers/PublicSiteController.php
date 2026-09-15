@@ -104,8 +104,27 @@ class PublicSiteController extends Controller
 
     public function blogShow(BlogPost $blogPost)
     {
+        $related = BlogPost::published()
+            ->where('id', '!=', $blogPost->id)
+            ->where('category', $blogPost->category)
+            ->latest('published_at')
+            ->take(3)
+            ->get();
+
+        if ($related->count() < 3) {
+            $related = $related->concat(
+                BlogPost::published()
+                    ->where('id', '!=', $blogPost->id)
+                    ->whereNotIn('id', $related->pluck('id'))
+                    ->latest('published_at')
+                    ->take(3 - $related->count())
+                    ->get()
+            );
+        }
+
         return Inertia::render('Blog/Show', [
             'post' => $blogPost,
+            'related' => $related,
         ]);
     }
 
