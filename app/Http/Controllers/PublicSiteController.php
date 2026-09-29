@@ -58,7 +58,13 @@ class PublicSiteController extends Controller
             'parents.videos',
         ]);
 
-        $puppy->documents->each(fn (PuppyDocument $document) => $document->append(['type_label', 'status_label']));
+        $puppy->documents->each(function (PuppyDocument $document) use ($puppy) {
+            $document->append(['type_label', 'status_label']);
+            $document->setAttribute(
+                'public_url',
+                route('puppies.documents.show', [$puppy, $document])
+            );
+        });
 
         $related = Puppy::with('images')
             ->where('id', '!=', $puppy->id)

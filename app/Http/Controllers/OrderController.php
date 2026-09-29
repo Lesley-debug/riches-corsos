@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Puppy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
@@ -19,24 +21,29 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        $puppy = Puppy::findOrFail($validated['puppy_id']);
+        $puppy = DB::transaction(function () use ($validated, $request): Puppy {
+            $puppy = Puppy::query()
+                ->whereKey($validated['puppy_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        // Guard against two buyers ordering the same puppy at once —
-        // if it's no longer available, don't create the order.
-        if ($puppy->status !== 'available') {
-            return back()->withErrors([
-                'puppy_id' => 'Sorry — this puppy is no longer available.',
+            if ($puppy->status !== 'available' || $puppy->visibility !== 'published') {
+                throw ValidationException::withMessages([
+                    'puppy_id' => 'Sorry — this puppy is no longer available.',
+                ]);
+            }
+
+            Order::create([
+                ...$validated,
+                'user_id' => $request->user()->id,
             ]);
-        }
 
-        $order = Order::create([
-            ...$validated,
-            'user_id' => $request->user()?->id,
-        ]);
+            // Keep the availability check, order creation, and status change
+            // in one transaction so concurrent requests cannot reserve twice.
+            $puppy->update(['status' => 'pending']);
 
-        // No payment is taken here. This writes the reservation request and
-        // the OrderObserver notifies the admin (email + dashboard bell icon).
-        $puppy->update(['status' => 'pending']);
+            return $puppy;
+        });
 
         return redirect()
             ->route('puppies.show', $puppy->slug)

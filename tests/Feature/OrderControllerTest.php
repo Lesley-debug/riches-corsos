@@ -29,22 +29,47 @@ class OrderControllerTest extends TestCase
     {
         Notification::fake();
 
-        $puppy = Puppy::factory()->create(['status' => 'available']);
+        $user = User::factory()->create();
+        $puppy = Puppy::factory()->create([
+            'status' => 'available',
+            'visibility' => 'published',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->post(route('orders.store'), $this->validPayload($puppy->id));
+
+        $response->assertRedirect(route('puppies.show', $puppy->slug));
+        $this->assertDatabaseHas('orders', [
+            'puppy_id' => $puppy->id,
+            'buyer_email' => 'jane@example.com',
+            'user_id' => $user->id,
+        ]);
+        $this->assertSame('pending', $puppy->fresh()->status);
+    }
+
+    public function test_guest_cannot_create_order_or_change_inventory(): void
+    {
+        $puppy = Puppy::factory()->create([
+            'status' => 'available',
+            'visibility' => 'published',
+        ]);
 
         $response = $this->post(route('orders.store'), $this->validPayload($puppy->id));
 
-        $response->assertRedirect(route('puppies.show', $puppy->slug));
-        $this->assertDatabaseHas('orders', ['puppy_id' => $puppy->id, 'buyer_email' => 'jane@example.com']);
-        $this->assertSame('pending', $puppy->fresh()->status);
+        $response->assertRedirect(route('login'));
+        $this->assertDatabaseCount('orders', 0);
+        $this->assertSame('available', $puppy->fresh()->status);
     }
 
     public function test_store_rejects_unavailable_puppy(): void
     {
         Notification::fake();
 
+        $user = User::factory()->create();
         $puppy = Puppy::factory()->unavailable()->create();
 
-        $response = $this->post(route('orders.store'), $this->validPayload($puppy->id));
+        $response = $this->actingAs($user)
+            ->post(route('orders.store'), $this->validPayload($puppy->id));
 
         $response->assertRedirect();
         $response->assertSessionHasErrors('puppy_id');
@@ -53,16 +78,36 @@ class OrderControllerTest extends TestCase
 
     public function test_store_validates_required_fields(): void
     {
-        $response = $this->post(route('orders.store'), []);
+        $response = $this->actingAs(User::factory()->create())
+            ->post(route('orders.store'), []);
 
         $response->assertSessionHasErrors(['puppy_id', 'buyer_name', 'buyer_email', 'buyer_phone']);
+    }
+
+    public function test_store_rejects_unpublished_puppy(): void
+    {
+        $user = User::factory()->create();
+        $puppy = Puppy::factory()->create([
+            'status' => 'available',
+            'visibility' => 'private',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->post(route('orders.store'), $this->validPayload($puppy->id));
+
+        $response->assertSessionHasErrors('puppy_id');
+        $this->assertDatabaseCount('orders', 0);
+        $this->assertSame('available', $puppy->fresh()->status);
     }
 
     public function test_store_attaches_authenticated_user_id(): void
     {
         Notification::fake();
 
-        $puppy = Puppy::factory()->create(['status' => 'available']);
+        $puppy = Puppy::factory()->create([
+            'status' => 'available',
+            'visibility' => 'published',
+        ]);
         $user = User::factory()->create();
 
         $this->actingAs($user)->post(route('orders.store'), $this->validPayload($puppy->id));
@@ -75,10 +120,41 @@ class OrderControllerTest extends TestCase
         Notification::fake();
 
         $admin = User::factory()->create(['role' => 'admin']);
-        $puppy = Puppy::factory()->create(['status' => 'available']);
+        $customer = User::factory()->create();
+        $puppy = Puppy::factory()->create([
+            'status' => 'available',
+            'visibility' => 'published',
+        ]);
 
-        $this->post(route('orders.store'), $this->validPayload($puppy->id));
+        $this->actingAs($customer)
+            ->post(route('orders.store'), $this->validPayload($puppy->id));
 
         Notification::assertSentTo($admin, NewOrderPlaced::class);
+    }
+
+    public function test_order_submissions_are_rate_limited_per_user(): void
+    {
+        Notification::fake();
+
+        $customer = User::factory()->create();
+        $puppies = Puppy::factory()->count(4)->create([
+            'status' => 'available',
+            'visibility' => 'published',
+        ]);
+
+        foreach ($puppies->take(3) as $puppy) {
+            $this->actingAs($customer)
+                ->post(route('orders.store'), $this->validPayload($puppy->id))
+                ->assertRedirect(route('puppies.show', $puppy->slug));
+        }
+
+        $blockedPuppy = $puppies->last();
+
+        $this->actingAs($customer)
+            ->post(route('orders.store'), $this->validPayload($blockedPuppy->id))
+            ->assertStatus(429);
+
+        $this->assertSame('available', $blockedPuppy->fresh()->status);
+        $this->assertDatabaseCount('orders', 3);
     }
 }

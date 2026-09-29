@@ -13,6 +13,33 @@ class PuppyDocumentController extends Controller
 {
     public function __construct(private PuppyDocumentService $service) {}
 
+    public function publicView(Puppy $puppy, PuppyDocument $document)
+    {
+        abort_unless($document->puppy_id === $puppy->id, 404);
+        abort_unless($document->visibility === 'public', 404);
+        abort_unless(
+            in_array($document->status, [
+                PuppyDocument::STATUS_GENERATED,
+                PuppyDocument::STATUS_UPLOADED,
+            ], true),
+            404
+        );
+        abort_unless(
+            $document->file_path
+            && Storage::disk('local')->exists($document->file_path),
+            404
+        );
+
+        return Storage::disk('local')->response(
+            $document->file_path,
+            basename($document->file_path),
+            [
+                'Content-Type' => $document->mime_type ?: 'application/octet-stream',
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+    }
+
     // ── Generate a new PDF document ───────────────────────────────────────────
     public function generate(Request $request, Puppy $puppy)
     {
@@ -78,7 +105,7 @@ class PuppyDocumentController extends Controller
 
         $file     = $request->file('file');
         $dir      = "puppy-documents/{$puppy->id}/uploaded";
-        $path     = $file->store($dir, 'public');
+        $path     = $file->store($dir, 'local');
         $docNum   = $this->service->generateDocumentNumber('other');
 
         $doc = PuppyDocument::create([
@@ -108,8 +135,8 @@ class PuppyDocumentController extends Controller
         Gate::authorize('admin-only');
         abort_unless($document->puppy_id === $puppy->id, 404);
 
-        if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
-            Storage::disk('public')->delete($document->file_path);
+        if ($document->file_path && Storage::disk('local')->exists($document->file_path)) {
+            Storage::disk('local')->delete($document->file_path);
         }
 
         $document->delete();
