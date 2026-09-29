@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 // Public pages
 Route::get('/', [PublicSiteController::class, 'home'])->name('home');
 Route::get('/puppies', [PublicSiteController::class, 'puppyIndex'])->name('puppies.index');
+Route::get('/puppies/{puppy:slug}/documents/{document}', [PuppyDocumentController::class, 'publicView'])
+    ->name('puppies.documents.show');
 Route::get('/puppies/{puppy:slug}', [PublicSiteController::class, 'puppyShow'])->name('puppies.show');
 Route::get('/blog', [PublicSiteController::class, 'blogIndex'])->name('blog.index');
 Route::get('/blog/{blogPost:slug}', [PublicSiteController::class, 'blogShow'])->name('blog.show');
@@ -26,21 +28,30 @@ Route::get('/sitemap.xml', [PublicSiteController::class, 'sitemap'])->name('site
 
 // Contact page + form submission
 Route::get('/contact', [PublicSiteController::class, 'contactShow'])->name('contact.show');
-Route::post('/contact', [PublicSiteController::class, 'contactStore'])->name('contact.store');
+Route::post('/contact', [PublicSiteController::class, 'contactStore'])
+    ->middleware('throttle:contact-submissions')
+    ->name('contact.store');
 
 // Legacy direct order endpoint kept for existing links and integrations.
-Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::post('/orders', [OrderController::class, 'store'])
+    ->middleware(['auth', 'throttle:order-submissions'])
+    ->name('orders.store');
 
 // Guest-only auth routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register'])
+        ->middleware('throttle:registrations');
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])
+        ->middleware('throttle:password-resets')
+        ->name('password.email');
     Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
-    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+        ->middleware('throttle:password-resets')
+        ->name('password.update');
 
     // Google OAuth
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');

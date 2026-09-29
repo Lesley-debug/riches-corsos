@@ -119,9 +119,9 @@ class PuppyDocumentService
     public function download(Puppy $puppy, PuppyDocument $doc): mixed
     {
         // If already stored, serve from disk
-        if ($doc->file_path && Storage::disk('public')->exists($doc->file_path)) {
+        if ($doc->file_path && Storage::disk('local')->exists($doc->file_path)) {
             return response()->download(
-                Storage::disk('public')->path($doc->file_path),
+                Storage::disk('local')->path($doc->file_path),
                 $this->filename($puppy, $doc)
             );
         }
@@ -176,7 +176,7 @@ class PuppyDocumentService
         $filename = Str::slug($docNumber).'.pdf';
         $path     = "{$dir}/{$filename}";
 
-        Storage::disk('public')->put($path, $pdf->output());
+        Storage::disk('local')->put($path, $pdf->output());
 
         return $path;
     }

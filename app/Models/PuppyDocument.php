@@ -65,6 +65,12 @@ class PuppyDocument extends Model
         'created_by', 'notes',
     ];
 
+    protected $hidden = [
+        'file_path',
+        'created_by',
+        'notes',
+    ];
+
     protected $casts = [
         'generated_at' => 'datetime',
         'issued_at'    => 'datetime',
@@ -112,4 +118,5 @@ class PuppyDocument extends Model
     {
         return self::$generatableTypes[$this->document_type] ?? ucwords(str_replace('_', ' ', $this->document_type));
     }
+
 }

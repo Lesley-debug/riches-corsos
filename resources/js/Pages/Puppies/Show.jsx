@@ -146,7 +146,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
 
     const images = cleanList(puppy.images);
     const videos = cleanList(puppy.videos);
-    const documents = cleanList(puppy.documents).filter((document) => document.file_path);
+    const documents = cleanList(puppy.documents).filter((document) => document.public_url);
     const age = ageLabel(puppy.age_in_weeks);
     const isAvailable = puppy.status === 'available';
     const status = labelize(puppy.status);
@@ -554,7 +554,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                                         <h3>Documents</h3>
                                         <div className="puppy-doc-list">
                                             {documents.map((document) => (
-                                                <a key={document.id} href={`/storage/${document.file_path}`} target="_blank" rel="noopener noreferrer" className="puppy-doc-card">
+                                                <a key={document.id} href={document.public_url} target="_blank" rel="noopener noreferrer" className="puppy-doc-card">
                                                     <span className="puppy-doc-icon"><DocumentIcon /></span>
                                                     <span>
                                                         <strong>{document.title || document.type_label || labelize(document.document_type)}</strong>

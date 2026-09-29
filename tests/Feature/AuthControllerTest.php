@@ -72,6 +72,29 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
+    public function test_registration_is_rate_limited(): void
+    {
+        Notification::fake();
+
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            $this->post('/register', [
+                'name' => "User {$attempt}",
+                'email' => "user{$attempt}@example.com",
+                'password' => 'new-password-123',
+                'password_confirmation' => 'new-password-123',
+            ])->assertRedirect(route('login'));
+        }
+
+        $this->post('/register', [
+            'name' => 'Blocked User',
+            'email' => 'blocked@example.com',
+            'password' => 'new-password-123',
+            'password_confirmation' => 'new-password-123',
+        ])->assertStatus(429);
+
+        $this->assertDatabaseCount('users', 3);
+    }
+
     public function test_user_can_logout(): void
     {
         $user = User::factory()->create();
@@ -102,6 +125,27 @@ class AuthControllerTest extends TestCase
         $response->assertSessionHas('status');
 
         Notification::assertSentTo($user, ResetPassword::class);
+    }
+
+    public function test_password_reset_requests_are_rate_limited_by_email_and_ip(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create();
+
+        $this->post(route('password.email'), [
+            'email' => $user->email,
+        ])->assertSessionHas('status');
+
+        // Laravel's password broker may reject this request using its own
+        // per-address cooldown, but it must still count toward the route limit.
+        $this->post(route('password.email'), [
+            'email' => $user->email,
+        ])->assertStatus(302);
+
+        $this->post(route('password.email'), [
+            'email' => $user->email,
+        ])->assertStatus(429);
     }
 
     public function test_reset_password_screen_can_be_rendered(): void

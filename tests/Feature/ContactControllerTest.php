@@ -62,4 +62,21 @@ class ContactControllerTest extends TestCase
 
         $this->assertDatabaseHas('contact_messages', ['is_read' => false]);
     }
+
+    public function test_contact_submissions_are_rate_limited(): void
+    {
+        Notification::fake();
+
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->post(route('contact.store'), [
+                ...$this->validPayload(),
+                'email' => "john{$attempt}@example.com",
+            ])->assertRedirect();
+        }
+
+        $this->post(route('contact.store'), $this->validPayload())
+            ->assertStatus(429);
+
+        $this->assertDatabaseCount('contact_messages', 5);
+    }
 }

@@ -31,6 +31,7 @@ class PuppyDocumentTest extends TestCase
         Notification::fake();
 
         Storage::fake('public');
+        Storage::fake('local');
 
         $this->admin    = User::factory()->create(['role' => 'admin']);
         $this->customer = User::factory()->create(['role' => 'customer']);
@@ -80,7 +81,8 @@ class PuppyDocumentTest extends TestCase
         $this->assertSame(PuppyDocument::SOURCE_GENERATED, $doc->source);
         $this->assertNotEmpty($doc->document_number);
         $this->assertNotEmpty($doc->file_path);
-        Storage::disk('public')->assertExists($doc->file_path);
+        Storage::disk('local')->assertExists($doc->file_path);
+        Storage::disk('public')->assertMissing($doc->file_path);
     }
 
     public function test_service_generates_document_without_puppy_image(): void
@@ -113,7 +115,7 @@ class PuppyDocumentTest extends TestCase
         $doc     = $service->generate($this->puppy, PuppyDocument::TYPE_INFO_SHEET);
 
         $this->assertSame(PuppyDocument::STATUS_GENERATED, $doc->status);
-        Storage::disk('public')->assertExists($doc->file_path);
+        Storage::disk('local')->assertExists($doc->file_path);
     }
 
     public function test_service_generates_all_document_types(): void
@@ -140,7 +142,7 @@ class PuppyDocumentTest extends TestCase
         $regenerated = $service->regenerate($this->puppy, $doc);
 
         $this->assertSame($originalPath, $regenerated->file_path);
-        Storage::disk('public')->assertExists($regenerated->file_path);
+        Storage::disk('local')->assertExists($regenerated->file_path);
     }
 
     // ── HTTP routes: authorization ────────────────────────────────────────────
@@ -202,6 +204,13 @@ class PuppyDocumentTest extends TestCase
             'source'   => PuppyDocument::SOURCE_UPLOADED,
             'status'   => PuppyDocument::STATUS_UPLOADED,
         ]);
+
+        $document = PuppyDocument::where('puppy_id', $this->puppy->id)
+            ->where('source', PuppyDocument::SOURCE_UPLOADED)
+            ->firstOrFail();
+
+        Storage::disk('local')->assertExists($document->file_path);
+        Storage::disk('public')->assertMissing($document->file_path);
     }
 
     public function test_upload_rejects_invalid_mime_type(): void
@@ -277,6 +286,87 @@ class PuppyDocumentTest extends TestCase
         $response = $this->get(route('admin.puppies.documents.preview', [$this->puppy, $doc]));
 
         $response->assertNotFound();
+    }
+
+    public function test_public_document_is_served_through_controlled_route(): void
+    {
+        $document = PuppyDocument::create([
+            'puppy_id' => $this->puppy->id,
+            'document_type' => PuppyDocument::TYPE_VET_CERTIFICATE,
+            'title' => 'Public certificate',
+            'status' => PuppyDocument::STATUS_UPLOADED,
+            'source' => PuppyDocument::SOURCE_UPLOADED,
+            'file_path' => "puppy-documents/{$this->puppy->id}/certificate.pdf",
+            'mime_type' => 'application/pdf',
+            'visibility' => 'public',
+        ]);
+
+        Storage::disk('local')->put($document->file_path, 'test-pdf');
+
+        $response = $this->get(route('puppies.documents.show', [$this->puppy, $document]));
+
+        $response->assertOk();
+        $response->assertHeader('X-Content-Type-Options', 'nosniff');
+    }
+
+    public function test_private_document_is_not_publicly_accessible(): void
+    {
+        $document = PuppyDocument::create([
+            'puppy_id' => $this->puppy->id,
+            'document_type' => PuppyDocument::TYPE_VET_CERTIFICATE,
+            'title' => 'Private certificate',
+            'status' => PuppyDocument::STATUS_UPLOADED,
+            'source' => PuppyDocument::SOURCE_UPLOADED,
+            'file_path' => "puppy-documents/{$this->puppy->id}/private.pdf",
+            'mime_type' => 'application/pdf',
+            'visibility' => 'admin_only',
+        ]);
+
+        Storage::disk('local')->put($document->file_path, 'test-pdf');
+
+        $this->get(route('puppies.documents.show', [$this->puppy, $document]))
+            ->assertNotFound();
+    }
+
+    public function test_document_serialization_does_not_expose_private_storage_details(): void
+    {
+        $document = PuppyDocument::create([
+            'puppy_id' => $this->puppy->id,
+            'document_type' => PuppyDocument::TYPE_OTHER,
+            'title' => 'Internal document',
+            'status' => PuppyDocument::STATUS_UPLOADED,
+            'source' => PuppyDocument::SOURCE_UPLOADED,
+            'file_path' => 'puppy-documents/internal.pdf',
+            'visibility' => 'admin_only',
+            'created_by' => $this->admin->id,
+            'notes' => 'Internal note',
+        ]);
+
+        $serialized = $document->toArray();
+
+        $this->assertArrayNotHasKey('file_path', $serialized);
+        $this->assertArrayNotHasKey('created_by', $serialized);
+        $this->assertArrayNotHasKey('notes', $serialized);
+    }
+
+    public function test_document_migration_command_moves_public_file_to_private_disk(): void
+    {
+        $document = PuppyDocument::create([
+            'puppy_id' => $this->puppy->id,
+            'document_type' => PuppyDocument::TYPE_OTHER,
+            'title' => 'Legacy document',
+            'status' => PuppyDocument::STATUS_UPLOADED,
+            'source' => PuppyDocument::SOURCE_UPLOADED,
+            'file_path' => 'puppy-documents/legacy.pdf',
+            'visibility' => 'admin_only',
+        ]);
+
+        Storage::disk('public')->put($document->file_path, 'legacy-file');
+
+        $this->artisan('documents:migrate-private')->assertSuccessful();
+
+        Storage::disk('local')->assertExists($document->file_path);
+        Storage::disk('public')->assertMissing($document->file_path);
     }
 
     // ── Logo & signature helpers ──────────────────────────────────────────────
