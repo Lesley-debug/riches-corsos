@@ -24,8 +24,8 @@ class NotificationTest extends TestCase
         $response = $this->post('/register', [
             'name' => 'Sarah Connor',
             'email' => 'sarah@example.com',
-            'password' => 'password-1234',
-            'password_confirmation' => 'password-1234',
+            'password' => 'Password-1234!',
+            'password_confirmation' => 'Password-1234!',
         ]);
 
         $response->assertRedirect(route('login'));
@@ -58,9 +58,10 @@ class NotificationTest extends TestCase
                 'buyer_email' => 'john@example.com',
                 'buyer_phone' => '+12145550199',
                 'buyer_address' => 'Continental Hotel, NYC',
+                'payment_method' => 'bank_transfer',
             ]);
 
-        $response->assertRedirect(route('puppies.index'));
+        $response->assertRedirect(route('order.success'));
 
         Notification::assertSentTo($user, OrderPlacedCustomerNotification::class);
     }

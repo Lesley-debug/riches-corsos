@@ -103,7 +103,8 @@ export default function Register() {
                   value={data.password}
                   onChange={(e) => setData('password', e.target.value)}
                   autoComplete="new-password"
-                  placeholder="At least 8 characters"
+                  placeholder="12+ characters with upper/lowercase, number and symbol"
+                  minLength={12}
                   required
                 />
                 <button

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\WelcomeNotification;
 use Exception;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -29,29 +30,21 @@ class GoogleAuthController extends Controller
                 ->redirect();
         } catch (Exception $e) {
             return redirect()->route('login')->withErrors([
-                'google' => 'Unable to connect to Google: ' . $e->getMessage(),
+                'google' => 'Unable to connect to Google. Please try again.',
             ]);
         }
     }
 
-    public function callback(): RedirectResponse
+    public function callback(Request $request): RedirectResponse
     {
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (Exception $e) {
-            try {
-                $googleProvider = Socialite::driver('google');
+            report($e);
 
-                if (!method_exists($googleProvider, 'stateless')) {
-                    throw new Exception('Stateless Google authentication is unavailable.');
-                }
-
-                $googleUser = $googleProvider->stateless()->user();
-            } catch (Exception $e2) {
-                return redirect()->route('login')->withErrors([
-                    'google' => 'Google authentication was cancelled or encountered an error. Please try again.',
-                ]);
-            }
+            return redirect()->route('login')->withErrors([
+                'google' => 'Google authentication was cancelled or encountered an error. Please try again.',
+            ]);
         }
 
         $email = $googleUser->getEmail();
@@ -65,9 +58,23 @@ class GoogleAuthController extends Controller
             ]);
         }
 
-        $user = User::where('google_id', $googleId)
-            ->orWhere('email', $email)
-            ->first();
+        $verifiedEmail = data_get($googleUser->user ?? [], 'verified_email')
+            ?? data_get($googleUser->user ?? [], 'email_verified');
+
+        if (! filter_var($verifiedEmail, FILTER_VALIDATE_BOOLEAN)) {
+            return redirect()->route('login')->withErrors([
+                'google' => 'Google did not provide a verified email address.',
+            ]);
+        }
+
+        $user = User::where('google_id', $googleId)->first()
+            ?? User::where('email', $email)->first();
+
+        if ($user?->google_id && ! hash_equals($user->google_id, $googleId)) {
+            return redirect()->route('login')->withErrors([
+                'google' => 'This email is already linked to another Google account.',
+            ]);
+        }
 
         if ($user) {
             $user->update([
@@ -92,6 +99,7 @@ class GoogleAuthController extends Controller
         }
 
         Auth::login($user, true);
+        $request->session()->regenerate();
 
         return redirect()->route('home')->with('login_notice', 'Welcome! You can visit your Account Dashboard anytime to track your puppy reservations and site activity.');
     }

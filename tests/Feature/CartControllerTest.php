@@ -125,7 +125,12 @@ class CartControllerTest extends TestCase
             ->withSession(['cart.puppy_ids' => [$puppy->id]])
             ->post(route('checkout.store'), []);
 
-        $response->assertSessionHasErrors(['buyer_name', 'buyer_email', 'buyer_phone']);
+        $response->assertSessionHasErrors([
+            'buyer_name',
+            'buyer_email',
+            'buyer_phone',
+            'payment_method',
+        ]);
         $this->assertDatabaseEmpty('orders');
     }
 
@@ -139,6 +144,7 @@ class CartControllerTest extends TestCase
                 'buyer_name' => 'Jane Doe',
                 'buyer_email' => 'jane@example.com',
                 'buyer_phone' => '555-123-4567',
+                'payment_method' => 'bank_transfer',
             ]);
 
         $response->assertSessionHasErrors(['cart']);
@@ -159,10 +165,11 @@ class CartControllerTest extends TestCase
                 'buyer_phone' => '555-987-6543',
                 'buyer_address' => '123 Main St, Springfield',
                 'notes' => 'Looking forward to meeting the puppies.',
+                'payment_method' => 'bank_transfer',
             ]);
 
-        $response->assertRedirect(route('puppies.index'));
-        $response->assertSessionHas('success');
+        $response->assertRedirect(route('order.success'));
+        $response->assertSessionHas('last_orders');
         $this->assertNull(session('cart.puppy_ids'));
 
         $this->assertDatabaseHas('orders', [
@@ -193,6 +200,7 @@ class CartControllerTest extends TestCase
                 'buyer_name' => 'John Doe',
                 'buyer_email' => 'john@example.com',
                 'buyer_phone' => '555-987-6543',
+                'payment_method' => 'bank_transfer',
             ]);
 
         $response->assertSessionHasErrors(['cart']);
@@ -211,9 +219,10 @@ class CartControllerTest extends TestCase
                 'buyer_name' => 'Registered Customer',
                 'buyer_email' => $user->email,
                 'buyer_phone' => '555-111-2222',
+                'payment_method' => 'bank_transfer',
             ]);
 
-        $response->assertRedirect(route('puppies.index'));
+        $response->assertRedirect(route('order.success'));
         $this->assertDatabaseHas('orders', [
             'puppy_id' => $puppy->id,
             'user_id' => $user->id,

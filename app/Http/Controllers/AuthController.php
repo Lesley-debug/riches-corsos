@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 use Inertia\Inertia;
 
 class AuthController extends Controller
@@ -68,7 +69,12 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                PasswordRule::min(12)->mixedCase()->numbers()->symbols(),
+            ],
         ]);
 
         $user = User::create([
@@ -103,17 +109,12 @@ class AuthController extends Controller
             'email' => 'required|email',
         ]);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
+        Password::sendResetLink($request->only('email'));
+
+        return back()->with(
+            'status',
+            'If an account exists for that email, a password reset link has been sent.'
         );
-
-        if ($status === Password::RESET_LINK_SENT) {
-            return back()->with('status', __($status));
-        }
-
-        throw ValidationException::withMessages([
-            'email' => [__($status)],
-        ]);
     }
 
     public function showResetPassword(Request $request, string $token)
@@ -129,7 +130,11 @@ class AuthController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => [
+                'required',
+                'confirmed',
+                PasswordRule::min(12)->mixedCase()->numbers()->symbols(),
+            ],
         ]);
 
         $status = Password::reset(
