@@ -57,8 +57,8 @@ class AuthControllerTest extends TestCase
         $response = $this->post('/register', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => 'new-password-123',
-            'password_confirmation' => 'new-password-123',
+            'password' => 'New-Password-123!',
+            'password_confirmation' => 'New-Password-123!',
         ]);
 
         $this->assertGuest();
@@ -80,16 +80,16 @@ class AuthControllerTest extends TestCase
             $this->post('/register', [
                 'name' => "User {$attempt}",
                 'email' => "user{$attempt}@example.com",
-                'password' => 'new-password-123',
-                'password_confirmation' => 'new-password-123',
+                'password' => 'New-Password-123!',
+                'password_confirmation' => 'New-Password-123!',
             ])->assertRedirect(route('login'));
         }
 
         $this->post('/register', [
             'name' => 'Blocked User',
             'email' => 'blocked@example.com',
-            'password' => 'new-password-123',
-            'password_confirmation' => 'new-password-123',
+            'password' => 'New-Password-123!',
+            'password_confirmation' => 'New-Password-123!',
         ])->assertStatus(429);
 
         $this->assertDatabaseCount('users', 3);
@@ -103,6 +103,19 @@ class AuthControllerTest extends TestCase
 
         $this->assertGuest();
         $response->assertRedirect('/');
+    }
+
+    public function test_registration_rejects_weak_password(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Weak Password',
+            'email' => 'weak@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors('password');
+        $this->assertDatabaseMissing('users', ['email' => 'weak@example.com']);
     }
 
     public function test_forgot_password_screen_can_be_rendered(): void
@@ -125,6 +138,20 @@ class AuthControllerTest extends TestCase
         $response->assertSessionHas('status');
 
         Notification::assertSentTo($user, ResetPassword::class);
+    }
+
+    public function test_password_reset_response_does_not_reveal_missing_account(): void
+    {
+        Notification::fake();
+
+        $response = $this->post(route('password.email'), [
+            'email' => 'missing@example.com',
+        ]);
+
+        $response->assertSessionHas(
+            'status',
+            'If an account exists for that email, a password reset link has been sent.'
+        );
     }
 
     public function test_password_reset_requests_are_rate_limited_by_email_and_ip(): void
@@ -166,13 +193,13 @@ class AuthControllerTest extends TestCase
         $response = $this->post(route('password.update'), [
             'token' => $token,
             'email' => $user->email,
-            'password' => 'brand-new-password-123',
-            'password_confirmation' => 'brand-new-password-123',
+            'password' => 'Brand-New-Password-123!',
+            'password_confirmation' => 'Brand-New-Password-123!',
         ]);
 
         $response->assertRedirect(route('login'));
         $response->assertSessionHas('success');
 
-        $this->assertTrue(Hash::check('brand-new-password-123', $user->fresh()->password));
+        $this->assertTrue(Hash::check('Brand-New-Password-123!', $user->fresh()->password));
     }
 }

@@ -36,6 +36,7 @@ class GoogleAuthTest extends TestCase
         $googleUser->shouldReceive('getName')->andReturn('Marcus Aurelius');
         $googleUser->shouldReceive('getEmail')->andReturn('marcus@example.com');
         $googleUser->shouldReceive('getAvatar')->andReturn('https://lh3.googleusercontent.com/a/avatar.jpg');
+        $googleUser->user = ['verified_email' => true];
 
         $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
         $provider->shouldReceive('user')->andReturn($googleUser);
@@ -72,6 +73,7 @@ class GoogleAuthTest extends TestCase
         $googleUser->shouldReceive('getName')->andReturn('Existing Corso Fan');
         $googleUser->shouldReceive('getEmail')->andReturn('existing@example.com');
         $googleUser->shouldReceive('getAvatar')->andReturn('https://lh3.googleusercontent.com/avatar.jpg');
+        $googleUser->user = ['verified_email' => true];
 
         $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
         $provider->shouldReceive('user')->andReturn($googleUser);
@@ -86,5 +88,42 @@ class GoogleAuthTest extends TestCase
 
         $existingUser->refresh();
         $this->assertEquals('google-789012', $existingUser->google_id);
+    }
+
+    public function test_google_callback_rejects_unverified_email(): void
+    {
+        $googleUser = Mockery::mock(SocialiteUser::class);
+        $googleUser->shouldReceive('getId')->andReturn('google-unverified');
+        $googleUser->shouldReceive('getName')->andReturn('Unverified User');
+        $googleUser->shouldReceive('getEmail')->andReturn('unverified@example.com');
+        $googleUser->shouldReceive('getAvatar')->andReturnNull();
+        $googleUser->user = ['verified_email' => false];
+
+        $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
+        $provider->shouldReceive('user')->once()->andReturn($googleUser);
+
+        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
+
+        $response = $this->get(route('auth.google.callback'));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('google');
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', ['email' => 'unverified@example.com']);
+    }
+
+    public function test_google_callback_fails_closed_when_state_validation_fails(): void
+    {
+        $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
+        $provider->shouldReceive('user')->once()->andThrow(new \Exception('Invalid state'));
+        $provider->shouldNotReceive('stateless');
+
+        Socialite::shouldReceive('driver')->once()->with('google')->andReturn($provider);
+
+        $response = $this->get(route('auth.google.callback'));
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('google');
+        $this->assertGuest();
     }
 }

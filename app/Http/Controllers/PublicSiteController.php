@@ -9,6 +9,7 @@ use App\Models\Puppy;
 use App\Models\PuppyDocument;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
+use App\Services\HtmlSanitizer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Sitemap\Sitemap;
@@ -110,6 +111,11 @@ class PublicSiteController extends Controller
 
     public function blogShow(BlogPost $blogPost)
     {
+        abort_unless(
+            $blogPost->published_at && $blogPost->published_at->lte(now()),
+            404
+        );
+
         $related = BlogPost::published()
             ->where('id', '!=', $blogPost->id)
             ->where('category', $blogPost->category)
@@ -128,11 +134,14 @@ class PublicSiteController extends Controller
             );
         }
 
-        return Inertia::render('Blog/Show', [
-            'post' => $blogPost->only([
+        $post = $blogPost->only([
                 'id', 'title', 'slug', 'category', 'excerpt',
                 'body', 'cover_image', 'published_at',
-            ]),
+            ]);
+        $post['body'] = app(HtmlSanitizer::class)->sanitize($post['body']);
+
+        return Inertia::render('Blog/Show', [
+            'post' => $post,
             'related' => $related->map(fn (BlogPost $p) => $p->only([
                 'id', 'title', 'slug', 'category', 'excerpt',
                 'cover_image', 'published_at',

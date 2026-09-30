@@ -47,7 +47,7 @@ export default function ResetPassword({ token, email = '' }) {
               Secure Reset
             </span>
             <h1>Choose a new password</h1>
-            <p>Please enter your email and set a new password of at least 8 characters.</p>
+            <p>Use at least 12 characters with uppercase, lowercase, a number and a symbol.</p>
           </div>
 
           <form onSubmit={submit} className="auth-form">
@@ -77,7 +77,8 @@ export default function ResetPassword({ token, email = '' }) {
                   value={data.password}
                   onChange={(e) => setData('password', e.target.value)}
                   autoComplete="new-password"
-                  placeholder="At least 8 characters"
+                  placeholder="12+ characters with upper/lowercase, number and symbol"
+                  minLength={12}
                   required
                 />
                 <button

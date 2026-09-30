@@ -40,7 +40,7 @@ export default function BlogShow({ post, related = [] }) {
             facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
             whatsapp: `https://wa.me/?text=${text}%20${url}`,
         };
-        if (links[platform]) window.open(links[platform], '_blank', 'width=600,height=450');
+        if (links[platform]) window.open(links[platform], '_blank', 'noopener,noreferrer,width=600,height=450');
     };
 
     const copyLink = () => {

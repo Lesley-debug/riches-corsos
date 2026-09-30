@@ -255,7 +255,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                 </svg>
             ),
             action: () => {
-                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=450');
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener,noreferrer,width=600,height=450');
             },
         },
         {
@@ -267,7 +267,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                 </svg>
             ),
             action: () => {
-                window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank', 'width=600,height=450');
+                window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank', 'noopener,noreferrer,width=600,height=450');
             },
         },
         {
@@ -280,7 +280,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                 </svg>
             ),
             action: () => {
-                window.open(`https://www.snapchat.com/share?url=${encodeURIComponent(shareUrl)}`, '_blank', 'width=600,height=500');
+                window.open(`https://www.snapchat.com/share?url=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener,noreferrer,width=600,height=500');
             },
         },
         {
