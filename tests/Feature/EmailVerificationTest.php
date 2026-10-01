@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Order;
+use App\Models\Puppy;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -37,13 +39,13 @@ class EmailVerificationTest extends TestCase
             ->assertRedirect(route('verification.notice'));
     }
 
-    public function test_unverified_user_can_still_use_wishlist_and_checkout(): void
+    public function test_unverified_user_is_redirected_from_wishlist_but_can_checkout(): void
     {
         $user = User::factory()->unverified()->create();
 
         $this->actingAs($user)
             ->get(route('wishlist.index'))
-            ->assertOk();
+            ->assertRedirect(route('verification.notice'));
 
         $this->actingAs($user)
             ->post(route('checkout.store'), [
@@ -60,6 +62,12 @@ class EmailVerificationTest extends TestCase
     {
         Event::fake();
         $user = User::factory()->unverified()->create();
+        $puppy = Puppy::factory()->create();
+        $order = Order::factory()->create([
+            'user_id' => null,
+            'puppy_id' => $puppy->id,
+            'buyer_email' => strtoupper($user->email),
+        ]);
 
         $url = URL::temporarySignedRoute(
             'verification.verify',
@@ -72,6 +80,7 @@ class EmailVerificationTest extends TestCase
             ->assertRedirect(route('account.dashboard'));
 
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
+        $this->assertSame($user->id, $order->fresh()->user_id);
         Event::assertDispatched(Verified::class);
     }
 
@@ -98,5 +107,14 @@ class EmailVerificationTest extends TestCase
         $this->actingAs($user)
             ->get(route('account.orders'))
             ->assertOk();
+    }
+
+    public function test_unverified_user_is_redirected_from_notification_center(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)
+            ->get(route('account.notifications'))
+            ->assertRedirect(route('verification.notice'));
     }
 }

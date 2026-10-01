@@ -12,13 +12,13 @@ class CartControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_is_redirected_to_login_when_accessing_cart(): void
+    public function test_guest_can_access_cart(): void
     {
         $response = $this->get(route('cart.index'));
-        $response->assertRedirect(route('login'));
+        $response->assertOk();
     }
 
-    public function test_guest_is_redirected_to_login_when_adding_to_cart(): void
+    public function test_guest_can_add_available_puppy_to_cart(): void
     {
         $puppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
 
@@ -26,7 +26,7 @@ class CartControllerTest extends TestCase
             'puppy_id' => $puppy->id,
         ]);
 
-        $response->assertRedirect(route('login'));
+        $response->assertSessionHas('cart.puppy_ids', [$puppy->id]);
     }
 
     public function test_cart_page_renders_with_cart_items_for_authenticated_user(): void
@@ -227,6 +227,28 @@ class CartControllerTest extends TestCase
             'puppy_id' => $puppy->id,
             'user_id' => $user->id,
             'buyer_name' => 'Registered Customer',
+        ]);
+    }
+
+    public function test_guest_can_checkout_without_creating_account(): void
+    {
+        \Illuminate\Support\Facades\Notification::fake();
+        $puppy = Puppy::factory()->create(['status' => 'available', 'visibility' => 'published']);
+
+        $response = $this
+            ->withSession(['cart.puppy_ids' => [$puppy->id]])
+            ->post(route('checkout.store'), [
+                'buyer_name' => 'Guest Customer',
+                'buyer_email' => 'guest@example.com',
+                'buyer_phone' => '555-333-4444',
+                'payment_method' => 'bank_transfer',
+            ]);
+
+        $response->assertRedirect(route('order.success'));
+        $this->assertDatabaseHas('orders', [
+            'puppy_id' => $puppy->id,
+            'buyer_email' => 'guest@example.com',
+            'user_id' => null,
         ]);
     }
 }

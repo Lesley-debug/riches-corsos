@@ -50,6 +50,10 @@ class AuthController extends Controller
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
 
+        if ($request->user()->hasVerifiedEmail()) {
+            $request->user()->claimGuestOrders();
+        }
+
         return redirect()->intended(route('home'))->with('login_notice', 'Welcome back! You can visit your Account Dashboard anytime to track your puppy reservations and site activity.');
     }
 

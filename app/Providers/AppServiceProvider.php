@@ -30,9 +30,12 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin-only', fn (User $user) => $user->isAdmin());
 
         RateLimiter::for('order-submissions', function (Request $request) {
-            return Limit::perMinute(3)->by(
-                'orders:'.($request->user()?->id ?: $request->ip())
-            );
+            $email = Str::lower((string) $request->input('buyer_email'));
+
+            return [
+                Limit::perHour(3)->by('orders-ip:'.$request->ip()),
+                Limit::perHour(3)->by('orders-email:'.sha1($email)),
+            ];
         });
 
         RateLimiter::for('contact-submissions', function (Request $request) {

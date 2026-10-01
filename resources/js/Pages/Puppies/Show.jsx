@@ -130,14 +130,21 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     const wishlistPuppyIds = props.wishlistPuppyIds ?? [];
     const cartPuppyIds = props.cartPuppyIds ?? [];
 
-    const isWishlisted = wishlistPuppyIds.includes(puppy.id) || (initialWishlisted ?? false);
-    const isInCart = cartPuppyIds.includes(puppy.id);
+    const serverWishlisted = wishlistPuppyIds.includes(puppy.id) || (initialWishlisted ?? false);
+    const serverInCart = cartPuppyIds.includes(puppy.id);
 
     const [activeImage, setActiveImage] = useState(0);
     const [shareOpen, setShareOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [selectedParentIndex, setSelectedParentIndex] = useState(0);
+    const [optimisticWishlisted, setOptimisticWishlisted] = useState(null);
+    const [optimisticInCart, setOptimisticInCart] = useState(null);
+    const [wishlistPending, setWishlistPending] = useState(false);
+    const [cartPending, setCartPending] = useState(false);
+
+    const isWishlisted = optimisticWishlisted ?? serverWishlisted;
+    const isInCart = optimisticInCart ?? serverInCart;
 
     const showToast = (message) => {
         setToastMessage(message);
@@ -204,32 +211,51 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
             return;
         }
 
+        if (!user.email_verified) {
+            router.visit('/email/verify');
+            return;
+        }
+
+        if (wishlistPending) return;
+
         const willAdd = !isWishlisted;
+        setOptimisticWishlisted(willAdd);
+        setWishlistPending(true);
+        showToast(willAdd ? `You like ${puppy.name}! Added to wishlist.` : `Removed ${puppy.name} from your wishlist.`);
 
         router.post('/wishlist/toggle', { puppy_id: puppy.id }, {
             preserveScroll: true,
-            onSuccess: () => {
-                showToast(willAdd ? `You like ${puppy.name}! Added to wishlist.` : `Removed ${puppy.name} from your wishlist.`);
+            preserveState: true,
+            only: ['wishlistCount', 'wishlistPuppyIds', 'flash'],
+            onError: () => {
+                setOptimisticWishlisted(!willAdd);
+                showToast('Unable to update your wishlist. Please try again.');
             },
+            onFinish: () => setWishlistPending(false),
         });
     };
 
     const handleCart = () => {
-        if (!user) {
-            router.visit('/login');
-            return;
-        }
-
         if (isInCart) {
             showToast(`${puppy.name} is already in your cart.`);
             return;
         }
 
+        if (cartPending) return;
+
+        setOptimisticInCart(true);
+        setCartPending(true);
+        showToast(`${puppy.name} added to your cart.`);
+
         router.post('/cart', { puppy_id: puppy.id }, {
             preserveScroll: true,
-            onSuccess: () => {
-                showToast(`${puppy.name} added to your cart.`);
+            preserveState: true,
+            only: ['cartCount', 'cartPuppyIds', 'cartItems', 'flash'],
+            onError: () => {
+                setOptimisticInCart(false);
+                showToast('Unable to add this puppy to your cart. Please try again.');
             },
+            onFinish: () => setCartPending(false),
         });
     };
 
