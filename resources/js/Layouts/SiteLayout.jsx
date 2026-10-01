@@ -86,8 +86,6 @@ export default function SiteLayout({ children }) {
   const user = props.auth?.user;
   const siteSettings = props.siteSettings ?? {};
 
-  const searchPuppies = props.searchPuppies ?? [];
-  const searchPosts = props.searchPosts ?? [];
   const cartItems = props.cartItems ?? [];
   const cartCount = props.cartCount ?? 0;
   const wishlistCount = props.wishlistCount ?? 0;
@@ -459,8 +457,6 @@ export default function SiteLayout({ children }) {
       <SearchOverlay
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
-        puppies={searchPuppies}
-        posts={searchPosts}
         topOffset={navBottom}
       />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} items={cartItems} />

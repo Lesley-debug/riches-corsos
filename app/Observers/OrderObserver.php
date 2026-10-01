@@ -16,12 +16,5 @@ class OrderObserver
         Notification::send($admins, new NewOrderPlaced($order));
         Notification::route('mail', config('mail.admin_notification_address'))
             ->notify(new NewOrderPlaced($order));
-
-        if ($order->user) {
-            $order->user->notify(new \App\Notifications\OrderPlacedCustomerNotification($order));
-        } elseif ($order->buyer_email) {
-            Notification::route('mail', $order->buyer_email)
-                ->notify(new \App\Notifications\OrderPlacedCustomerNotification($order));
-        }
     }
 }

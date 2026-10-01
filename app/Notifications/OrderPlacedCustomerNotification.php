@@ -5,10 +5,11 @@ namespace App\Notifications;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderPlacedCustomerNotification extends Notification
+class OrderPlacedCustomerNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -17,7 +18,9 @@ class OrderPlacedCustomerNotification extends Notification
         public Order $order,
         public array $orders = [],
         public string $paymentMethodLabel = '',
-    ) {}
+    ) {
+        $this->afterCommit();
+    }
 
     public function via(object $notifiable): array
     {

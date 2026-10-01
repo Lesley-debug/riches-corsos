@@ -129,31 +129,16 @@ class CartController extends Controller
         // Send confirmation email to the buyer (use first order for the email)
         if (! empty($orders)) {
             $firstOrder = $orders[0];
-            $buyerNotifiable = $request->user()
-                ?? (new class($firstOrder->buyer_email, $firstOrder->buyer_name)
-                {
-                    public string $email;
+            $notification = new OrderPlacedCustomerNotification(
+                $firstOrder,
+                $orders,
+                $paymentLabels[$validated['payment_method']] ?? $validated['payment_method']
+            );
 
-                    public string $name;
-
-                    public function __construct(string $email, string $name)
-                    {
-                        $this->email = $email;
-                        $this->name = $name;
-                    }
-
-                    public function routeNotificationForMail(): string
-                    {
-                        return $this->email;
-                    }
-                });
-
-            Notification::route('mail', $firstOrder->buyer_email)
-                ->notify(new OrderPlacedCustomerNotification($firstOrder, $orders, $paymentLabels[$validated['payment_method']] ?? $validated['payment_method']));
-
-            // Also save to database if buyer has an account
             if ($request->user()) {
-                $request->user()->notify(new OrderPlacedCustomerNotification($firstOrder, $orders, $paymentLabels[$validated['payment_method']] ?? $validated['payment_method']));
+                $request->user()->notify($notification);
+            } else {
+                Notification::route('mail', $firstOrder->buyer_email)->notify($notification);
             }
         }
 

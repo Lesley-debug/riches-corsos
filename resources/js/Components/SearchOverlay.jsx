@@ -122,11 +122,13 @@ function scoreText(text, terms) {
 export default function SearchOverlay({
   open,
   onClose,
-  puppies = [],
-  posts = [],
   topOffset = 108,
 }) {
   const [query, setQuery] = useState('');
+  const [puppies, setPuppies] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [suggestionsLoaded, setSuggestionsLoaded] = useState(false);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -135,6 +137,35 @@ export default function SearchOverlay({
       setTimeout(() => inputRef.current?.focus(), 80);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!open || suggestionsLoaded) return undefined;
+
+    const controller = new AbortController();
+    setSuggestionsLoading(true);
+
+    fetch('/search/suggestions', {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Unable to load search suggestions.');
+        return response.json();
+      })
+      .then((data) => {
+        setPuppies(data.puppies ?? []);
+        setPosts(data.posts ?? []);
+        setSuggestionsLoaded(true);
+      })
+      .catch((error) => {
+        if (error.name !== 'AbortError') {
+          setSuggestionsLoaded(true);
+        }
+      })
+      .finally(() => setSuggestionsLoading(false));
+
+    return () => controller.abort();
+  }, [open, suggestionsLoaded]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -256,13 +287,19 @@ export default function SearchOverlay({
         {/* Blank clean body — only displays matched results when user types */}
         <div className="search-draw-body">
           <div className="search-draw-content-wrap">
-            {q && !hasResults && (
+            {q && suggestionsLoading && (
+              <div className="search-no-results-box">
+                <p>Loading search results…</p>
+              </div>
+            )}
+
+            {q && suggestionsLoaded && !hasResults && (
               <div className="search-no-results-box">
                 <p>No results found for "<strong>{query}</strong>"</p>
               </div>
             )}
 
-            {q && hasResults && (
+            {q && suggestionsLoaded && hasResults && (
               <div className="search-results-canvas">
                 {matchedPuppies.length > 0 && (
                   <div className="search-canvas-section">

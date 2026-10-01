@@ -4,15 +4,19 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewOrderPlaced extends Notification
+class NewOrderPlaced extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public Order $order) {}
+    public function __construct(public Order $order)
+    {
+        $this->afterCommit();
+    }
 
     // 'database' drives the bell icon inside Filament's admin panel.
     // 'mail' sends the client an email the moment someone reserves a puppy.

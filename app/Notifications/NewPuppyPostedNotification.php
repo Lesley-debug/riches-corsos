@@ -7,14 +7,17 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewPuppyPostedNotification extends Notification
+class NewPuppyPostedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(public \App\Models\Puppy $puppy) {}
+    public function __construct(public \App\Models\Puppy $puppy)
+    {
+        $this->afterCommit();
+    }
 
     public function via(object $notifiable): array
     {

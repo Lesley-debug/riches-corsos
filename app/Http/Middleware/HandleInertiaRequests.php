@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\BlogPost;
 use App\Models\Puppy;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
@@ -49,13 +48,6 @@ class HandleInertiaRequests extends Middleware
                     $request->session()->get('cart.puppy_ids', []),
                 )))
                 ->get(),
-            // Shared with every page so the search overlay can filter client-side.
-            'searchPuppies' => fn () => Puppy::with('images:id,puppy_id,path,sort_order')
-                ->whereIn('status', ['available', 'pending', 'reserved'])
-                ->where('visibility', 'published')
-                ->get(['id', 'name', 'slug', 'breed', 'sex', 'price', 'status', 'description']),
-            'searchPosts' => fn () => BlogPost::published()
-                ->get(['id', 'title', 'slug', 'category', 'excerpt', 'cover_image']),
         ]);
     }
 }

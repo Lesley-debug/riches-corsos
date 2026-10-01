@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Puppy;
+use App\Notifications\OrderPlacedCustomerNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -21,7 +22,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        $puppy = DB::transaction(function () use ($validated, $request): Puppy {
+        $order = DB::transaction(function () use ($validated, $request): Order {
             $puppy = Puppy::query()
                 ->whereKey($validated['puppy_id'])
                 ->lockForUpdate()
@@ -33,7 +34,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            Order::create([
+            $order = Order::create([
                 ...$validated,
                 'user_id' => $request->user()->id,
             ]);
@@ -42,11 +43,14 @@ class OrderController extends Controller
             // in one transaction so concurrent requests cannot reserve twice.
             $puppy->update(['status' => 'pending']);
 
-            return $puppy;
+            return $order;
         });
 
+        $order->load('puppy');
+        $request->user()->notify(new OrderPlacedCustomerNotification($order));
+
         return redirect()
-            ->route('puppies.show', $puppy->slug)
-            ->with('success', "Your request for {$puppy->name} has been sent. We'll contact you directly to confirm — no payment has been taken.");
+            ->route('puppies.show', $order->puppy->slug)
+            ->with('success', "Your request for {$order->puppy->name} has been sent. We'll contact you directly to confirm — no payment has been taken.");
     }
 }
