@@ -49,6 +49,9 @@ class AuthController extends Controller
 
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
+        $request->user()->mergeGuestWishlist(
+            $request->session()->pull('wishlist.puppy_ids', [])
+        );
 
         if ($request->user()->hasVerifiedEmail()) {
             $request->user()->claimGuestOrders();

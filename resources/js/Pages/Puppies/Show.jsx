@@ -126,7 +126,6 @@ function PlayIcon() {
 
 export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishlisted, related = [] }) {
     const { props } = usePage();
-    const user = props.auth?.user;
     const wishlistPuppyIds = props.wishlistPuppyIds ?? [];
     const cartPuppyIds = props.cartPuppyIds ?? [];
 
@@ -206,16 +205,6 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     ].filter(({ parent }) => parent);
 
     const toggleWishlist = () => {
-        if (!user) {
-            router.visit('/login');
-            return;
-        }
-
-        if (!user.email_verified) {
-            router.visit('/email/verify');
-            return;
-        }
-
         if (wishlistPending) return;
 
         const willAdd = !isWishlisted;

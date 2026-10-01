@@ -52,6 +52,9 @@ Route::post('/checkout', [CartController::class, 'checkout'])
     ->middleware('throttle:order-submissions')
     ->name('checkout.store');
 Route::get('/order/success', [OrderSuccessController::class, '__invoke'])->name('order.success');
+Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])
+    ->middleware('throttle:60,1')
+    ->name('wishlist.toggle');
 
 // Guest-only auth routes
 Route::middleware('guest')->group(function () {
@@ -125,7 +128,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/account/notifications/read-all', [AccountController::class, 'markAllNotificationsRead'])->name('account.notifications.read-all');
     Route::post('/account/notifications/{id}/read', [AccountController::class, 'markNotificationRead'])->name('account.notifications.read');
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
 // ── Puppy document routes (admin-only, protected by Gate inside controller) ──

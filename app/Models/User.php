@@ -46,6 +46,17 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             ->update(['user_id' => $this->id]);
     }
 
+    public function mergeGuestWishlist(array $puppyIds): void
+    {
+        $validIds = Puppy::query()
+            ->whereKey(array_values(array_unique(array_map('intval', $puppyIds))))
+            ->pluck('id');
+
+        foreach ($validIds as $puppyId) {
+            $this->wishlists()->firstOrCreate(['puppy_id' => $puppyId]);
+        }
+    }
+
     public const ROLE_ADMIN = 'admin';
 
     public function isAdmin(): bool
