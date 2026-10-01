@@ -98,6 +98,7 @@ class GoogleAuthController extends Controller
             $user->notify(new WelcomeNotification());
         }
 
+        $user->claimGuestOrders();
         Auth::login($user, true);
         $request->session()->regenerate();
 

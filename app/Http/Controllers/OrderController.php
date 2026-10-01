@@ -7,6 +7,7 @@ use App\Models\Puppy;
 use App\Notifications\OrderPlacedCustomerNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
@@ -36,7 +37,7 @@ class OrderController extends Controller
 
             $order = Order::create([
                 ...$validated,
-                'user_id' => $request->user()->id,
+                'user_id' => $request->user()?->id,
             ]);
 
             // Keep the availability check, order creation, and status change
@@ -47,7 +48,13 @@ class OrderController extends Controller
         });
 
         $order->load('puppy');
-        $request->user()->notify(new OrderPlacedCustomerNotification($order));
+        $notification = new OrderPlacedCustomerNotification($order);
+
+        if ($request->user()) {
+            $request->user()->notify($notification);
+        } else {
+            Notification::route('mail', $order->buyer_email)->notify($notification);
+        }
 
         return redirect()
             ->route('puppies.show', $order->puppy->slug)

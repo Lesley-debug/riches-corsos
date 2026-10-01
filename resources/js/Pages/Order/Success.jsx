@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import SiteLayout from '@/Layouts/SiteLayout';
 
 const PAYMENT_ICONS = {
@@ -12,6 +12,8 @@ const PAYMENT_ICONS = {
 };
 
 export default function Success({ orders = [] }) {
+    const { props } = usePage();
+    const user = props.auth?.user;
     const totalPuppies = orders.length;
     const totalAmount = orders.reduce((sum, o) => sum + (Number(o.puppy_price) || 0), 0);
     const firstOrder = orders[0] ?? {};
@@ -125,14 +127,24 @@ export default function Success({ orders = [] }) {
                             <div className="success-sidebar-card">
                                 <h3>Manage Your Reservation</h3>
                                 <div className="success-sidebar-actions">
-                                    <Link href="/orders" className="btn-solid success-sidebar-btn">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /></svg>
-                                        View My Orders
-                                    </Link>
-                                    <Link href="/account" className="btn-secondary success-sidebar-btn">
-                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" /></svg>
-                                        Visit Dashboard
-                                    </Link>
+                                    {user ? (
+                                        <>
+                                            <Link href="/orders" className="btn-solid success-sidebar-btn">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /></svg>
+                                                View My Orders
+                                            </Link>
+                                            <Link href="/account" className="btn-secondary success-sidebar-btn">
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6" /></svg>
+                                                Visit Dashboard
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p>Create and verify an account with <strong>{firstOrder.buyer_email}</strong> to track this reservation online.</p>
+                                            <Link href="/register" className="btn-solid success-sidebar-btn">Create Account to Track Order</Link>
+                                            <Link href="/login" className="btn-secondary success-sidebar-btn">Already have an account? Log in</Link>
+                                        </>
+                                    )}
                                     <Link href="/puppies" className="success-back-link">
                                         ← Back to Available Puppies
                                     </Link>

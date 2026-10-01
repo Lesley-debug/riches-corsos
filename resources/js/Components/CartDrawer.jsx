@@ -1,13 +1,10 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 function priceLabel(price) {
     return price ? `$${Number(price).toLocaleString()}` : 'Contact for price';
 }
 
 export default function CartDrawer({ open, onClose, items = [] }) {
-    const { props } = usePage();
-    const user = props.auth?.user;
-
     const removeItem = (puppy) => {
         router.delete(`/cart/${puppy.id}`, { preserveScroll: true });
     };
@@ -87,15 +84,9 @@ export default function CartDrawer({ open, onClose, items = [] }) {
                                 <strong>${subtotal.toLocaleString()}</strong>
                             </div>
                         )}
-                        {user ? (
-                            <Link href="/cart" className="btn-solid cart-drawer-cta" onClick={onClose}>
-                                View Cart &amp; Checkout
-                            </Link>
-                        ) : (
-                            <Link href="/login" className="btn-solid cart-drawer-cta" onClick={onClose}>
-                                Sign In to Checkout
-                            </Link>
-                        )}
+                        <Link href="/cart" className="btn-solid cart-drawer-cta" onClick={onClose}>
+                            View Cart &amp; Checkout
+                        </Link>
                         <Link href="/puppies" className="cart-continue-link" onClick={onClose}>
                             Continue Shopping
                         </Link>

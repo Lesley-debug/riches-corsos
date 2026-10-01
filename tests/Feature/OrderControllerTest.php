@@ -48,8 +48,9 @@ class OrderControllerTest extends TestCase
         $this->assertSame('pending', $puppy->fresh()->status);
     }
 
-    public function test_guest_cannot_create_order_or_change_inventory(): void
+    public function test_guest_can_create_order_without_account(): void
     {
+        Notification::fake();
         $puppy = Puppy::factory()->create([
             'status' => 'available',
             'visibility' => 'published',
@@ -57,9 +58,17 @@ class OrderControllerTest extends TestCase
 
         $response = $this->post(route('orders.store'), $this->validPayload($puppy->id));
 
-        $response->assertRedirect(route('login'));
-        $this->assertDatabaseCount('orders', 0);
-        $this->assertSame('available', $puppy->fresh()->status);
+        $response->assertRedirect(route('puppies.show', $puppy->slug));
+        $this->assertDatabaseHas('orders', [
+            'puppy_id' => $puppy->id,
+            'buyer_email' => 'jane@example.com',
+            'user_id' => null,
+        ]);
+        $this->assertSame('pending', $puppy->fresh()->status);
+        Notification::assertSentOnDemand(
+            OrderPlacedCustomerNotification::class,
+            fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'jane@example.com'
+        );
     }
 
     public function test_store_rejects_unavailable_puppy(): void

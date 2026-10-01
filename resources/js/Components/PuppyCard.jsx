@@ -52,8 +52,15 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
     const wishlistPuppyIds = props.wishlistPuppyIds ?? [];
     const cartPuppyIds = props.cartPuppyIds ?? [];
 
-    const isWishlisted = wishlistPuppyIds.includes(puppy.id) || wishlisted;
-    const isInCart = cartPuppyIds.includes(puppy.id);
+    const serverWishlisted = wishlistPuppyIds.includes(puppy.id) || wishlisted;
+    const serverInCart = cartPuppyIds.includes(puppy.id);
+    const [optimisticWishlisted, setOptimisticWishlisted] = useState(null);
+    const [optimisticInCart, setOptimisticInCart] = useState(null);
+    const [wishlistPending, setWishlistPending] = useState(false);
+    const [cartPending, setCartPending] = useState(false);
+
+    const isWishlisted = optimisticWishlisted ?? serverWishlisted;
+    const isInCart = optimisticInCart ?? serverInCart;
 
     const cover = puppy.images?.[0]?.path;
     const age = ageLabel(puppy.age_in_weeks);
@@ -75,34 +82,53 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
             return;
         }
 
+        if (!user.email_verified) {
+            router.visit('/email/verify');
+            return;
+        }
+
+        if (wishlistPending) return;
+
         const willAdd = !isWishlisted;
+        setOptimisticWishlisted(willAdd);
+        setWishlistPending(true);
+        showNotice(willAdd ? `You like ${puppy.name}! Added to wishlist.` : `Removed ${puppy.name} from your wishlist.`);
 
         router.post('/wishlist/toggle', { puppy_id: puppy.id }, {
             preserveScroll: true,
-            onSuccess: () => {
-                showNotice(willAdd ? `You like ${puppy.name}! Added to wishlist.` : `Removed ${puppy.name} from your wishlist.`);
+            preserveState: true,
+            only: ['wishlistCount', 'wishlistPuppyIds', 'flash'],
+            onError: () => {
+                setOptimisticWishlisted(!willAdd);
+                showNotice('Unable to update your wishlist. Please try again.');
             },
+            onFinish: () => setWishlistPending(false),
         });
     };
 
     const handleCart = (event) => {
         event.preventDefault();
 
-        if (!user) {
-            router.visit('/login');
-            return;
-        }
-
         if (isInCart) {
             showNotice(`${puppy.name} is already in your cart.`);
             return;
         }
 
+        if (cartPending) return;
+
+        setOptimisticInCart(true);
+        setCartPending(true);
+        showNotice(`${puppy.name} added to your cart.`);
+
         router.post('/cart', { puppy_id: puppy.id }, {
             preserveScroll: true,
-            onSuccess: () => {
-                showNotice(`${puppy.name} added to your cart.`);
+            preserveState: true,
+            only: ['cartCount', 'cartPuppyIds', 'cartItems', 'flash'],
+            onError: () => {
+                setOptimisticInCart(false);
+                showNotice('Unable to add this puppy to your cart. Please try again.');
             },
+            onFinish: () => setCartPending(false),
         });
     };
 

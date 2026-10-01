@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
@@ -35,6 +36,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function wishlists(): HasMany
     {
         return $this->hasMany(Wishlist::class);
+    }
+
+    public function claimGuestOrders(): int
+    {
+        return Order::query()
+            ->whereNull('user_id')
+            ->whereRaw('LOWER(buyer_email) = ?', [Str::lower(trim($this->email))])
+            ->update(['user_id' => $this->id]);
     }
 
     public const ROLE_ADMIN = 'admin';
