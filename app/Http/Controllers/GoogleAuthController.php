@@ -98,6 +98,9 @@ class GoogleAuthController extends Controller
             $user->notify(new WelcomeNotification());
         }
 
+        $user->mergeGuestWishlist(
+            $request->session()->pull('wishlist.puppy_ids', [])
+        );
         $user->claimGuestOrders();
         Auth::login($user, true);
         $request->session()->regenerate();

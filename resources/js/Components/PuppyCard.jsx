@@ -48,7 +48,6 @@ function HeartIcon({ filled }) {
 
 export default function PuppyCard({ puppy, wishlisted = false }) {
     const { props } = usePage();
-    const user = props.auth?.user;
     const wishlistPuppyIds = props.wishlistPuppyIds ?? [];
     const cartPuppyIds = props.cartPuppyIds ?? [];
 
@@ -76,16 +75,6 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
 
     const handleWishlist = (event) => {
         event.preventDefault();
-
-        if (!user) {
-            router.visit('/login');
-            return;
-        }
-
-        if (!user.email_verified) {
-            router.visit('/email/verify');
-            return;
-        }
 
         if (wishlistPending) return;
 

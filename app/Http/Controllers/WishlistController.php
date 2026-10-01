@@ -27,6 +27,32 @@ class WishlistController extends Controller
         ]);
 
         $user = $request->user();
+
+        if (! $user) {
+            $puppyIds = array_values(array_unique(array_map(
+                'intval',
+                $request->session()->get('wishlist.puppy_ids', [])
+            )));
+
+            if (in_array((int) $validated['puppy_id'], $puppyIds, true)) {
+                $puppyIds = array_values(array_filter(
+                    $puppyIds,
+                    fn (int $id): bool => $id !== (int) $validated['puppy_id']
+                ));
+                $message = 'Removed from your wishlist.';
+            } else {
+                $puppyIds[] = (int) $validated['puppy_id'];
+                $message = 'Added to your wishlist.';
+            }
+
+            $request->session()->put('wishlist.puppy_ids', $puppyIds);
+
+            return back()->with('success', $message);
+        }
+
+        $user->mergeGuestWishlist(
+            $request->session()->pull('wishlist.puppy_ids', [])
+        );
         $existing = $user->wishlists()->where('puppy_id', $validated['puppy_id'])->first();
 
         if ($existing) {
