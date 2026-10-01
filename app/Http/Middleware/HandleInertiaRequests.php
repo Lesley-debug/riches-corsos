@@ -22,6 +22,7 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'avatar' => $request->user()->avatar,
                     'isAdmin' => $request->user()->isAdmin(),
+                    'email_verified' => $request->user()->hasVerifiedEmail(),
                 ] : null,
             ],
             'siteSettings' => fn () => SiteSetting::current(),

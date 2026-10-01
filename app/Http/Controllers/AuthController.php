@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -49,7 +50,7 @@ class AuthController extends Controller
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
 
-        return redirect()->route('home')->with('login_notice', 'Welcome back! You can visit your Account Dashboard anytime to track your puppy reservations and site activity.');
+        return redirect()->intended(route('home'))->with('login_notice', 'Welcome back! You can visit your Account Dashboard anytime to track your puppy reservations and site activity.');
     }
 
     private function loginThrottleKey(Request $request): string
@@ -73,7 +74,7 @@ class AuthController extends Controller
                 'required',
                 'string',
                 'confirmed',
-                PasswordRule::min(12)->mixedCase()->numbers()->symbols(),
+                PasswordRule::min(8)->letters()->numbers(),
             ],
         ]);
 
@@ -84,9 +85,10 @@ class AuthController extends Controller
             'role' => 'customer',
         ]);
 
+        event(new Registered($user));
         $user->notify(new \App\Notifications\WelcomeNotification());
 
-        return redirect()->route('login')->with('success', 'Account created successfully! Welcome to Riches Corsos. Please log in with your email and password to access your account.');
+        return redirect()->route('login')->with('success', 'Account created! Please check your email to verify your address. You can still shop and place an order before verification.');
     }
 
     public function logout(Request $request)
@@ -133,7 +135,7 @@ class AuthController extends Controller
             'password' => [
                 'required',
                 'confirmed',
-                PasswordRule::min(12)->mixedCase()->numbers()->symbols(),
+                PasswordRule::min(8)->letters()->numbers(),
             ],
         ]);
 
