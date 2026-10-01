@@ -28,6 +28,9 @@ Route::get('/testimonials', [PublicSiteController::class, 'testimonials'])->name
 Route::get('/privacy', [PublicSiteController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [PublicSiteController::class, 'terms'])->name('terms');
 Route::get('/sitemap.xml', [PublicSiteController::class, 'sitemap'])->name('sitemap');
+Route::get('/search/suggestions', [PublicSiteController::class, 'searchSuggestions'])
+    ->middleware('throttle:60,1')
+    ->name('search.suggestions');
 
 // Contact page + form submission
 Route::get('/contact', [PublicSiteController::class, 'contactShow'])->name('contact.show');

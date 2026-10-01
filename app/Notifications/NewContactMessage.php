@@ -4,15 +4,19 @@ namespace App\Notifications;
 
 use App\Models\ContactMessage;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewContactMessage extends Notification
+class NewContactMessage extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public ContactMessage $contactMessage) {}
+    public function __construct(public ContactMessage $contactMessage)
+    {
+        $this->afterCommit();
+    }
 
     public function via(object $notifiable): array
     {

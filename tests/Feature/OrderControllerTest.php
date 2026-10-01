@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Puppy;
 use App\Models\User;
 use App\Notifications\NewOrderPlaced;
+use App\Notifications\OrderPlacedCustomerNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -134,6 +135,26 @@ class OrderControllerTest extends TestCase
             NewOrderPlaced::class,
             fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'info@richescorsos.com'
                 && $channels === ['mail']
+        );
+    }
+
+    public function test_store_sends_one_customer_notification(): void
+    {
+        Notification::fake();
+
+        $customer = User::factory()->create();
+        $puppy = Puppy::factory()->create([
+            'status' => 'available',
+            'visibility' => 'published',
+        ]);
+
+        $this->actingAs($customer)
+            ->post(route('orders.store'), $this->validPayload($puppy->id));
+
+        Notification::assertSentToTimes(
+            $customer,
+            OrderPlacedCustomerNotification::class,
+            1
         );
     }
 

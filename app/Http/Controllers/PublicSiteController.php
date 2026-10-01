@@ -10,13 +10,31 @@ use App\Models\PuppyDocument;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
 use App\Services\HtmlSanitizer;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
 class PublicSiteController extends Controller
 {
+    public function searchSuggestions(): JsonResponse
+    {
+        $suggestions = Cache::remember('public.search-suggestions', now()->addMinutes(5), function (): array {
+            return [
+                'puppies' => Puppy::with('images:id,puppy_id,path,sort_order')
+                    ->whereIn('status', ['available', 'pending', 'reserved'])
+                    ->where('visibility', 'published')
+                    ->get(['id', 'name', 'slug', 'breed', 'sex', 'color', 'price', 'status', 'description']),
+                'posts' => BlogPost::published()
+                    ->get(['id', 'title', 'slug', 'category', 'excerpt', 'cover_image']),
+            ];
+        });
+
+        return response()->json($suggestions);
+    }
+
     public function home()
     {
         return Inertia::render('Home', [

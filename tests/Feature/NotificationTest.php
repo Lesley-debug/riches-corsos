@@ -10,6 +10,7 @@ use App\Notifications\PasswordResetSuccessNotification;
 use App\Notifications\WelcomeNotification;
 use App\Notifications\WishlistAddedNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -64,6 +65,7 @@ class NotificationTest extends TestCase
         $response->assertRedirect(route('order.success'));
 
         Notification::assertSentTo($user, OrderPlacedCustomerNotification::class);
+        Notification::assertSentToTimes($user, OrderPlacedCustomerNotification::class, 1);
     }
 
     public function test_adding_to_wishlist_dispatches_wishlist_notification(): void
@@ -95,6 +97,27 @@ class NotificationTest extends TestCase
         ]);
 
         Notification::assertSentTo([$user1, $user2], NewPuppyPostedNotification::class);
+    }
+
+    public function test_mail_notifications_are_queued(): void
+    {
+        $this->assertInstanceOf(ShouldQueue::class, new WelcomeNotification());
+        $this->assertInstanceOf(
+            ShouldQueue::class,
+            new OrderPlacedCustomerNotification(new \App\Models\Order())
+        );
+        $this->assertInstanceOf(
+            ShouldQueue::class,
+            new \App\Notifications\NewOrderPlaced(new \App\Models\Order())
+        );
+        $this->assertInstanceOf(
+            ShouldQueue::class,
+            new \App\Notifications\NewContactMessage(new \App\Models\ContactMessage())
+        );
+        $this->assertInstanceOf(
+            ShouldQueue::class,
+            new NewPuppyPostedNotification(new Puppy())
+        );
     }
 
     public function test_notification_center_renders_and_marks_notifications_as_read(): void
