@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -17,7 +18,7 @@ class NewOrderPlaced extends Notification
     // 'mail' sends the client an email the moment someone reserves a puppy.
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return $notifiable instanceof AnonymousNotifiable ? ['mail'] : ['database'];
     }
 
     public function toMail(object $notifiable): MailMessage

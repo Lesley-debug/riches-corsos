@@ -9,7 +9,10 @@ use App\Http\Controllers\OrderSuccessController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\PuppyDocumentController;
 use App\Http\Controllers\WishlistController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Public pages
 Route::get('/', [PublicSiteController::class, 'home'])->name('home');
@@ -59,6 +62,33 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/email/verify', function (Request $request) {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('account.dashboard');
+        }
+
+        return Inertia::render('Auth/VerifyEmail');
+    })->name('verification.notice');
+
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+
+        return redirect()->route('account.dashboard')
+            ->with('success', 'Your email address has been verified.');
+    })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        if ($request->user()->hasVerifiedEmail()) {
+            return redirect()->route('account.dashboard');
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('status', 'A new verification link has been sent to your email address.');
+    })->middleware('throttle:6,1')->name('verification.send');
+});
+
 // ── Legacy 301 Permanent Redirects ──
 Route::permanentRedirect('/shop', '/puppies');
 Route::permanentRedirect('/shop/index.php', '/puppies');
@@ -75,8 +105,12 @@ Route::permanentRedirect('/testimonials.php', '/testimonials');
 
 // Customer account & shopping area — requires login
 Route::middleware('auth')->group(function () {
-    Route::get('/account', [AccountController::class, 'dashboard'])->name('account.dashboard');
-    Route::get('/orders', [AccountController::class, 'orders'])->name('account.orders');
+    Route::get('/account', [AccountController::class, 'dashboard'])
+        ->middleware('verified')
+        ->name('account.dashboard');
+    Route::get('/orders', [AccountController::class, 'orders'])
+        ->middleware('verified')
+        ->name('account.orders');
     Route::get('/account/notifications', [AccountController::class, 'notifications'])->name('account.notifications');
     Route::post('/account/notifications/read-all', [AccountController::class, 'markAllNotificationsRead'])->name('account.notifications.read-all');
     Route::post('/account/notifications/{id}/read', [AccountController::class, 'markNotificationRead'])->name('account.notifications.read');

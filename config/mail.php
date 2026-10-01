@@ -115,4 +115,6 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    'admin_notification_address' => env('ADMIN_NOTIFICATION_EMAIL', 'info@richescorsos.com'),
+
 ];

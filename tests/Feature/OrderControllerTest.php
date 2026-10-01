@@ -130,6 +130,11 @@ class OrderControllerTest extends TestCase
             ->post(route('orders.store'), $this->validPayload($puppy->id));
 
         Notification::assertSentTo($admin, NewOrderPlaced::class);
+        Notification::assertSentOnDemand(
+            NewOrderPlaced::class,
+            fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'info@richescorsos.com'
+                && $channels === ['mail']
+        );
     }
 
     public function test_order_submissions_are_rate_limited_per_user(): void

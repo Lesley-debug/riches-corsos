@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -54,11 +55,13 @@ class AuthControllerTest extends TestCase
 
     public function test_user_can_register(): void
     {
+        Notification::fake();
+
         $response = $this->post('/register', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => 'New-Password-123!',
-            'password_confirmation' => 'New-Password-123!',
+            'password' => 'puppy123',
+            'password_confirmation' => 'puppy123',
         ]);
 
         $this->assertGuest();
@@ -70,6 +73,10 @@ class AuthControllerTest extends TestCase
             'email' => 'john@example.com',
             'role' => 'customer',
         ]);
+
+        $user = User::where('email', 'john@example.com')->firstOrFail();
+        $this->assertNull($user->email_verified_at);
+        Notification::assertSentTo($user, VerifyEmail::class);
     }
 
     public function test_registration_is_rate_limited(): void
@@ -110,8 +117,8 @@ class AuthControllerTest extends TestCase
         $response = $this->post('/register', [
             'name' => 'Weak Password',
             'email' => 'weak@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'password',
+            'password_confirmation' => 'password',
         ]);
 
         $response->assertSessionHasErrors('password');

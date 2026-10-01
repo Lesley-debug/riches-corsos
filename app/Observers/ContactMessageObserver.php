@@ -14,5 +14,7 @@ class ContactMessageObserver
         $admins = User::where('role', 'admin')->get();
 
         Notification::send($admins, new NewContactMessage($contactMessage));
+        Notification::route('mail', config('mail.admin_notification_address'))
+            ->notify(new NewContactMessage($contactMessage));
     }
 }

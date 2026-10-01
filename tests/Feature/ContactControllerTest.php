@@ -52,6 +52,11 @@ class ContactControllerTest extends TestCase
         $this->post(route('contact.store'), $this->validPayload());
 
         Notification::assertSentTo($admin, NewContactMessage::class);
+        Notification::assertSentOnDemand(
+            NewContactMessage::class,
+            fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'info@richescorsos.com'
+                && $channels === ['mail']
+        );
     }
 
     public function test_contact_store_sets_is_read_false_by_default(): void

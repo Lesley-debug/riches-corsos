@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Puppy;
-use App\Models\User;
-use App\Notifications\NewOrderPlaced;
 use App\Notifications\OrderPlacedCustomerNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -127,13 +125,6 @@ class CartController extends Controller
                 $orders[] = $order;
             }
         });
-
-        // Notify all admin users about new orders
-        $admins = User::where('role', 'admin')->get();
-        foreach ($orders as $order) {
-            $order->load('puppy');
-            Notification::send($admins, new NewOrderPlaced($order));
-        }
 
         // Send confirmation email to the buyer (use first order for the email)
         if (! empty($orders)) {

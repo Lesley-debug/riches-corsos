@@ -14,6 +14,8 @@ class OrderObserver
         $admins = User::where('role', User::ROLE_ADMIN)->get();
 
         Notification::send($admins, new NewOrderPlaced($order));
+        Notification::route('mail', config('mail.admin_notification_address'))
+            ->notify(new NewOrderPlaced($order));
 
         if ($order->user) {
             $order->user->notify(new \App\Notifications\OrderPlacedCustomerNotification($order));
