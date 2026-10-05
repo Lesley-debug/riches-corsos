@@ -347,16 +347,12 @@ export default function Home({
                             </div>
                             <div className="about-text-col">
                                 <h3 className="about-col-title">Overview</h3>
-                                <p>The Cane Corso is a large, powerful Italian mastiff breed known for its imposing presence and deeply loyal nature. Males typically weigh between 99–110 lbs and stand 25–27.5 inches tall; females are slightly smaller at 85–99 lbs and 23.5–26 inches.</p>
-                                <p>With a lifespan of 9–12 years, the Corso is a long-term companion. They are intelligent, trainable, and deeply bonded to their family. Their short, dense double coat comes in black, grey, fawn, and brindle — requiring only weekly brushing and occasional baths.</p>
-                                <p>Health-wise, responsible breeders screen for hip dysplasia, elbow dysplasia, cardiac conditions, and eye anomalies. At Riches Corsos, every breeding pair is fully health-tested before any litter is planned.</p>
+                                <p>The Cane Corso is a large, powerful Italian mastiff breed known for its imposing presence and deeply loyal nature. Males typically weigh between 99–110 lbs and stand 25–27.5 inches tall; females are slightly smaller at 85–99 lbs and 23.5–26 inches.</p>                   
                             </div>
                             <div className="about-text-col">
                                 <h3 className="about-col-title">Temperament</h3>
                                 <p>The Cane Corso is confident, calm, and deeply devoted. They are natural protectors — alert without being aggressive — and form an unbreakable bond with their immediate family.</p>
-                                <p>With children they are gentle and patient when raised alongside them. They can coexist with other pets, especially when socialized early. Their intelligence means they thrive with consistent, firm, and positive training from puppyhood.</p>
-                                <p>Early socialization is essential. A well-raised Corso is stable, adaptable, and a joy to live with — equally at home on a long walk or settled at your feet in the evening.</p>
-                            </div>
+                            </div>  
                         </div>
                     </div>
                 </div>

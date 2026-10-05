@@ -42,7 +42,6 @@ class PublicSiteController extends Controller
                 ->where('status', 'available')
                 ->where('visibility', 'published')
                 ->latest()
-                ->take(4)
                 ->get(),
             'recentPosts' => BlogPost::published()->latest('published_at')->take(3)->get(),
             'testimonials' => Testimonial::where('is_featured', true)->take(3)->get(),
@@ -69,7 +68,7 @@ class PublicSiteController extends Controller
         $puppy->load([
             'images',
             'videos',
-            'documents' => fn ($q) => $q
+            'documents' => fn($q) => $q
                 ->where('visibility', 'public')
                 ->whereIn('status', [PuppyDocument::STATUS_GENERATED, PuppyDocument::STATUS_UPLOADED])
                 ->latest(),
@@ -153,16 +152,27 @@ class PublicSiteController extends Controller
         }
 
         $post = $blogPost->only([
-                'id', 'title', 'slug', 'category', 'excerpt',
-                'body', 'cover_image', 'published_at',
-            ]);
+            'id',
+            'title',
+            'slug',
+            'category',
+            'excerpt',
+            'body',
+            'cover_image',
+            'published_at',
+        ]);
         $post['body'] = app(HtmlSanitizer::class)->sanitize($post['body']);
 
         return Inertia::render('Blog/Show', [
             'post' => $post,
-            'related' => $related->map(fn (BlogPost $p) => $p->only([
-                'id', 'title', 'slug', 'category', 'excerpt',
-                'cover_image', 'published_at',
+            'related' => $related->map(fn(BlogPost $p) => $p->only([
+                'id',
+                'title',
+                'slug',
+                'category',
+                'excerpt',
+                'cover_image',
+                'published_at',
             ]))->values(),
         ]);
     }
