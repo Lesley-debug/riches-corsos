@@ -28,7 +28,9 @@ class SiteSetting extends Model
 
     public static function current(): self
     {
-        return Cache::rememberForever(self::CACHE_KEY, fn () => static::firstOrCreate([]));
+        $id = Cache::rememberForever(self::CACHE_KEY, fn () => static::firstOrCreate([])->id);
+
+        return static::find($id) ?? static::firstOrCreate([]);
     }
 
     protected static function booted(): void
