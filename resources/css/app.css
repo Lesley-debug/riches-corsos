@@ -9788,3 +9788,217 @@ button {
         justify-content: center;
     }
 }
+
+/* ===== TESTIMONIAL SLIDER ===== */
+.tslider-wrap {
+    background: #FDFBF7;
+    padding: 40px 24px 32px;
+    border-radius: 18px;
+}
+.tslider-card {
+    background: #fff;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.07);
+    border-radius: 0;
+    padding: 48px 52px 36px;
+    position: relative;
+    max-width: 780px;
+    margin: 0 auto 28px;
+    text-align: center;
+}
+.tslider-quote-mark {
+    position: absolute;
+    top: 16px;
+    left: 24px;
+    font-size: 72px;
+    line-height: 1;
+    color: #B8860B;
+    opacity: 0.13;
+    font-family: 'Fraunces', serif;
+    pointer-events: none;
+    user-select: none;
+}
+.tslider-stars {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+.tslider-text {
+    font-size: 16px;
+    font-style: italic;
+    color: #4A4A4A;
+    line-height: 1.8;
+    margin: 0 0 24px;
+    font-family: 'Fraunces', serif;
+}
+.tslider-divider-top,
+.tslider-divider-bot {
+    height: 1px;
+    background: #e8e4dc;
+    margin: 16px auto;
+    width: 60px;
+}
+.tslider-author {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #222;
+    margin: 0 0 4px;
+}
+.tslider-meta {
+    font-size: 12px;
+    color: #4A4A4A;
+    margin: 0;
+}
+.tslider-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.tslider-arrow {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e0dbd2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    transition: box-shadow 0.15s;
+    flex-shrink: 0;
+}
+.tslider-arrow:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.12); }
+.tslider-indicators {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.tslider-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d4cfc6;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s;
+}
+.tslider-dot--active {
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: #B8860B;
+}
+
+/* ===== HOMEPAGE MOBILE OVERRIDES (max-width: 640px) ===== */
+@media (max-width: 640px) {
+
+    /* 1. Trust numbers — compact */
+    .trust-item-card {
+        padding: 12px 10px !important;
+        gap: 8px !important;
+    }
+    .trust-item-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        flex-shrink: 0;
+    }
+    .trust-item-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+    .trust-item-info span {
+        font-size: 18px !important;
+        margin-bottom: 2px !important;
+    }
+    .trust-item-info p {
+        font-size: 10.5px !important;
+        line-height: 1.2 !important;
+    }
+
+    /* 2. About — keep only first paragraph (handled in JSX via CSS display) */
+    /* Already trimmed in JSX */
+
+    /* 3. Puppy grid — 2×2 */
+    .puppy-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+    .pcard { border-radius: 10px; }
+    .pcard-body { padding: 10px 12px 12px; }
+    .pcard-name { font-size: 14px; }
+    .pcard-meta { font-size: 11px; }
+    .pcard-price { font-size: 15px; }
+
+    /* 4. Story second paragraph hidden on mobile */
+    .story-second-para { display: none; }
+
+    /* 6. Why grid — 2×2 */
+    .why-grid-full {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 14px !important;
+    }
+    .why-item-full {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        padding: 16px !important;
+        gap: 10px !important;
+    }
+    .why-item-full .why-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+    }
+    .why-item-full .why-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+    .why-item-body h3 { font-size: 13px; margin-bottom: 4px; }
+    .why-item-body p { font-size: 12px; line-height: 1.5; display: none; }
+
+    /* 7. Milestones — compact */
+    .milestones-section { margin-top: 20px; padding-top: 16px; }
+    .milestones-header h3 { font-size: 15px; }
+    .milestones-header p { font-size: 12px; }
+    .milestone-tabs { gap: 6px; }
+    .milestone-tab-btn { padding: 7px 12px; border-radius: 8px; }
+    .milestone-tab-stage { font-size: 12px; }
+    .milestone-tab-title { font-size: 10px; }
+    .milestone-content-card {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        padding: 16px !important;
+    }
+    .metric-pill { margin-bottom: 10px; }
+    .metric-pill strong { font-size: 16px; }
+    .metric-pill p { font-size: 12px; }
+    .milestone-desc-col h4 { font-size: 14px; }
+    .milestone-desc-col p { font-size: 12px; }
+
+    /* 8. Testimonial slider — tighter card */
+    .tslider-card { padding: 32px 20px 24px; }
+    .tslider-text { font-size: 14px; }
+
+    /* 9. Blog — 2×2 grid */
+    .home-blog-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+    .home-blog-card--featured {
+        grid-column: span 1 !important;
+    }
+    .home-blog-card--featured .home-blog-img {
+        aspect-ratio: 4/3 !important;
+    }
+    .home-blog-img { aspect-ratio: 4/3; }
+    .home-blog-body { padding: 10px 12px 12px; }
+    .home-blog-title { font-size: 13px !important; -webkit-line-clamp: 2; }
+    .home-blog-excerpt { display: none; }
+    .home-blog-meta { font-size: 11px; }
+}

@@ -20,7 +20,7 @@ class SecurityHeaders
             "frame-ancestors 'none'",
             "form-action 'self'",
             "script-src 'self' 'unsafe-inline'".($isLocal ? ' http://localhost:* http://127.0.0.1:*' : '')." https://www.smartsuppchat.com https://*.smartsuppchat.com https://*.smartsupp.com https://*.smartsuppcdn.com",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.smartsuppcdn.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.smartsuppcdn.com".($isLocal ? ' http://localhost:* http://127.0.0.1:*' : ''),
             "font-src 'self' data: https://fonts.gstatic.com https://*.smartsuppcdn.com",
             "img-src 'self' data: blob: https:",
             "connect-src 'self'".($isLocal ? ' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*' : '')." https://*.smartsupp.com https://*.smartsuppchat.com https://*.smartsuppcdn.com wss://*.smartsupp.com wss://*.smartsuppchat.com",
