@@ -30,6 +30,14 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::hex('#2F6B4F'),
             ])
             ->brandName('Riches Corsos')
+            ->renderHook(
+                'panels::head.end',
+                fn(): \Illuminate\Contracts\View\View => view('filament.admin-pwa'),
+            )
+            ->renderHook(
+                'panels::content.start',
+                fn(): \Illuminate\Contracts\View\View => view('filament.admin-pwa-install'),
+            )
             ->discoverResources(
                 in: app_path('Filament/Resources'),
                 for: 'App\\Filament\\Resources'
