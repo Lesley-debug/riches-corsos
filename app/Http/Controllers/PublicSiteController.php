@@ -42,8 +42,9 @@ class PublicSiteController extends Controller
                 ->where('status', 'available')
                 ->where('visibility', 'published')
                 ->latest()
+                ->take(4)
                 ->get(),
-            'recentPosts' => BlogPost::published()->latest('published_at')->take(3)->get(),
+            'recentPosts' => BlogPost::published()->latest('published_at')->take(4)->get(),
             'testimonials' => Testimonial::where('is_featured', true)->take(3)->get(),
             'heroImage' => SiteSetting::current()->hero_image,
             'homecomingPhotos' => HomecomingPhoto::orderBy('sort_order')->get(),

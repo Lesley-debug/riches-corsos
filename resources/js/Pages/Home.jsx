@@ -4,6 +4,7 @@ import SiteLayout from '@/Layouts/SiteLayout';
 import PuppyCard from '@/Components/PuppyCard';
 import CaneCorsoQuiz from '@/Components/CaneCorsoQuiz';
 import StoryGallery from '@/Components/StoryGallery';
+import TestimonialSlider from '@/Components/TestimonialSlider';
 
 const TESTIMONIALS = [
     {
@@ -122,9 +123,8 @@ export default function Home({
     homecomingPhotos = [],
     heroImage,
 }) {
-    // Interactive Puppy filter
-    const [puppyFilter, setPuppyFilter] = useState('all');
-
+    // Limit to 4 puppies on homepage
+    const homePuppies = featuredPuppies.slice(0, 4);
     // Milestones tab
     const [activeMilestone, setActiveMilestone] = useState('8w');
 
@@ -149,17 +149,7 @@ export default function Home({
         setHeroSlide(idx);
     }
 
-    // Puppy counts for filter tabs
-    const malesCount = featuredPuppies.filter((p) => (p.sex || '').toLowerCase() === 'male').length;
-    const femalesCount = featuredPuppies.filter((p) => (p.sex || '').toLowerCase() === 'female').length;
-    const availableCount = featuredPuppies.filter((p) => p.status === 'available').length;
 
-    const filteredPuppies = featuredPuppies.filter((puppy) => {
-        if (puppyFilter === 'male') return (puppy.sex || '').toLowerCase() === 'male';
-        if (puppyFilter === 'female') return (puppy.sex || '').toLowerCase() === 'female';
-        if (puppyFilter === 'available') return puppy.status === 'available';
-        return true;
-    });
 
     return (
         <SiteLayout>
@@ -264,10 +254,7 @@ export default function Home({
 
             {/* ===== 2. TRUST NUMBERS WITH MICRO ICONS ===== */}
             <div className="home-page">
-                <SectionTitle
-                    title="Our Numbers"
-                    sub="Nine years of health-tested, home-raised Cane Corso placements."
-                />
+                <SectionTitle title="Our Numbers" />
                 <div className="home-section-wrap">
                     <div className="card-3d">
                         <div className="trust-grid-card">
@@ -367,53 +354,21 @@ export default function Home({
                 />
                 <div className="home-section-wrap">
                     <div className="card-3d">
-                        {/* Interactive Filter Pills */}
-                        <div className="puppy-quick-filters">
-                            <button
-                                type="button"
-                                className={`puppy-filter-btn ${puppyFilter === 'all' ? 'active' : ''}`}
-                                onClick={() => setPuppyFilter('all')}
-                            >
-                                All Puppies <span className="filter-pill-count">{featuredPuppies.length}</span>
-                            </button>
-                            {malesCount > 0 && (
-                                <button
-                                    type="button"
-                                    className={`puppy-filter-btn ${puppyFilter === 'male' ? 'active' : ''}`}
-                                    onClick={() => setPuppyFilter('male')}
-                                >
-                                    ♂ Males <span className="filter-pill-count">{malesCount}</span>
-                                </button>
-                            )}
-                            {femalesCount > 0 && (
-                                <button
-                                    type="button"
-                                    className={`puppy-filter-btn ${puppyFilter === 'female' ? 'active' : ''}`}
-                                    onClick={() => setPuppyFilter('female')}
-                                >
-                                    ♀ Females <span className="filter-pill-count">{femalesCount}</span>
-                                </button>
-                            )}
-                            {availableCount > 0 && (
-                                <button
-                                    type="button"
-                                    className={`puppy-filter-btn ${puppyFilter === 'available' ? 'active' : ''}`}
-                                    onClick={() => setPuppyFilter('available')}
-                                >
-                                    Available Now <span className="filter-pill-count">{availableCount}</span>
-                                </button>
+                        {/* Puppy Grid — 4 puppies, 2×2 on mobile */}
+                        <div className="puppy-grid">
+                            {homePuppies.length > 0 ? (
+                                homePuppies.map((puppy) => <PuppyCard key={puppy.id} puppy={puppy} />)
+                            ) : (
+                                <p style={{ color: 'var(--stone)', gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0' }}>
+                                    No puppies available right now — check back soon.
+                                </p>
                             )}
                         </div>
 
-                        {/* Puppy Grid */}
-                        <div className="puppy-grid">
-                            {filteredPuppies.length > 0 ? (
-                                filteredPuppies.map((puppy) => <PuppyCard key={puppy.id} puppy={puppy} />)
-                            ) : (
-                                <p style={{ color: 'var(--stone)', gridColumn: '1 / -1', textAlign: 'center', padding: '40px 0' }}>
-                                    No puppies currently match the selected filter.
-                                </p>
-                            )}
+                        <div className="section-cta">
+                            <Link href="/puppies" className="dark-btn">
+                                View All Available Puppies
+                            </Link>
                         </div>
 
                         {/* VIP Next Litter Waitlist Card */}
@@ -421,21 +376,12 @@ export default function Home({
                             <div className="waitlist-banner-content">
                                 <span className="waitlist-badge">Upcoming Breedings</span>
                                 <h4>Looking for a Specific Color or Upcoming Litter?</h4>
-                                <p>
-                                    Our litters are reserved quickly. Join our priority waitlist to receive private advance notices before public announcements.
-                                </p>
                             </div>
                             <div className="waitlist-banner-action">
                                 <Link href="/contact" className="btn-solid">
                                     Join Priority Waitlist
                                 </Link>
                             </div>
-                        </div>
-
-                        <div className="section-cta">
-                            <Link href="/puppies" className="dark-btn">
-                                View All Available Puppies
-                            </Link>
                         </div>
                     </div>
                 </div>
@@ -448,13 +394,10 @@ export default function Home({
                     <div className="card-3d">
                         <div className="story-grid">
                             <div className="story-text-col">
-                                <p className="story-subtitle">
-                                    WE ARE A TEAM OF DEDICATED PET LOVERS, CARETAKERS, AND TRAINERS.
-                                </p>
                                 <p>
                                     Riches Corsos was founded on a simple belief: that every puppy deserves the best possible start in life. Our program began over nine years ago with a single litter and a commitment to doing things the right way — health testing every breeding pair, raising every litter inside our home, and staying connected with every family long after their puppy goes home.
                                 </p>
-                                <p>
+                                <p className="story-second-para">
                                     We are not a kennel. We are a family. Our Corsos grow up under feet, around children, exposed to everyday sounds and experiences that build the confident, stable temperament this breed is known for. We take on a limited number of litters each year so that every puppy receives the individual attention they deserve.
                                 </p>
                                 <Link href="/about" className="dark-btn">
@@ -488,11 +431,7 @@ export default function Home({
                 <SectionDivider />
 
                 {/* ===== 04 WHAT RAISING THEM MEANS ===== */}
-                <SectionTitle
-                    number="04"
-                    title="What Raising Them This Way Means"
-                    sub="This section explains the actual practices, environment, and ongoing care that go into raising each puppy."
-                />
+                <SectionTitle number="04" title="What Raising Them This Way Means" />
                 <div className="home-section-wrap">
                     <div className="card-3d">
                         <div className="why-grid-full">
@@ -504,7 +443,7 @@ export default function Home({
                                 </div>
                                 <div className="why-item-body">
                                     <h3>Health Tested</h3>
-                                    <p>Before a litter is planned, both parents undergo the appropriate health screening. This includes hip evaluations, heart evaluations, and genetic health panels. The goal is to make informed breeding decisions and give each puppy the strongest possible start.</p>
+                                    <p>Both parents are screened before every litter — hips, heart, and genetics.</p>
                                 </div>
                             </div>
 
@@ -516,7 +455,7 @@ export default function Home({
                                 </div>
                                 <div className="why-item-body">
                                     <h3>Home Raised</h3>
-                                    <p>Our puppies grow up inside our home rather than being raised in a kennel environment. They experience everyday household life from an early age — people moving around, normal household sounds, different surfaces, and regular human interaction. This helps them become familiar with the environment they will eventually share with their families.</p>
+                                    <p>Every puppy grows up inside our home — not a kennel. Real life, real sounds, real family.</p>
                                 </div>
                             </div>
 
@@ -528,7 +467,7 @@ export default function Home({
                                 </div>
                                 <div className="why-item-body">
                                     <h3>Early Foundations</h3>
-                                    <p>Preparation begins well before a puppy reaches eight weeks. Age-appropriate foundations are introduced gradually, including basic commands, leash exposure, gentle handling, everyday interaction, and confidence-building experiences. The focus is not on rushing training, but on giving each puppy positive early experiences that can serve as a foundation for life with its future family.</p>
+                                    <p>Basic handling, leash exposure, and socialization start before eight weeks.</p>
                                 </div>
                             </div>
 
@@ -541,7 +480,7 @@ export default function Home({
                                 </div>
                                 <div className="why-item-body">
                                     <h3>Support That Continues</h3>
-                                    <p>Our relationship with a puppy's family does not end when the puppy goes home. Whether a family has a question during the first few days or needs guidance months later, we remain available to help. Questions at one year should receive the same care and attention as questions on day one.</p>
+                                    <p>We stay available long after your puppy comes home — day one or year one.</p>
                                 </div>
                             </div>
                         </div>
@@ -551,7 +490,6 @@ export default function Home({
                             <DiamondDivider />
                             <div className="milestones-header">
                                 <h3>Puppy to Giant: What to Expect as Your Corso Grows</h3>
-                                <p>Cane Corsos develop steadily over two years. Here is how your puppy matures at each stage:</p>
                             </div>
 
                             <div className="milestone-tabs">
@@ -588,62 +526,31 @@ export default function Home({
                             ))}
                         </div>
 
-                        <div className="why-closing">
-                            <DiamondDivider />
-                            <p>Raising puppies this way takes time, consistency, and attention to the details that happen long before a puppy meets their new family. That is the standard we aim to maintain with every litter.</p>
-                        </div>
+
                     </div>
                 </div>
 
                 <SectionDivider />
 
-                {/* ===== 05 TESTIMONIALS WITH REAL OWNER DETAILS ===== */}
+                {/* ===== 05 TESTIMONIALS ===== */}
                 <SectionTitle number="05" title="What Our Customers Are Saying" />
                 <div className="home-section-wrap">
-                    <div className="card-3d">
-                        <DiamondDivider />
-                        <div className="google-badge">
-                            <svg viewBox="0 0 24 24" width="22" height="22">
-                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                            </svg>
-                            <span>Google Verified Reviews</span>
-                            <Stars />
-                        </div>
-
-                        <div className="testimonial-grid-4">
-                            {TESTIMONIALS.map((t) => (
-                                <div className="t-card-4" key={t.author}>
-                                    <Stars count={t.rating} />
-                                    <p>"{t.text}"</p>
-                                    <div className="t-card-footer">
-                                        <DiamondDivider />
-                                        <cite>{t.author}</cite>
-                                        <span className="t-card-meta">{t.location} • {t.dog}</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="testimonial-actions">
-                            <Link href="/testimonials" className="dark-btn">More About What People Are Saying</Link>
-                            <Link href="/contact" className="dark-btn dark-btn--outline">Submit A Testimony</Link>
-                        </div>
-                        <DiamondDivider />
+                    <TestimonialSlider testimonials={TESTIMONIALS} />
+                    <div className="testimonial-actions" style={{ marginTop: 24 }}>
+                        <Link href="/testimonials" className="dark-btn">More About What People Are Saying</Link>
+                        <Link href="/contact" className="dark-btn dark-btn--outline">Submit A Testimony</Link>
                     </div>
                 </div>
 
                 <SectionDivider />
 
                 {/* ===== 06 BLOG ===== */}
-                <SectionTitle number="06" title="From The Blog" sub="Care guides, training tips, and stories from families who've brought a Corso home." />
+                <SectionTitle number="06" title="From The Blog" />
                 <div className="home-section-wrap">
                     <div className="card-3d">
                         {recentPosts.length > 0 ? (
                             <div className="home-blog-grid">
-                                {recentPosts.map((post, i) => (
+                                {recentPosts.slice(0, 4).map((post, i) => (
                                     <Link href={`/blog/${post.slug}`} key={post.id} className={`home-blog-card ${i === 0 ? 'home-blog-card--featured' : ''}`}>
                                         <div className="home-blog-img">
                                             {post.cover_image
