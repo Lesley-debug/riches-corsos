@@ -141,5 +141,14 @@ Route::middleware('auth')->prefix('admin/puppies/{puppy}/documents')->name('admi
     Route::delete('/{document}', [PuppyDocumentController::class, 'destroy'])->name('destroy');
 });
 
+// PWA files served via Laravel so they resolve correctly regardless of the
+// public_html forwarding setup on Hostinger.
+Route::get('/admin-manifest.json', function () {
+    return response()->file(public_path('admin-manifest.json'), ['Content-Type' => 'application/manifest+json']);
+});
+Route::get('/admin-sw.js', function () {
+    return response()->file(public_path('admin-sw.js'), ['Content-Type' => 'application/javascript']);
+});
+
 // The Filament admin panel is auto-registered by AdminPanelProvider at /admin —
 // no routes needed here for that; see app/Providers/Filament/AdminPanelProvider.php
