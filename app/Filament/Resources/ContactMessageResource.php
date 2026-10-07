@@ -9,6 +9,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 
 class ContactMessageResource extends Resource
 {
@@ -29,14 +31,34 @@ class ContactMessageResource extends Resource
         return 'danger';
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            Infolists\Components\Section::make('Sender')->schema([
+                Infolists\Components\TextEntry::make('name'),
+                Infolists\Components\TextEntry::make('email'),
+                Infolists\Components\TextEntry::make('phone')->placeholder('—'),
+                Infolists\Components\TextEntry::make('subject'),
+            ])->columns(2),
+            Infolists\Components\Section::make('Message')->schema([
+                Infolists\Components\TextEntry::make('message')
+                    ->label('')
+                    ->columnSpanFull(),
+            ]),
+            Infolists\Components\Section::make('Status')->schema([
+                Infolists\Components\IconEntry::make('is_read')
+                    ->label('Read')
+                    ->boolean(),
+                Infolists\Components\TextEntry::make('created_at')
+                    ->label('Received')
+                    ->dateTime('M j, Y g:ia'),
+            ])->columns(2),
+        ]);
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('name')->disabled(),
-            Forms\Components\TextInput::make('email')->disabled(),
-            Forms\Components\TextInput::make('phone')->disabled(),
-            Forms\Components\TextInput::make('subject')->disabled(),
-            Forms\Components\Textarea::make('message')->disabled()->rows(5)->columnSpanFull(),
             Forms\Components\Toggle::make('is_read')->label('Marked as read'),
         ]);
     }
@@ -50,7 +72,6 @@ class ContactMessageResource extends Resource
                     ->boolean()
                     ->trueIcon('heroicon-o-envelope-open')
                     ->falseIcon('heroicon-o-envelope'),
-
                 Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('email')->searchable(),
                 Tables\Columns\TextColumn::make('subject')->limit(40),
@@ -60,7 +81,20 @@ class ContactMessageResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->after(function (ContactMessage $record) {
+                        $record->update(['is_read' => true]);
+                    }),
+                Tables\Actions\Action::make('reply')
+                    ->label('Reply')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->color('success')
+                    ->url(function (ContactMessage $record) {
+                        $subject = urlencode('Re: ' . $record->subject);
+                        $body    = urlencode("\n\n---\nOriginal message from {$record->name}:\n{$record->message}");
+                        return "mailto:{$record->email}?subject={$subject}&body={$body}";
+                    })
+                    ->openUrlInNewTab(),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -69,7 +103,7 @@ class ContactMessageResource extends Resource
     {
         return [
             'index' => Pages\ListContactMessages::route('/'),
-            'edit' => Pages\EditContactMessage::route('/{record}/edit'),
+            'view'  => Pages\ViewContactMessage::route('/{record}'),
         ];
     }
 }
