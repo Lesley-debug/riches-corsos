@@ -1,9 +1,10 @@
 {
+    "id": "/admin",
     "name": "Riches Corsos Admin",
     "short_name": "RC Admin",
     "description": "Riches Corsos administration dashboard.",
     "start_url": "/admin",
-    "scope": "/admin/",
+    "scope": "/admin",
     "display": "standalone",
     "background_color": "#FFFFFF",
     "theme_color": "#2F6B4F",
