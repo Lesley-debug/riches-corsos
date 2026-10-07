@@ -144,12 +144,15 @@ Route::middleware('auth')->prefix('admin/puppies/{puppy}/documents')->name('admi
 // PWA files served via Laravel so they resolve correctly regardless of the
 // public_html forwarding setup on Hostinger.
 Route::get('/admin-manifest.json', function () {
-    return response()->file(public_path('admin-manifest.json'), ['Content-Type' => 'application/manifest+json']);
+    return response(file_get_contents(public_path('admin-manifest.json')), 200, [
+        'Content-Type' => 'application/manifest+json',
+    ]);
 });
 Route::get('/admin-sw.js', function () {
-    return response()
-        ->file(public_path('admin-sw.js'), ['Content-Type' => 'application/javascript'])
-        ->header('Service-Worker-Allowed', '/admin/');
+    return response(file_get_contents(public_path('admin-sw.js')), 200, [
+        'Content-Type' => 'application/javascript',
+        'Service-Worker-Allowed' => '/admin/',
+    ]);
 });
 
 // The Filament admin panel is auto-registered by AdminPanelProvider at /admin —
