@@ -8,18 +8,12 @@
 
 <script>
     (() => {
-        if (!('serviceWorker' in navigator)) {
-            return;
-        }
+        if (!('serviceWorker' in navigator)) return;
 
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/admin-sw.js')
-                .then((reg) => {
-                    console.log('Admin SW registered, scope:', reg.scope);
-                })
-                .catch((error) => {
-                    console.error('Riches Corsos Admin PWA registration failed:', error);
-                });
+            navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' })
+                .then((reg) => console.log('Admin SW registered, scope:', reg.scope))
+                .catch((err) => console.error('Admin SW failed:', err));
         });
     })();
 </script>
