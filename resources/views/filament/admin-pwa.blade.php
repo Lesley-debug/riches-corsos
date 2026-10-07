@@ -11,7 +11,7 @@
         if (!('serviceWorker' in navigator)) return;
 
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' })
+            navigator.serviceWorker.register('/admin-sw.js', { scope: '/admin/' })
                 .then((reg) => console.log('Admin SW registered, scope:', reg.scope))
                 .catch((err) => console.error('Admin SW failed:', err));
         });

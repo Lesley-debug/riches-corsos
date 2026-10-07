@@ -146,7 +146,7 @@ Route::middleware('auth')->prefix('admin/puppies/{puppy}/documents')->name('admi
 Route::get('/admin-manifest.json', function () {
     return response()->file(public_path('admin-manifest.json'), ['Content-Type' => 'application/manifest+json']);
 });
-Route::get('/admin/sw.js', function () {
+Route::get('/admin-sw.js', function () {
     return response()
         ->file(public_path('admin-sw.js'), ['Content-Type' => 'application/javascript'])
         ->header('Service-Worker-Allowed', '/admin/');
