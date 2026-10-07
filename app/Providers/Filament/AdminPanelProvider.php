@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::hex('#2F6B4F'),
             ])
             ->brandName('Riches Corsos')
+            ->font('Inter', provider: \Filament\FontProviders\LocalFontProvider::class)
             ->renderHook(
                 'panels::head.end',
                 fn(): \Illuminate\Contracts\View\View => view('filament.admin-pwa'),
