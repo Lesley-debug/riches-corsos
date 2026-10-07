@@ -31,14 +31,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandName('Riches Corsos')
             ->font('Inter', provider: \Filament\FontProviders\LocalFontProvider::class)
-            ->renderHook(
-                'panels::head.end',
-                fn(): \Illuminate\Contracts\View\View => view('filament.admin-pwa'),
-            )
-            ->renderHook(
-                'panels::content.start',
-                fn(): \Illuminate\Contracts\View\View => view('filament.admin-pwa-install'),
-            )
             ->discoverResources(
                 in: app_path('Filament/Resources'),
                 for: 'App\\Filament\\Resources'
