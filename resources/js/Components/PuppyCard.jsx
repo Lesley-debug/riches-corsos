@@ -128,7 +128,14 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
                 {cover
                     ? <img src={`/storage/${cover}`} alt={puppy.name} className="pcard-img" loading="lazy" />
                     : coverVideo
-                        ? <video src={`/storage/${coverVideo}`} className="pcard-img" muted playsInline preload="metadata" />
+                        ? (
+                            <div className="pcard-video-thumb">
+                                <video src={`/storage/${coverVideo}#t=0.1`} className="pcard-img" muted playsInline preload="metadata" />
+                                <span className="pcard-video-play-icon">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="white" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.45)" /><path d="M10 8l6 4-6 4V8z" /></svg>
+                                </span>
+                            </div>
+                        )
                         : <div className="pcard-img-placeholder" />
                 }
                 {/* Wishlist button — top right of image */}
