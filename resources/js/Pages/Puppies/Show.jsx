@@ -154,6 +154,8 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     const uploadedVideos = cleanList(puppy.videos).filter(v => v.source === 'upload');
     const urlVideos = cleanList(puppy.videos).filter(v => v.source === 'url');
     const allMediaCount = images.length + uploadedVideos.length;
+    const documents = cleanList(puppy.documents).filter((document) => document.public_url);
+    const age = ageLabel(puppy.age_in_weeks);
     const isAvailable = puppy.status === 'available';
     const status = labelize(puppy.status);
     const shareUrl = typeof window !== 'undefined'
