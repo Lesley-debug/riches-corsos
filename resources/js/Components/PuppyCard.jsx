@@ -130,9 +130,13 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
                     : coverVideo
                         ? (
                             <div className="pcard-video-thumb">
-                                <video src={`/storage/${coverVideo}#t=0.1`} className="pcard-img" muted playsInline preload="metadata" />
                                 <span className="pcard-video-play-icon">
-                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="white" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="rgba(0,0,0,0.45)" /><path d="M10 8l6 4-6 4V8z" /></svg>
+                                    <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true">
+                                        <circle cx="12" cy="12" r="12" fill="rgba(47,107,79,0.15)" />
+                                        <circle cx="12" cy="12" r="9" fill="none" stroke="#2F6B4F" strokeWidth="1.5" />
+                                        <path d="M10 8.5l5 3.5-5 3.5V8.5z" fill="#2F6B4F" />
+                                    </svg>
+                                    <span>Video Available</span>
                                 </span>
                             </div>
                         )

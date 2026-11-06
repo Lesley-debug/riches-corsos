@@ -5737,7 +5737,10 @@ button {
 .pcard-video-thumb {
     width: 100%; height: 100%;
     position: relative;
-    background: #111;
+    background: linear-gradient(135deg, #e8f4ee, #f0f7f3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .pcard-video-thumb video {
     width: 100%; height: 100%;
@@ -5745,12 +5748,19 @@ button {
     display: block;
 }
 .pcard-video-play-icon {
-    position: absolute;
-    inset: 0;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 10px;
     pointer-events: none;
+}
+.pcard-video-play-icon span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--green-dark);
+    letter-spacing: .04em;
+    text-transform: uppercase;
 }
 .pcard-status-badge {
     position: absolute;
