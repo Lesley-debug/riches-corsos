@@ -132,7 +132,11 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     const serverWishlisted = wishlistPuppyIds.includes(puppy.id) || (initialWishlisted ?? false);
     const serverInCart = cartPuppyIds.includes(puppy.id);
 
-    const [activeMedia, setActiveMedia] = useState({ type: 'image', index: 0 });
+    const [activeMedia, setActiveMedia] = useState(() => {
+        const hasImages = (puppy.images?.length ?? 0) > 0;
+        const hasVideos = (puppy.videos?.filter(v => v.source === 'upload').length ?? 0) > 0;
+        return hasImages ? { type: 'image', index: 0 } : hasVideos ? { type: 'video', index: 0 } : { type: 'image', index: 0 };
+    });
     const [shareOpen, setShareOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const [toastMessage, setToastMessage] = useState('');

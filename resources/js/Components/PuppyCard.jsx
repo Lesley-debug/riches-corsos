@@ -62,6 +62,7 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
     const isInCart = optimisticInCart ?? serverInCart;
 
     const cover = puppy.images?.[0]?.path;
+    const coverVideo = !cover ? puppy.videos?.find(v => v.source === 'upload')?.file_path : null;
     const age = ageLabel(puppy.age_in_weeks);
     const gender = puppy.sex === 'male' ? 'Male' : (puppy.sex === 'female' ? 'Female' : (puppy.sex ?? ''));
     const subtitle = [gender, age, puppy.color].filter(Boolean).join(' - ');
@@ -126,7 +127,9 @@ export default function PuppyCard({ puppy, wishlisted = false }) {
             <Link href={`/puppies/${puppy.slug}`} className="pcard-img-wrap">
                 {cover
                     ? <img src={`/storage/${cover}`} alt={puppy.name} className="pcard-img" loading="lazy" />
-                    : <div className="pcard-img-placeholder" />
+                    : coverVideo
+                        ? <video src={`/storage/${coverVideo}`} className="pcard-img" muted playsInline preload="metadata" />
+                        : <div className="pcard-img-placeholder" />
                 }
                 {/* Wishlist button — top right of image */}
                 <button
