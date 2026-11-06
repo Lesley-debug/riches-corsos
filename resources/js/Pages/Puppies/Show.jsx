@@ -132,7 +132,7 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     const serverWishlisted = wishlistPuppyIds.includes(puppy.id) || (initialWishlisted ?? false);
     const serverInCart = cartPuppyIds.includes(puppy.id);
 
-    const [activeImage, setActiveImage] = useState(0);
+    const [activeMedia, setActiveMedia] = useState({ type: 'image', index: 0 });
     const [shareOpen, setShareOpen] = useState(false);
     const [copied, setCopied] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -151,9 +151,9 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
     };
 
     const images = cleanList(puppy.images);
-    const videos = cleanList(puppy.videos);
-    const documents = cleanList(puppy.documents).filter((document) => document.public_url);
-    const age = ageLabel(puppy.age_in_weeks);
+    const uploadedVideos = cleanList(puppy.videos).filter(v => v.source === 'upload');
+    const urlVideos = cleanList(puppy.videos).filter(v => v.source === 'url');
+    const allMediaCount = images.length + uploadedVideos.length;
     const isAvailable = puppy.status === 'available';
     const status = labelize(puppy.status);
     const shareUrl = typeof window !== 'undefined'
@@ -361,11 +361,20 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                     <div className="puppy-show-hero">
                         <div className="puppy-gallery-panel">
                             <div className="puppy-gallery-main">
-                                {images[activeImage] ? (
+                                {activeMedia.type === 'video' ? (
+                                    <video
+                                        key={uploadedVideos[activeMedia.index]?.id}
+                                        src={`/storage/${uploadedVideos[activeMedia.index]?.file_path}`}
+                                        className="puppy-gallery-main-video"
+                                        controls
+                                        autoPlay
+                                        playsInline
+                                    />
+                                ) : images[activeMedia.index] ? (
                                     <img
-                                        key={images[activeImage].id ?? activeImage}
-                                        src={`/storage/${images[activeImage].path}`}
-                                        alt={images[activeImage].alt_text || puppy.name}
+                                        key={images[activeMedia.index].id ?? activeMedia.index}
+                                        src={`/storage/${images[activeMedia.index].path}`}
+                                        alt={images[activeMedia.index].alt_text || puppy.name}
                                         className="puppy-gallery-main-img"
                                     />
                                 ) : (
@@ -375,25 +384,37 @@ export default function PuppyShow({ puppy, sire, dam, isWishlisted: initialWishl
                                 )}
                             </div>
 
-                            {images.length > 1 && (
-                                <div className="puppy-gallery-thumbs" aria-label={`${puppy.name} photo gallery`}>
+                            {allMediaCount > 1 && (
+                                <div className="puppy-gallery-thumbs" aria-label={`${puppy.name} media gallery`}>
                                     {images.map((image, index) => (
                                         <button
                                             type="button"
                                             key={image.id ?? image.path}
-                                            onClick={() => setActiveImage(index)}
-                                            className={`puppy-thumb-btn${index === activeImage ? ' active' : ''}`}
+                                            onClick={() => setActiveMedia({ type: 'image', index })}
+                                            className={`puppy-thumb-btn${activeMedia.type === 'image' && index === activeMedia.index ? ' active' : ''}`}
                                             aria-label={`View photo ${index + 1}`}
                                         >
                                             <img src={`/storage/${image.path}`} alt={image.alt_text || puppy.name} />
                                         </button>
                                     ))}
+                                    {uploadedVideos.map((video, index) => (
+                                        <button
+                                            type="button"
+                                            key={video.id ?? video.file_path}
+                                            onClick={() => setActiveMedia({ type: 'video', index })}
+                                            className={`puppy-thumb-btn puppy-thumb-btn--video${activeMedia.type === 'video' && index === activeMedia.index ? ' active' : ''}`}
+                                            aria-label={`Play video ${index + 1}`}
+                                        >
+                                            <video src={`/storage/${video.file_path}`} muted preload="metadata" />
+                                            <span className="puppy-thumb-play"><PlayIcon /></span>
+                                        </button>
+                                    ))}
                                 </div>
                             )}
 
-                            {videos.length > 0 && (
+                            {urlVideos.length > 0 && (
                                 <div className="puppy-video-list">
-                                    {videos.map((video) => (
+                                    {urlVideos.map((video) => (
                                         <a key={video.id ?? video.video_url} href={video.video_url} target="_blank" rel="noopener noreferrer" className="puppy-video-link">
                                             <span><PlayIcon /></span>
                                             {video.title || 'Watch Video'}

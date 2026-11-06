@@ -37,7 +37,7 @@ export default function Contact() {
     const cleanPhone = contactPhone.replace(/[^\d+]/g, '');
     const contactWhatsapp = siteSettings.whatsapp
         ? siteSettings.whatsapp.replace(/[^\d+]/g, '')
-        : (cleanPhone.replace('+', '') || '12142123023');
+        : '14482046167';
     const contactEmail = siteSettings.email || 'info@richescorsos.com';
     const contactAddress = siteSettings.address || 'Dallas, Texas';
 

@@ -312,11 +312,25 @@ class PuppyResource extends Resource
                                         ->helperText('Upload multiple photos. Drag to reorder — first photo becomes the featured image.'),
                                 ]),
 
-                            Forms\Components\Section::make('Videos')
-                                ->description('Add YouTube or Vimeo URLs for this puppy.')
+                            Forms\Components\Section::make('Uploaded Videos')
+                                ->description('Upload MP4/MOV video files directly. These play inline on the puppy page.')
                                 ->schema([
-                                    Forms\Components\Repeater::make('videos')
-                                        ->relationship()
+                                    Forms\Components\FileUpload::make('uploaded_videos')
+                                        ->label('Video Files')
+                                        ->multiple()
+                                        ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/webm'])
+                                        ->maxSize(102400)
+                                        ->reorderable()
+                                        ->appendFiles()
+                                        ->directory('puppies/videos')
+                                        ->helperText('MP4, MOV or WebM. Max 100 MB each. Drag to reorder.'),
+                                ]),
+
+                            Forms\Components\Section::make('YouTube / Vimeo Links')
+                                ->description('Optionally add external video links alongside uploaded videos.')
+                                ->schema([
+                                    Forms\Components\Repeater::make('url_videos')
+                                        ->label('External Video Links')
                                         ->schema([
                                             Forms\Components\TextInput::make('title')
                                                 ->placeholder('e.g. Rocky\'s First Outdoor Playtime'),
@@ -325,16 +339,11 @@ class PuppyResource extends Resource
                                                 ->url()
                                                 ->required()
                                                 ->placeholder('https://youtube.com/watch?v=…'),
-                                            Forms\Components\TextInput::make('sort_order')
-                                                ->numeric()
-                                                ->default(0)
-                                                ->hidden(),
                                         ])
                                         ->columns(2)
-                                        ->orderColumn('sort_order')
-                                        ->reorderable()
-                                        ->addActionLabel('Add Video')
-                                        ->collapsible(),
+                                        ->addActionLabel('Add Link')
+                                        ->collapsible()
+                                        ->dehydrated(false),
                                 ]),
                         ]),
 

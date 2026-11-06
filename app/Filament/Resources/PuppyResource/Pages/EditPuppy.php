@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PuppyResource\Pages;
 use App\Filament\Resources\PuppyResource;
 use App\Models\PuppyDocument;
 use App\Models\PuppyImage;
+use App\Models\PuppyVideo;
 use App\Services\PuppyDocumentService;
 use Filament\Actions;
 use Filament\Forms;
@@ -100,6 +101,21 @@ class EditPuppy extends EditRecord
             ->pluck('path')
             ->all();
 
+        $this->data['uploaded_videos'] = $this->record
+            ->videos()
+            ->where('source', 'upload')
+            ->orderBy('sort_order')
+            ->pluck('file_path')
+            ->all();
+
+        $this->data['url_videos'] = $this->record
+            ->videos()
+            ->where('source', 'url')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn ($v) => ['title' => $v->title, 'video_url' => $v->video_url])
+            ->all();
+
         $sire = $this->record->parents()->wherePivot('role', 'sire')->first();
         $dam  = $this->record->parents()->wherePivot('role', 'dam')->first();
 
@@ -109,13 +125,14 @@ class EditPuppy extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        unset($data['uploaded_images'], $data['sire_id'], $data['dam_id'], $data['documents_table']);
+        unset($data['uploaded_images'], $data['uploaded_videos'], $data['url_videos'], $data['sire_id'], $data['dam_id'], $data['documents_table']);
         return $data;
     }
 
     protected function afterSave(): void
     {
         $this->syncImages();
+        $this->syncVideos();
         $this->syncParents();
     }
 
@@ -129,6 +146,33 @@ class EditPuppy extends EditRecord
                 'path'        => $path,
                 'sort_order'  => $order,
                 'is_featured' => $order === 0,
+            ]);
+        }
+    }
+
+    private function syncVideos(): void
+    {
+        $this->record->videos()->delete();
+
+        $order = 0;
+
+        foreach (array_values($this->data['uploaded_videos'] ?? []) as $path) {
+            PuppyVideo::create([
+                'puppy_id'   => $this->record->id,
+                'file_path'  => $path,
+                'source'     => 'upload',
+                'sort_order' => $order++,
+            ]);
+        }
+
+        foreach (array_values($this->data['url_videos'] ?? []) as $video) {
+            if (empty($video['video_url'])) continue;
+            PuppyVideo::create([
+                'puppy_id'   => $this->record->id,
+                'title'      => $video['title'] ?? null,
+                'video_url'  => $video['video_url'],
+                'source'     => 'url',
+                'sort_order' => $order++,
             ]);
         }
     }
